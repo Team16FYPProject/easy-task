@@ -10,11 +10,21 @@ CREATE TABLE public.profile
 ALTER TABLE public.profile
     ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "Profiles can be seen by any logged in user"
+    ON profile FOR SELECT
+    TO authenticated
+    USING (TRUE);
+
+CREATE POLICY "Users can modify their profiles"
+    ON profile FOR ALL
+    TO authenticated
+    USING ((SELECT auth.uid()) = user_id)
+    WITH CHECK ((SELECT auth.uid()) = user_id);
+
 -- inserts a row into public.profiles
-CREATE FUNCTION public.handle_new_user()
+CREATE FUNCTION public.create_profile_for_new_user()
     RETURNS trigger
     LANGUAGE plpgsql
-    SECURITY DEFINER SET search_path = ''
 AS
 $$
 BEGIN
@@ -29,4 +39,4 @@ CREATE TRIGGER on_auth_user_created
     AFTER INSERT
     ON auth.users
     FOR EACH ROW
-EXECUTE PROCEDURE public.handle_new_user();
+EXECUTE PROCEDURE public.create_profile_for_new_user();
