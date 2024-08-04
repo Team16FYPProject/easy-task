@@ -25,6 +25,7 @@ CREATE POLICY "Users can modify their profiles"
 CREATE FUNCTION public.create_profile_for_new_user()
     RETURNS trigger
     LANGUAGE plpgsql
+    SECURITY DEFINER SET search_path = ''
 AS
 $$
 BEGIN
