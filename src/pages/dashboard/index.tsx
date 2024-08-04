@@ -1,27 +1,17 @@
-import { useEffect, useState } from "react";
-import { getBrowserSupabase } from "@/utils/supabase/client";
-import { User } from "@supabase/auth-js";
 import { useRouter } from "next/router";
+import { useEffectAsync } from "@/hooks/useEffectAsync";
+import { useUser } from "@/hooks/useUser";
 
 export default function Dashboard() {
     const router = useRouter();
+    const { loadingUser, user } = useUser();
 
-    const supabase = getBrowserSupabase();
-    const [user, setUser] = useState<User>();
-
-    useEffect(() => {
-        (async () => {
-            const {
-                data: { user },
-                error,
-            } = await supabase.auth.getUser();
-            if (error || !user) {
-                await router.push("/login");
-                return;
-            }
-            setUser(user);
-        })();
-    }, [user]);
+    useEffectAsync(async () => {
+        if (!loadingUser && !user) {
+            await router.push("/login");
+            return;
+        }
+    }, [loadingUser, user]);
 
     if (!user) {
         return <></>;

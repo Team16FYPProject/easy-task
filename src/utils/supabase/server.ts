@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions, serializeCookieHeader } from "@supabase/ssr";
+import { type CookieOptions, createServerClient, serializeCookieHeader } from "@supabase/ssr";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export function getServerSupabase(request: NextApiRequest, response: NextApiResponse) {
