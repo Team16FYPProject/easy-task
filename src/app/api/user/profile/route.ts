@@ -31,7 +31,45 @@ export async function GET() {
     );
 }
 
-export async function PATCH() {
-    // const data = await request.formData();
-    return Response.json({}, { status: 200 });
+export async function PATCH(request: Request) {
+    const supabase = getServerSupabase();
+    const user = (await supabase.auth.getUser())?.data?.user;
+    if (!user) {
+        return Response.json({ success: false, data: "Unauthorized" }, { status: 401 });
+    }
+    const data = await request.formData();
+    const updateData: Record<string, string | undefined> = {};
+
+    if (data.has("avatar_image")) {
+        const avatarImage = data.get("avatar_image");
+        if (avatarImage instanceof File) {
+            const { data, error } = await supabase.storage
+                .from("avatars")
+                .upload(user.id, avatarImage, {
+                    cacheControl: "3600",
+                    upsert: true,
+                });
+            if (error || !data) {
+                console.log(`Unable to upload avatar image for ${user.id}`);
+                console.error(error);
+            }
+            updateData.profile_avatar = data?.fullPath;
+        }
+    }
+
+    if (data.has("display_name")) {
+        updateData.profile_display_name = data.get("display_name") as string;
+    }
+    if (data.has("bio")) {
+        updateData.profile_bio = data.get("bio") as string;
+    }
+
+    const { error } = await supabase.from("profile").update(updateData).eq("user_id", user.id);
+
+    if (error) {
+        console.error(`Error while updating profile details for user ${user.id}`, error);
+        return Response.json({ success: false, data: "Unable to update your profile details." });
+    }
+
+    return Response.json({ success: true, data: "Profile updated" }, { status: 201 });
 }
