@@ -1,10 +1,17 @@
 import { getServerSupabase } from "@/utils/supabase/server";
+import {
+    badRequestResponse,
+    createdResponse,
+    internalErrorResponse,
+    okResponse,
+    unauthorizedResponse,
+} from "@/utils/server/server.responses.utils";
 
 export async function GET() {
     const supabase = getServerSupabase();
     const user = (await supabase.auth.getUser())?.data?.user;
     if (!user) {
-        return Response.json({ success: false, data: "Unauthorized" }, { status: 401 });
+        return badRequestResponse({ success: false, data: "Unauthorized" });
     }
     const { data, error } = await supabase
         .from("profile")
@@ -12,30 +19,24 @@ export async function GET() {
         .eq("user_id", user.id)
         .single();
     if (error) {
-        return Response.json(
-            { success: false, data: "Unable to load profile data" },
-            { status: 500 },
-        );
+        return internalErrorResponse({ success: false, data: "Unable to load profile data" });
     }
 
-    return Response.json(
-        {
-            success: true,
-            data: {
-                display_name: data.profile_display_name,
-                bio: data.profile_bio,
-                avatar: data.profile_avatar,
-            },
+    return okResponse({
+        success: true,
+        data: {
+            display_name: data.profile_display_name,
+            bio: data.profile_bio,
+            avatar: data.profile_avatar,
         },
-        { status: 200 },
-    );
+    });
 }
 
 export async function PATCH(request: Request) {
     const supabase = getServerSupabase();
     const user = (await supabase.auth.getUser())?.data?.user;
     if (!user) {
-        return Response.json({ success: false, data: "Unauthorized" }, { status: 401 });
+        return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
     const data = await request.formData();
     const updateData: Record<string, string | undefined> = {};
@@ -52,15 +53,16 @@ export async function PATCH(request: Request) {
             if (error || !data) {
                 console.log(`Unable to upload avatar image for ${user.id}`);
                 console.error(error);
+            } else {
+                updateData.profile_avatar = data.fullPath;
             }
-            updateData.profile_avatar = data?.fullPath;
         }
     }
 
-    if (data.has("display_name")) {
+    if (data.get("display_name")) {
         updateData.profile_display_name = data.get("display_name") as string;
     }
-    if (data.has("bio")) {
+    if (data.get("bio")) {
         updateData.profile_bio = data.get("bio") as string;
     }
 
@@ -68,8 +70,11 @@ export async function PATCH(request: Request) {
 
     if (error) {
         console.error(`Error while updating profile details for user ${user.id}`, error);
-        return Response.json({ success: false, data: "Unable to update your profile details." });
+        return internalErrorResponse({
+            success: false,
+            data: "Unable to update your profile details.",
+        });
     }
 
-    return Response.json({ success: true, data: "Profile updated" }, { status: 201 });
+    return createdResponse({ success: true, data: "Profile updated" });
 }
