@@ -6,7 +6,7 @@ type ResponseData = {
     data: any;
 };
 
-const POST = async (request: NextApiRequest, response: NextApiResponse) => {
+export const POST = async (request: NextApiRequest, response: NextApiResponse) => {
     const { email, password } = request.body;
 
     if (!email) {
