@@ -1,5 +1,7 @@
+"use client";
+
 import { getBrowserSupabase } from "@/utils/supabase/client";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 
 export default function Logout() {

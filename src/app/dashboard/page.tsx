@@ -1,4 +1,6 @@
-import { useRouter } from "next/router";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 
