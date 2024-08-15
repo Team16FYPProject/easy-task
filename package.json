@@ -7,7 +7,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "test": "vitest run",
+        "lint:report": "next lint --format stylish --output-file eslint-report.txt",
+        "test": "vitest run --coverage",
         "format": "prettier --write .",
         "prepare": "husky install"
     },
@@ -24,6 +25,7 @@
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "@vitejs/plugin-react": "^4.3.1",
+        "@vitest/coverage-v8": "^2.0.5",
         "autoprefixer": "^10.4.19",
         "eslint": "^8.57.0",
         "eslint-config-next": "^14.2.5",
