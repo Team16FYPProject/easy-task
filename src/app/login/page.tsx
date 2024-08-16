@@ -35,6 +35,20 @@ export default function Login() {
             {error && <p className="text-red-400">{error}</p>}
             <form className="flex w-2/5 flex-col gap-2" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-1">
+                    <label style={{ fontSize: "30px" }}>
+                        <b>Sign in</b>
+                    </label>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <div>
+                        <label>New User? </label>
+                        <a href="register" style={{ color: "hotpink" }}>
+                            {" "}
+                            Create an account
+                        </a>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-1">
                     <label>Email</label>
                     <input
                         className="rounded-sm bg-gray-500 p-2 text-white focus:outline-none"
@@ -49,6 +63,21 @@ export default function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <div>
+                        <label>Forgot your </label>
+                        <a href="register" style={{ color: "hotpink" }}>
+                            {" "}
+                            email
+                        </a>
+                        <label> or </label>
+                        <a href="register" style={{ color: "hotpink" }}>
+                            {" "}
+                            password
+                        </a>
+                        <label>?</label>
+                    </div>
                 </div>
                 <button type="submit" className="mt-1 bg-green-500 p-2">
                     Submit
