@@ -7,8 +7,14 @@ export default defineConfig({
     test: {
         environment: "jsdom",
         coverage: {
-            reporter: ['text', 'json', 'html'],
-            reportsDirectory: './coverage',
-          },
+            reporter: ["text", "json", "html"],
+            reportsDirectory: "./coverage",
+            thresholds: {
+                lines: 70,
+                functions: 70,
+                branches: 70,
+                statements: 70,
+            },
+        },
     },
 });
