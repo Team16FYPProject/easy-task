@@ -51,8 +51,7 @@ export async function PATCH(request: Request) {
                     upsert: true,
                 });
             if (error || !data) {
-                console.log(`Unable to upload avatar image for ${user.id}`);
-                console.error(error);
+                console.error(`Unable to upload avatar image for ${user.id}`, error);
             } else {
                 updateData.profile_avatar = data.fullPath;
             }
