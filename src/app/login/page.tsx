@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Login() {
     const router = useRouter();
@@ -31,55 +32,53 @@ export default function Login() {
     }
 
     return (
-        <div className="flex h-screen w-screen flex-col items-center justify-center">
+        <div className="flex h-screen w-screen flex-col items-center justify-center bg-white">
             {error && <p className="text-red-400">{error}</p>}
             <form className="flex w-2/5 flex-col gap-2" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-1">
-                    <label style={{ fontSize: "30px" }}>
-                        <b>Sign in</b>
+                    <label className="text-3xl font-bold text-black">Sign in</label>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label className="text-black">
+                        New User?{" "}
+                        <Link href="/register" className="text-purple-500">
+                            Create an account
+                        </Link>
                     </label>
                 </div>
-                <div className="flex flex-col gap-1">
-                    <div>
-                        <label>New User? </label>
-                        <a href="register" style={{ color: "hotpink" }}>
-                            {" "}
-                            Create an account
-                        </a>
-                    </div>
-                </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-black">
                     <label>Email</label>
                     <input
-                        className="rounded-sm bg-gray-500 p-2 text-white focus:outline-none"
+                        className="rounded-md border-2 border-solid border-gray-600 p-2"
+                        placeholder="john@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-black">
                     <label>Password</label>
                     <input
-                        className="rounded-sm bg-gray-500 p-2 text-white focus:outline-none"
+                        type="password"
+                        className="rounded-md border-2 border-solid border-gray-600 p-2"
+                        placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <div className="flex flex-col gap-1">
-                    <div>
-                        <label>Forgot your </label>
-                        <a href="register" style={{ color: "hotpink" }}>
-                            {" "}
+                <div className="text-black">
+                    <label>
+                        Forgot your{" "}
+                        <Link href="/register" className="text-purple-500">
                             email
-                        </a>
-                        <label> or </label>
-                        <a href="register" style={{ color: "hotpink" }}>
-                            {" "}
+                        </Link>{" "}
+                        or{" "}
+                        <Link href="/register" className="text-purple-500">
                             password
-                        </a>
-                        <label>?</label>
-                    </div>
+                        </Link>
+                        ?
+                    </label>
                 </div>
-                <button type="submit" className="mt-1 bg-green-500 p-2">
+                <button type="submit" className="mx-14 my-3 rounded-md bg-purple-500 p-2">
                     Submit
                 </button>
             </form>
