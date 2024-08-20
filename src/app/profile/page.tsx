@@ -81,12 +81,14 @@ export default function Profile() {
                                         cy: 150,
                                     },
                                 ]}
-                                slotProps={{
-                                    pieCenter: {
-                                        pieCenterLabel: "XX Achievements",
-                                        fontSize: 15,
-                                    },
-                                }}
+                                slotProps={
+                                    {
+                                        // pieCenter: {
+                                        //     pieCenterLabel: "XX Achievements",
+                                        //     fontSize: 15,
+                                        // },
+                                    }
+                                }
                                 width={400}
                             />
                         </Grid>

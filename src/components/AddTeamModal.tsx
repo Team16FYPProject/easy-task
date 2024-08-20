@@ -50,9 +50,6 @@ export default function AddTeamModal({
         try {
             const response = await fetch("/api/projects", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
                 body: formData,
             });
 

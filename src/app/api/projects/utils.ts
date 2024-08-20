@@ -5,6 +5,7 @@ import {
     internalErrorResponse,
     okResponse,
 } from "@/utils/server/server.responses.utils";
+import { getServiceSupabase } from "@/utils/supabase/server";
 
 export async function setProjectSettings(
     id: string | null,
@@ -25,7 +26,7 @@ export async function setProjectSettings(
         });
     }
 
-    const { user, supabase } = session;
+    const { user } = session;
 
     let projectId: string;
     if (create) {
@@ -37,6 +38,7 @@ export async function setProjectSettings(
         projectId = id;
     }
 
+    const supabase = getServiceSupabase();
     let imageUrl: string | undefined = undefined;
     if (data.has("image")) {
         const profileImage = data.get("image");
@@ -66,13 +68,13 @@ export async function setProjectSettings(
     const { data: projectData, error: projectError } = await supabase
         .from("project")
         .upsert({
-            projectId: projectId,
+            project_id: projectId,
             project_name: name,
             project_owner_id: user.id,
             project_desc: description,
             project_profile_pic: imageUrl,
         })
-        .select("id")
+        .select("project_id")
         .single();
 
     if (projectError || !data) {
@@ -85,12 +87,12 @@ export async function setProjectSettings(
 
     if (create) {
         const { error: memberError } = await supabase.from("project_member").insert({
-            project_id: projectData.id,
+            project_id: projectData.project_id,
             user_id: user.id,
         });
         if (memberError) {
             console.error(
-                `Unable to add user ${user.id} to project ${projectData.id} `,
+                `Unable to add user ${user.id} to project ${projectData.project_id} `,
                 memberError,
             );
             return internalErrorResponse({
@@ -100,7 +102,7 @@ export async function setProjectSettings(
         }
     }
     if (create) {
-        return createdResponse({ success: true, data: { id: projectData.id } });
+        return createdResponse({ success: true, data: { id: projectData.project_id } });
     } else {
         return okResponse({ success: true, data: "Successfully updated your project" });
     }
