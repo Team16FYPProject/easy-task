@@ -21,10 +21,15 @@ import {
 } from "@mui/material";
 import TeamCard from "@/components/TeamCard";
 import GroupsIcon from "@mui/icons-material/Groups";
+import AddTeamModal from "@/components/AddTeamModal";
+import React from "react";
 
 export default function Dashboard() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -47,9 +52,10 @@ export default function Dashboard() {
                             <Typography variant="h3">Teams</Typography>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" color="secondary">
+                            <Button variant="contained" color="secondary" onClick={handleOpen}>
                                 CREATE TEAM
                             </Button>
+                            <AddTeamModal open={open} handleClose={handleClose} />
                         </Grid>
                     </Grid>
                 </Grid>
