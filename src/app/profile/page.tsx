@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { Button, Container, Grid, Typography } from "@mui/material";
-import TeamCard from "@/components/TeamCard";
-import { PieChart } from "@mui/x-charts/PieChart";
+// import TeamCard from "@/components/TeamCard";
+import { PieChart } from "@mui/x-charts";
 
 export default function Profile() {
     const router = useRouter();
@@ -110,7 +110,7 @@ export default function Profile() {
 
                 {/* Teams */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
+                    {/* <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={4}>
                             <TeamCard title="Team 1" image="/GroupIcon.png" />
                         </Grid>
@@ -120,7 +120,7 @@ export default function Profile() {
                         <Grid item xs={12} sm={6} md={4}>
                             <TeamCard title="Team 3" image="/GroupIcon.png" />
                         </Grid>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </Grid>
         </Container>
