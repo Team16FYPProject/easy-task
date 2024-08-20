@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 
 import * as React from "react";
@@ -7,8 +8,65 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import {
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Divider,
+    Drawer,
+} from "@mui/material";
 
 export default function ButtonAppBar() {
+    const [open, setOpen] = React.useState(false);
+
+    const toggleDrawer = (newOpen: boolean) => () => {
+        setOpen(newOpen);
+    };
+
+    const DrawerList = (
+        <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+            <List>
+                <ListItem key="Dashboard" disablePadding>
+                    <Link href="/dashboard">
+                        <ListItemButton>
+                            {/* <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon> */}
+                            <ListItemText primary="Dashboard" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
+                <ListItem key="Profile" disablePadding>
+                    <Link href="/profile">
+                        <ListItemButton>
+                            {/* <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon> */}
+                            <ListItemText primary="Profile" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
+            </List>
+            <Divider />
+            <List>
+                {["Calendar View", "List View", "Kanban View"].map((text, index) => (
+                    <ListItem key={text} disablePadding>
+                        <Link href="/dashboard">
+                            <ListItemButton>
+                                {/* <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon> */}
+                                <ListItemText primary={text} />
+                            </ListItemButton>
+                        </Link>
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+    );
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -19,6 +77,7 @@ export default function ButtonAppBar() {
                         color="inherit"
                         aria-label="menu"
                         sx={{ mr: 2 }}
+                        onClick={toggleDrawer(true)}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -27,6 +86,9 @@ export default function ButtonAppBar() {
                     </Typography>
                 </Toolbar>
             </AppBar>
+            <Drawer open={open} onClose={toggleDrawer(false)}>
+                {DrawerList}
+            </Drawer>
         </Box>
     );
 }
