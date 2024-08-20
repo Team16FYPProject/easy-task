@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { Button, Container, Grid, Typography } from "@mui/material";
-// import TeamCard from "@/components/TeamCard";
 import { PieChart } from "@mui/x-charts";
+import TeamCard from "@/components/TeamCard";
 
 export default function Profile() {
     const router = useRouter();
@@ -23,7 +23,7 @@ export default function Profile() {
     }
 
     return (
-        <Container>
+        <Container sx={{ padding: 6 }}>
             <Grid container direction="column" spacing={2}>
                 <Grid item xs={12}>
                     <Grid container spacing={2} alignItems="center" justifyContent="space-between">
@@ -40,14 +40,7 @@ export default function Profile() {
 
                 {/* Profile Information */}
                 <Grid item xs={12}>
-                    <Grid container direction="column" spacing={2}>
-                        <Grid item>
-                            <Typography variant="h4">Profile</Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="h5">Profile Info</Typography>
-                        </Grid>
-                    </Grid>
+                    <Typography variant="h5">Profile Info</Typography>
                 </Grid>
 
                 {/* Achievements */}
@@ -95,7 +88,6 @@ export default function Profile() {
                                     },
                                 }}
                                 width={400}
-                                height={200}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
@@ -103,14 +95,18 @@ export default function Profile() {
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
                             {/* tree */}
-                            <img src="public\emptytree.jpg"></img>
+                            <img src="emptytree.jpg"></img>
                         </Grid>
                     </Grid>
+                </Grid>
+                {/* Profile Information */}
+                <Grid item xs={12}>
+                    <Typography variant="h5">Teams</Typography>
                 </Grid>
 
                 {/* Teams */}
                 <Grid item xs={12}>
-                    {/* <Grid container spacing={2}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={4}>
                             <TeamCard title="Team 1" image="/GroupIcon.png" />
                         </Grid>
@@ -120,7 +116,7 @@ export default function Profile() {
                         <Grid item xs={12} sm={6} md={4}>
                             <TeamCard title="Team 3" image="/GroupIcon.png" />
                         </Grid>
-                    </Grid> */}
+                    </Grid>
                 </Grid>
             </Grid>
         </Container>
