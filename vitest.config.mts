@@ -16,5 +16,11 @@ export default defineConfig({
                 statements: 70,
             },
         },
+        include: ["./src/**/*.test.{js,ts,jsx,tsx}"],
+        exclude: [
+            "**/node_modules/**",
+            "**/dist/**",
+            "./src/**/*.{spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+        ],
     },
 });
