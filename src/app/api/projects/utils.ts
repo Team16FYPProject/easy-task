@@ -14,7 +14,6 @@ export async function setProjectSettings(
 ): Promise<Response> {
     const name = data.get("name");
     const description = data.get("description");
-    const profileImage = data.get("image");
 
     if (!name) {
         return badRequestResponse({ success: false, data: "Project name is a required field" });
@@ -24,12 +23,6 @@ export async function setProjectSettings(
             success: false,
             data: "Project description is a required field",
         });
-    }
-    if (!profileImage) {
-        return badRequestResponse({ success: false, data: "Project image is a required field" });
-    }
-    if (!(profileImage instanceof File)) {
-        return badRequestResponse({ success: false, data: "Please upload a valid project image" });
     }
 
     const { user, supabase } = session;
@@ -43,19 +36,31 @@ export async function setProjectSettings(
         }
         projectId = id;
     }
-    const { data: imageData, error: imageError } = await supabase.storage
-        .from("public_images")
-        .upload(`projects/${projectId}`, profileImage, {
-            cacheControl: "3600",
-            upsert: true,
-        });
-    if (imageError || !imageData) {
-        console.error("Unable to upload project image");
-        console.error(imageError);
-        return internalErrorResponse({
-            success: false,
-            data: "Unable to create your project. Please try again later.",
-        });
+
+    let imageUrl: string | undefined = undefined;
+    if (data.has("image")) {
+        const profileImage = data.get("image");
+        if (!(profileImage instanceof File)) {
+            return badRequestResponse({
+                success: false,
+                data: "Please upload a valid project image",
+            });
+        }
+        const { data: imageData, error: imageError } = await supabase.storage
+            .from("public_images")
+            .upload(`projects/${projectId}`, profileImage, {
+                cacheControl: "3600",
+                upsert: true,
+            });
+        if (imageError || !imageData) {
+            console.error("Unable to upload project image");
+            console.error(imageError);
+            return internalErrorResponse({
+                success: false,
+                data: "Unable to create your project. Please try again later.",
+            });
+        }
+        imageUrl = imageData.fullPath;
     }
 
     const { data: projectData, error: projectError } = await supabase
@@ -65,13 +70,13 @@ export async function setProjectSettings(
             project_name: name,
             project_owner_id: user.id,
             project_desc: description,
-            project_profile_pic: imageData.fullPath,
+            project_profile_pic: imageUrl,
         })
         .select("id")
         .single();
 
     if (projectError || !data) {
-        console.error("Unable to insert project to database", imageError);
+        console.error("Unable to insert project to database", projectError);
         return internalErrorResponse({
             success: false,
             data: "Unable to create project at this time. Please try again later",
