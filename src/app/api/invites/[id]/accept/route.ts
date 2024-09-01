@@ -24,6 +24,21 @@ export async function POST(_: Request, { params: { id } }: InviteIdParams) {
         return badRequestResponse({ success: false, data: "Invalid invite link provided" });
     }
 
+    const { error: memberError, data: memberData } = await supabase
+        .from("project_member")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("project_id", inviteData.project_id)
+        .maybeSingle();
+    if (memberError) {
+        console.error(memberError);
+        return internalErrorResponse({ success: false, data: "Unable to join that project" });
+    }
+
+    if (memberData) {
+        return badRequestResponse({ success: false, data: "You are already a part of that team." });
+    }
+
     const { error: joinError } = await supabase.from("project_member").insert({
         project_id: inviteData.project_id,
         user_id: session.user.id,
