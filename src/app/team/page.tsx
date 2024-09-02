@@ -18,8 +18,6 @@ import {
     TableCell,
     TableBody,
 } from "@mui/material";
-import { PieChart } from "@mui/x-charts";
-import TeamCard from "@/components/TeamCard";
 import { SettingsFilled } from "@mui/icons-material";
 
 export default function TeamMembers() {
