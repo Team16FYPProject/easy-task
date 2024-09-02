@@ -3,9 +3,19 @@
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import { Button, Container, Grid, Typography } from "@mui/material";
+import {
+    Container,
+    Grid,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+} from "@mui/material";
 import { PieChart } from "@mui/x-charts";
-import TeamCard from "@/components/TeamCard";
 
 export default function Achievements() {
     const router = useRouter();
@@ -85,24 +95,41 @@ export default function Achievements() {
                     </Grid>
                 </Grid>
 
-                {/* Profile Information */}
+                {/* Achievement Table Title */}
                 <Grid item xs={12}>
                     <Typography variant="h5">Achievements</Typography>
                 </Grid>
 
-                {/* Teams */}
+                {/* Achievements */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TeamCard title="Team 1" image="/GroupIcon.png" />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TeamCard title="Team 2" image="/GroupIcon.png" />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TeamCard title="Team 3" image="/GroupIcon.png" />
-                        </Grid>
-                    </Grid>
+                    <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Sakura</TableCell>
+                                    <TableCell>Status</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            {/* Achievement Table Contents */}
+                            <TableBody>
+                                {/* {rows.map((row) => (
+                                <TableRow
+                                    key={row.name}
+                                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell align="right">{row.calories}</TableCell>
+                                    <TableCell align="right">{row.fat}</TableCell>
+                                    <TableCell align="right">{row.carbs}</TableCell>
+                                    <TableCell align="right">{row.protein}</TableCell>
+                                </TableRow>
+                            ))} */}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Grid>
             </Grid>
         </Container>
