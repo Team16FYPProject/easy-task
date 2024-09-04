@@ -46,11 +46,12 @@ export default function Dashboard() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const [projects, setProjects] = React.useState<Project[]>([]);
-    const [rows, setRows] = useState([]);
+    const [rows, setRows] = useState<
+        { id: number; teamView1: string; teamView2: string; teamView3: string }[]
+    >([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [loadingTasks, setLoadingTasks] = useState(true);
     const [tasks, setTasks] = useState([]);
-    const [error, setError] = useState(null);
     const dataTableHeight = 300;
 
     useEffectAsync(async () => {
@@ -83,7 +84,6 @@ export default function Dashboard() {
                 }
                 console.log("Projects:", projects);
             } catch (e) {
-                setError(e.message);
                 console.error("Error:", e);
             } finally {
                 setLoadingProjects(false);
@@ -96,13 +96,15 @@ export default function Dashboard() {
     // Add projects to Data Table rows
     useEffect(() => {
         console.log("Projects updated:", projects);
-        const newRows = [];
+        const newRows: { id: number; teamView1: string; teamView2: string; teamView3: string }[] =
+            [];
         for (let i = 0; i < Math.ceil(projects.length / 3); i++) {
             const temp_row = { id: i + 1, teamView1: "", teamView2: "", teamView3: "" };
             for (let j = 0; j < 3; j++) {
                 const projectIndex = i * 3 + j;
                 if (projectIndex < projects.length) {
-                    temp_row[`teamView${j + 1}`] = projects[projectIndex].project_name;
+                    temp_row[`teamView${j + 1}` as keyof typeof temp_row] =
+                        projects[projectIndex].project_name;
                 }
             }
             newRows.push(temp_row);
