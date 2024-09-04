@@ -12,19 +12,10 @@
         "test:e2e": "npx playwright test",
         "test:e2e:ui": "npx playwright test --ui",
         "format": "prettier --write .",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "type-checks": "tsc --noEmit"
     },
     "dependencies": {
-        "@emotion/react": "^11.13.0",
-        "@emotion/styled": "^11.13.0",
-        "@mui/icons-material": "^5.16.7",
-        "@mui/material": "^5.16.7",
-        "@supabase/ssr": "^0.4.0",
-        "@supabase/supabase-js": "^2.45.0",
-        "next": "^14.2.5",
-        "playwright": "^1.46.1",
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1",
         "@emotion/cache": "^11.13.1",
         "@emotion/react": "^11.13.0",
         "@emotion/server": "^11.11.0",
@@ -39,7 +30,8 @@
         "next": "^14.2.5",
         "playwright": "^1.46.1",
         "react": "^18.3.1",
-        "react-dom": "^18.3.1"
+        "react-dom": "^18.3.1",
+        "resend": "^4.0.0"
     },
     "devDependencies": {
         "@playwright/test": "^1.46.1",

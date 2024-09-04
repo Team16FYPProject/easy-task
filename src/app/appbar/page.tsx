@@ -57,6 +57,16 @@ export default function ButtonAppBar() {
                         </ListItemButton>
                     </Link>
                 </ListItem>
+                <ListItem key="Achievements" disablePadding>
+                    <Link href="/achievement">
+                        <ListItemButton>
+                            {/* <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon> */}
+                            <ListItemText primary="Achievements" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
             </List>
             <Divider />
             <List>
