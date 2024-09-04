@@ -18,7 +18,7 @@ import {
     TableCell,
     TableBody,
 } from "@mui/material";
-import { SettingsFilled } from "@mui/icons-material";
+import SettingsFilled from "@mui/icons-material/Settings";
 
 export default function TeamMembers() {
     const router = useRouter();
@@ -45,9 +45,8 @@ export default function TeamMembers() {
 
                 {/* Team Features */}
                 <Grid item xs={12}>
-                    {" "}
                     {/* Search bar */}
-                    <Grid container spacing={2} alignItems="left" justifyContent="space-between">
+                    <Grid container spacing={2} alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <TextField
                                 id="search-team-member"
@@ -55,21 +54,14 @@ export default function TeamMembers() {
                                 defaultValue="Enter Team Member..."
                             />
                         </Grid>
-                    </Grid>
-                    {/* All the buttons */}
-                    <Grid container spacing={2} alignItems="right" justifyContent="space-between">
                         <Grid item>
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary" sx={{ mr: 2 }}>
                                 LEAVE TEAM
                             </Button>
-                        </Grid>
-                        <Grid item>
-                            <Button variant="contained" color="secondary">
+                            <Button variant="contained" color="secondary" sx={{ mr: 2 }}>
                                 INVITE MEMBER
                             </Button>
-                        </Grid>
-                        <Grid item>
-                            <IconButton color="default" size="medium">
+                            <IconButton color="default" size="medium" sx={{ mr: 2 }}>
                                 <SettingsFilled />
                             </IconButton>
                         </Grid>

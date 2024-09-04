@@ -32,7 +32,8 @@ export async function POST(request: Request) {
         return Response.json(
             {
                 success: false,
-                data: "Unable to login at this time. Please try again later.",
+                /*data: "Unable to login at this time. Please try again later.",*/
+                data: error.message,
             },
             { status: 400 },
         );
