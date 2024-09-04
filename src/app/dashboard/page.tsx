@@ -135,7 +135,7 @@ export default function Dashboard() {
             field: "teamView1",
             headerName: "",
             flex: 1,
-            renderCell: (params) => {
+            renderCell: (params: any) => {
                 const value = params.value as TeamViewData;
                 return value ? (
                     <ButtonBase onClick={() => handleCardClick(value[1])}>
@@ -150,7 +150,7 @@ export default function Dashboard() {
             field: "teamView2",
             headerName: "",
             flex: 1,
-            renderCell: (params) => {
+            renderCell: (params: any) => {
                 const value = params.value as TeamViewData;
                 return value ? (
                     <ButtonBase onClick={() => handleCardClick(value[1])}>
@@ -165,7 +165,7 @@ export default function Dashboard() {
             field: "teamView3",
             headerName: "",
             flex: 1,
-            renderCell: (params) => {
+            renderCell: (params: any) => {
                 const value = params.value as TeamViewData;
                 return value ? (
                     <ButtonBase onClick={() => handleCardClick(value[1])}>
