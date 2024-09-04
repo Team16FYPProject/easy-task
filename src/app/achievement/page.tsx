@@ -41,7 +41,7 @@ export default function Achievements() {
 
                 {/* Achievement Summary */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} justifyContent="space-between">
                         <Grid item xs={12} sm={6} md={4}>
                             {/* stats chart */}
                             <PieChart
