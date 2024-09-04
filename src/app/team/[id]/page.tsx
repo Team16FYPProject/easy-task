@@ -73,10 +73,12 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         fetchMembers();
     }, []);
 
+    // If user is not logged in, return empty
     if (!user) {
         return <></>;
     }
 
+    // Generate table row function
     function generateRowFunction(users: any): React.ReactNode {
         if (!users) {
             return <></>;
@@ -84,7 +86,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         return users.map((user: Profile) => (
             <TableRow key={user.user_id}>
                 <TableCell>{user.profile_display_name}</TableCell>
-                <TableCell>{user.email}</TableCell>
+                <TableCell>{}</TableCell> {/* Email */}
                 <TableCell>
                     <Button variant="contained" color="secondary">
                         REMOVE
@@ -113,6 +115,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 defaultValue="Enter Team Member..."
                             />
                         </Grid>
+                        {/* Leave Team, Invite Member, Settings */}
                         <Grid item>
                             <Button variant="contained" color="primary" sx={{ mr: 2 }}>
                                 LEAVE TEAM

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-// import DebugProjectList from "./DebugProjectList";
 
 import {
     Box,
@@ -32,12 +31,24 @@ import React, { useEffect, useState } from "react";
 import { a } from "vitest/dist/chunks/suite.CcK46U-P.js";
 import { zhCN } from "@mui/material/locale";
 
+// Interface for Project
 interface Project {
     project_id: string;
     project_name: string;
     project_desc: string;
     project_owner_id: string;
     project_profile_pic: string | null;
+}
+
+// Data Table row data
+type TeamViewData = [string, string] | undefined;
+
+// Interface for Data Table rows
+interface RowData {
+    id: number;
+    teamView1: TeamViewData;
+    teamView2: TeamViewData;
+    teamView3: TeamViewData;
 }
 
 export default function Dashboard() {
@@ -47,19 +58,14 @@ export default function Dashboard() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const [projects, setProjects] = React.useState<Project[]>([]);
-    const [rows, setRows] = useState<
-        {
-            id: number;
-            teamView1: Array<string>;
-            teamView2: Array<string>;
-            teamView3: Array<string>;
-        }[]
-    >([]);
+    const [rows, setRows] = useState<RowData[]>([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [loadingTasks, setLoadingTasks] = useState(true);
     const [tasks, setTasks] = useState([]);
     const dataTableHeight = 300;
+    const paginationModel = { page: 0, pageSize: 1 };
 
+    // Redirect to login if user is not logged in
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
             await router.push("/login");
@@ -102,80 +108,84 @@ export default function Dashboard() {
     // Add projects to Data Table rows
     useEffect(() => {
         console.log("Projects updated:", projects);
-        const newRows: {
-            id: number;
-            teamView1: Array<string>;
-            teamView2: Array<string>;
-            teamView3: Array<string>;
-        }[] = [];
+        const newRows: RowData[] = [];
         for (let i = 0; i < Math.ceil(projects.length / 3); i++) {
-            let temp_row = { id: 1, teamView1: [], teamView2: [], teamView3: [] };
-            temp_row.id = i + 1;
-            let j = 0;
-            for (const key of Object.keys(temp_row) as (keyof typeof temp_row)[]) {
-                if (j + 3 * i >= projects.length) {
-                    break;
-                }
-                if (key !== "id") {
-                    temp_row[key] = [
-                        projects[j + 3 * i].project_name,
-                        projects[j + 3 * i].project_id,
-                    ];
-                    j++;
+            const rowData: RowData = {
+                id: i + 1,
+                teamView1: undefined,
+                teamView2: undefined,
+                teamView3: undefined,
+            };
+
+            for (let j = 0; j < 3; j++) {
+                const projectIndex = i * 3 + j;
+                if (projectIndex < projects.length) {
+                    const project = projects[projectIndex];
+                    const viewKey = `teamView${j + 1}` as keyof Omit<RowData, "id">;
+                    rowData[viewKey] = [project.project_name, project.project_id];
                 }
             }
-            newRows.push({ ...temp_row });
+
+            newRows.push(rowData);
         }
         setRows(newRows);
     }, [projects]);
 
+    // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
     }
+
+    // Grid Column Definitions
     const columns: GridColDef[] = [
         {
             field: "teamView1",
             headerName: "",
             flex: 1,
-            renderCell: (params) =>
-                params.value ? (
-                    <ButtonBase onClick={() => handleCardClick(params.value[1])}>
-                        <TeamCard title={params.value[0]} image="/GroupIcon.png" />
+            renderCell: (params) => {
+                const value = params.value as TeamViewData;
+                return value ? (
+                    <ButtonBase onClick={() => handleCardClick(value[1])}>
+                        <TeamCard title={value[0]} image="/GroupIcon.png" />
                     </ButtonBase>
                 ) : (
                     <div style={{ height: "100%", width: "100%" }} />
-                ),
+                );
+            },
         },
         {
             field: "teamView2",
             headerName: "",
             flex: 1,
-            renderCell: (params) =>
-                params.value ? (
-                    <ButtonBase onClick={() => handleCardClick(params.value[1])}>
-                        <TeamCard title={params.value[0]} image="/GroupIcon.png" />
+            renderCell: (params) => {
+                const value = params.value as TeamViewData;
+                return value ? (
+                    <ButtonBase onClick={() => handleCardClick(value[1])}>
+                        <TeamCard title={value[0]} image="/GroupIcon.png" />
                     </ButtonBase>
                 ) : (
                     <div style={{ height: "100%", width: "100%" }} />
-                ),
+                );
+            },
         },
         {
             field: "teamView3",
             headerName: "",
             flex: 1,
-            renderCell: (params) =>
-                params.value ? (
-                    <ButtonBase onClick={() => handleCardClick(params.value[1])}>
-                        <TeamCard title={params.value[0]} image="/GroupIcon.png" />
+            renderCell: (params) => {
+                const value = params.value as TeamViewData;
+                return value ? (
+                    <ButtonBase onClick={() => handleCardClick(value[1])}>
+                        <TeamCard title={value[0]} image="/GroupIcon.png" />
                     </ButtonBase>
                 ) : (
                     <div style={{ height: "100%", width: "100%" }} />
-                ),
+                );
+            },
         },
     ];
 
-    const paginationModel = { page: 0, pageSize: 1 };
-
+    // Data Table component
     function DataTable() {
         const footerHeight = 53; // Approximate height of the footer
         const availableHeight = dataTableHeight - footerHeight;
@@ -203,10 +213,12 @@ export default function Dashboard() {
         );
     }
 
+    // Generate rows for Upcoming Tasks Table
     function generateRowFunction(tasks: never[]): React.ReactNode {
         throw new Error("Function not implemented.");
     }
 
+    // Handle card click for Team Cards
     function handleCardClick(projectId: any): void {
         router.push(`/team/${projectId}`);
     }
@@ -236,19 +248,7 @@ export default function Dashboard() {
                         <DataTable />
                     )}
                 </Grid>
-                {/* <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TeamCard title="Team 1" image="/GroupIcon.png" />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TeamCard title="Team 2" image="/GroupIcon.png" />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TeamCard title="Team 3" image="/GroupIcon.png" />
-                        </Grid>
-                    </Grid>
-                </Grid> */}
+                {/* Available Views Title */}
                 <Grid item xs={12}>
                     <Typography variant="h4">Available Views</Typography>
                 </Grid>
