@@ -42,6 +42,10 @@ export default function Dashboard() {
         return <></>;
     }
 
+    function handleNavigateList(): React.MouseEventHandler<HTMLButtonElement> | undefined {
+        return () => router.push("/listView");
+    }
+
     return (
         <Container sx={{ padding: 6 }}>
             <Grid container direction="column" spacing={2}>
@@ -85,7 +89,12 @@ export default function Dashboard() {
                             </Button>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Button variant="contained" color="secondary" fullWidth>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                fullWidth
+                                onClick={handleNavigateList()}
+                            >
                                 LIST VIEW
                             </Button>
                         </Grid>
