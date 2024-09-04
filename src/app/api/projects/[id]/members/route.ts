@@ -25,3 +25,35 @@ export async function DELETE(request: Request, { params: { id } }: ProjectIdPara
     }
     return okResponse({ success: true, data: "Successfully left that team" });
 }
+
+export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
+    console.log("Fetching members for project", id);
+    const session = await getSession();
+    if (!session) {
+        return unauthorizedResponse({ success: false, data: "Unauthorized" });
+    }
+
+    const supabase = getServiceSupabase();
+    const { data: memberData, error: memberError } = await supabase
+        .from("project_member")
+        .select("user_id")
+        .eq("project_id", id);
+
+    if (memberError) {
+        console.error(`Unable to fetch member data for team ${id}`, memberError);
+        return okResponse({ success: true, users: [] });
+    }
+
+    const { data: userData, error: userError } = await supabase
+        .from("profile")
+        .select("*")
+        .in(
+            "user_id",
+            memberData!.map((data) => data.user_id),
+        );
+    if (userError) {
+        console.error(`Unable to fetch user data for team ${id}`, userError);
+        return okResponse({ success: false, users: [] });
+    }
+    return okResponse({ success: true, users: userData });
+}

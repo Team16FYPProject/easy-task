@@ -9,6 +9,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
     Box,
     Button,
+    ButtonBase,
     ButtonGroup,
     Container,
     Grid,
@@ -47,7 +48,12 @@ export default function Dashboard() {
     const handleClose = () => setOpen(false);
     const [projects, setProjects] = React.useState<Project[]>([]);
     const [rows, setRows] = useState<
-        { id: number; teamView1: string; teamView2: string; teamView3: string }[]
+        {
+            id: number;
+            teamView1: Array<string>;
+            teamView2: Array<string>;
+            teamView3: Array<string>;
+        }[]
     >([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [loadingTasks, setLoadingTasks] = useState(true);
@@ -96,18 +102,29 @@ export default function Dashboard() {
     // Add projects to Data Table rows
     useEffect(() => {
         console.log("Projects updated:", projects);
-        const newRows: { id: number; teamView1: string; teamView2: string; teamView3: string }[] =
-            [];
+        const newRows: {
+            id: number;
+            teamView1: Array<string>;
+            teamView2: Array<string>;
+            teamView3: Array<string>;
+        }[] = [];
         for (let i = 0; i < Math.ceil(projects.length / 3); i++) {
-            const temp_row = { id: i + 1, teamView1: "", teamView2: "", teamView3: "" };
-            for (let j = 0; j < 3; j++) {
-                const projectIndex = i * 3 + j;
-                if (projectIndex < projects.length) {
-                    temp_row[`teamView${j + 1}` as keyof typeof temp_row] =
-                        projects[projectIndex].project_name;
+            let temp_row = { id: 1, teamView1: [], teamView2: [], teamView3: [] };
+            temp_row.id = i + 1;
+            let j = 0;
+            for (const key of Object.keys(temp_row) as (keyof typeof temp_row)[]) {
+                if (j + 3 * i >= projects.length) {
+                    break;
+                }
+                if (key !== "id") {
+                    temp_row[key] = [
+                        projects[j + 3 * i].project_name,
+                        projects[j + 3 * i].project_id,
+                    ];
+                    j++;
                 }
             }
-            newRows.push(temp_row);
+            newRows.push({ ...temp_row });
         }
         setRows(newRows);
     }, [projects]);
@@ -122,7 +139,9 @@ export default function Dashboard() {
             flex: 1,
             renderCell: (params) =>
                 params.value ? (
-                    <TeamCard title={params.value} image="/GroupIcon.png" />
+                    <ButtonBase onClick={() => handleCardClick(params.value[1])}>
+                        <TeamCard title={params.value[0]} image="/GroupIcon.png" />
+                    </ButtonBase>
                 ) : (
                     <div style={{ height: "100%", width: "100%" }} />
                 ),
@@ -133,7 +152,9 @@ export default function Dashboard() {
             flex: 1,
             renderCell: (params) =>
                 params.value ? (
-                    <TeamCard title={params.value} image="/GroupIcon.png" />
+                    <ButtonBase onClick={() => handleCardClick(params.value[1])}>
+                        <TeamCard title={params.value[0]} image="/GroupIcon.png" />
+                    </ButtonBase>
                 ) : (
                     <div style={{ height: "100%", width: "100%" }} />
                 ),
@@ -144,7 +165,9 @@ export default function Dashboard() {
             flex: 1,
             renderCell: (params) =>
                 params.value ? (
-                    <TeamCard title={params.value} image="/GroupIcon.png" />
+                    <ButtonBase onClick={() => handleCardClick(params.value[1])}>
+                        <TeamCard title={params.value[0]} image="/GroupIcon.png" />
+                    </ButtonBase>
                 ) : (
                     <div style={{ height: "100%", width: "100%" }} />
                 ),
@@ -182,6 +205,10 @@ export default function Dashboard() {
 
     function generateRowFunction(tasks: never[]): React.ReactNode {
         throw new Error("Function not implemented.");
+    }
+
+    function handleCardClick(projectId: any): void {
+        router.push(`/team/${projectId}`);
     }
 
     return (
