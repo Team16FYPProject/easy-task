@@ -12,7 +12,8 @@
         "test:e2e": "npx playwright test",
         "test:e2e:ui": "npx playwright test --ui",
         "format": "prettier --write .",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "type-checks": "tsc --noEmit"
     },
     "dependencies": {
         "@emotion/react": "^11.13.0",
