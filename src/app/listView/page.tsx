@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 import {
     Box,
@@ -23,14 +22,13 @@ import {
     TableRow,
     Typography,
 } from "@mui/material";
-import TeamCard from "@/components/TeamCard";
-import GroupsIcon from "@mui/icons-material/Groups";
 import AddTeamModal from "@/components/AddTeamModal";
 import React, { useEffect, useState } from "react";
 import { a } from "vitest/dist/chunks/suite.CcK46U-P.js";
 import { zhCN } from "@mui/material/locale";
 import { PieChart } from "@mui/x-charts";
 
+// Interface for Project
 interface Project {
     project_id: string;
     project_name: string;
@@ -39,6 +37,7 @@ interface Project {
     project_profile_pic: string | null;
 }
 
+// Interface for Task
 interface Task {
     task_id: number;
     project_id: string;
@@ -59,12 +58,9 @@ export default function ListView() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const [tasks, setTasks] = React.useState<Task[]>([]);
-    const [projects, setProjects] = React.useState<Project[]>([]);
-    const [rows, setRows] = useState([]);
     const [loadingTasks, setLoadingTasks] = useState(true);
-    const [error, setError] = useState(null);
-    const dataTableHeight = 300;
 
+    // Redirect to login if user is not logged in
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
             await router.push("/login");
@@ -72,60 +68,9 @@ export default function ListView() {
         }
     }, [loadingUser, user]);
 
-    // // Fetch projects
-    // useEffect(() => {
-    //     async function fetchProjects() {
-    //         try {
-    //             const response = await fetch("/api/projects", {
-    //                 method: "GET",
-    //                 credentials: "include",
-    //             });
-
-    //             const result = await response.json();
-
-    //             if (!response.ok) {
-    //                 throw new Error(result.data || "Failed to fetch projects");
-    //             }
-
-    //             if (result.success) {
-    //                 setProjects(result.projects);
-    //             } else {
-    //                 throw new Error("Failed to fetch projects");
-    //             }
-    //             console.log("Projects:", projects);
-    //         } catch (e) {
-    //             setError(e.message);
-    //             console.error("Error:", e);
-    //         }
-    //     }
-
-    //     fetchProjects();
-    // }, []);
-
     // Fetch tasks
     useEffect(() => {
         async function fetchTasks() {
-            // try {
-            //     const response = await fetch("/api/projects", {
-            //         method: "GET",
-            //         credentials: "include",
-            //     });
-
-            //     const result = await response.json();
-
-            //     if (!response.ok) {
-            //         throw new Error(result.data || "Failed to fetch projects");
-            //     }
-
-            //     if (result.success) {
-            //         setProjects(result.projects);
-            //     } else {
-            //         throw new Error("Failed to fetch projects");
-            //     }
-            // } catch (e) {
-            //     setError(e.message);
-            //     console.error("Error:", e);
-            // }
             try {
                 setLoadingTasks(true);
                 const response = await fetch("/api/projects", {
@@ -139,13 +84,10 @@ export default function ListView() {
                     throw new Error(result.data || "Failed to fetch projects");
                 }
 
-                // if (result.success) {
-                //     setProjects(result.projects);
-                // } else {
-                //     throw new Error("Failed to fetch projects");
-                // }
-                const projectIDs = result.projects.map((project) => project.project_id);
-                const fetchPromises = projectIDs.map((project_id) =>
+                const projectIDs = result.projects.map(
+                    (project: { project_id: any }) => project.project_id,
+                );
+                const fetchPromises = projectIDs.map((project_id: any) =>
                     fetch(`/api/projects/${project_id}/tasks`, {
                         method: "GET",
                         credentials: "include",
@@ -162,7 +104,6 @@ export default function ListView() {
                 setTasks(allTasks);
                 console.log("All Tasks: ", allTasks);
             } catch (e) {
-                setError(e.message);
                 console.error("Error:", e);
             } finally {
                 setLoadingTasks(false);
@@ -172,13 +113,13 @@ export default function ListView() {
         fetchTasks();
     }, []);
 
+    // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
     }
 
-    const paginationModel = { page: 0, pageSize: 1 };
-
-    function generateRowFunction(tasks: never[]): React.ReactNode {
+    // Generate rows for the table
+    function generateRowFunction(tasks: Task[]): React.ReactNode {
         return tasks.map((task, index) => (
             <TableRow key={index}>
                 <TableCell>{task.task_deadline}</TableCell>
@@ -304,10 +245,6 @@ export default function ListView() {
                         </Grid>
                     </Grid>
                 </Grid>
-                {/* Upcoming Tasks Title */}
-                {/* <Grid item xs={12}>
-                    <Typography variant="h4">Upcoming Tasks</Typography>
-                </Grid> */}
                 {/* Upcoming Tasks Table */}
                 <Grid item xs={12}>
                     <TableContainer component={Paper}>
