@@ -7,12 +7,14 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 // import DebugProjectList from "./DebugProjectList";
 
 import {
+    Box,
     Button,
     ButtonGroup,
     Container,
     Grid,
     Pagination,
     Paper,
+    Skeleton,
     Stack,
     Table,
     TableBody,
@@ -38,7 +40,6 @@ interface Project {
 }
 
 export default function Dashboard() {
-    // return <DebugProjectList />;
     const router = useRouter();
     const { loadingUser, user } = useUser();
     const [open, setOpen] = React.useState(false);
@@ -46,6 +47,11 @@ export default function Dashboard() {
     const handleClose = () => setOpen(false);
     const [projects, setProjects] = React.useState<Project[]>([]);
     const [rows, setRows] = useState([]);
+    const [loadingProjects, setLoadingProjects] = useState(true);
+    const [loadingTasks, setLoadingTasks] = useState(true);
+    const [tasks, setTasks] = useState([]);
+    const [error, setError] = useState(null);
+    const dataTableHeight = 300;
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -54,21 +60,22 @@ export default function Dashboard() {
         }
     }, [loadingUser, user]);
 
+    // Fetch projects
     useEffect(() => {
         async function fetchProjects() {
             try {
-                // setLoading(true);
+                setLoadingProjects(true);
                 const response = await fetch("/api/projects", {
                     method: "GET",
                     credentials: "include",
                 });
 
                 const result = await response.json();
-                console.log("Result:", result);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(result.data || "Failed to fetch projects");
                 }
-                console.log("Result.projects:", result.projects);
+
                 if (result.success) {
                     setProjects(result.projects);
                 } else {
@@ -76,16 +83,17 @@ export default function Dashboard() {
                 }
                 console.log("Projects:", projects);
             } catch (e) {
-                // setError('Failed to fetch projects');
+                setError(e.message);
                 console.error("Error:", e);
             } finally {
-                // setLoading(false);
+                setLoadingProjects(false);
             }
         }
 
         fetchProjects();
     }, []);
 
+    // Add projects to Data Table rows
     useEffect(() => {
         console.log("Projects updated:", projects);
         const newRows = [];
@@ -144,11 +152,10 @@ export default function Dashboard() {
     const paginationModel = { page: 0, pageSize: 1 };
 
     function DataTable() {
-        const tableHeight = 300;
         const footerHeight = 53; // Approximate height of the footer
-        const availableHeight = tableHeight - footerHeight;
+        const availableHeight = dataTableHeight - footerHeight;
         return (
-            <Paper sx={{ height: tableHeight, width: "100%" }}>
+            <Paper sx={{ height: dataTableHeight, width: "100%" }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -171,9 +178,9 @@ export default function Dashboard() {
         );
     }
 
-    //     { id: 1, teamView1: "Team 1", teamView2: "Team 2", teamView3: "Team 3" },
-    //     { id: 2, teamView1: "Team 4", teamView2: "Team 5", teamView3: "Team 6" },
-    // ];
+    function generateRowFunction(tasks: never[]): React.ReactNode {
+        throw new Error("Function not implemented.");
+    }
 
     return (
         <Container sx={{ padding: 6 }}>
@@ -193,7 +200,13 @@ export default function Dashboard() {
                     </Grid>
                 </Grid>
                 {/* Team Cards */}
-                <DataTable />
+                <Grid item xs={12}>
+                    {loadingProjects ? (
+                        <Skeleton variant="rounded" width={"100%"} height={dataTableHeight} />
+                    ) : (
+                        <DataTable />
+                    )}
+                </Grid>
                 {/* <Grid item xs={12}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={4}>
@@ -248,20 +261,27 @@ export default function Dashboard() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {/* {rows.map((row) => (
-                                <TableRow
-                                    key={row.name}
-                                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    <TableCell align="right">{row.fat}</TableCell>
-                                    <TableCell align="right">{row.carbs}</TableCell>
-                                    <TableCell align="right">{row.protein}</TableCell>
-                                </TableRow>
-                            ))} */}
+                                {loadingTasks
+                                    ? [...Array(5)].map((_, index) => (
+                                          <TableRow key={index}>
+                                              <TableCell>
+                                                  <Skeleton variant="text" />
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Skeleton variant="text" />
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Skeleton variant="text" />
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Skeleton variant="text" />
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Skeleton variant="text" />
+                                              </TableCell>
+                                          </TableRow>
+                                      ))
+                                    : generateRowFunction(tasks)}
                             </TableBody>
                         </Table>
                     </TableContainer>
