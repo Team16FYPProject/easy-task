@@ -27,29 +27,8 @@ import React, { useEffect, useState } from "react";
 import { a } from "vitest/dist/chunks/suite.CcK46U-P.js";
 import { zhCN } from "@mui/material/locale";
 import { PieChart } from "@mui/x-charts";
-
-// Interface for Project
-interface Project {
-    project_id: string;
-    project_name: string;
-    project_desc: string;
-    project_owner_id: string;
-    project_profile_pic: string | null;
-}
-
-// Interface for Task
-interface Task {
-    task_id: number;
-    project_id: string;
-    project_name: string;
-    task_name: string;
-    task_desc: string;
-    task_deadline: string;
-    task_time_spent: string;
-    task_creator_id: string;
-    task_status: string;
-    task_priority: string;
-}
+import { Project } from "../../utils/lib/types";
+import { Task } from "./types";
 
 export default function ListView() {
     const router = useRouter();
@@ -102,7 +81,6 @@ export default function ListView() {
                 const results = await Promise.all(fetchPromises);
                 const allTasks = results.flatMap((result) => result.tasks);
                 setTasks(allTasks);
-                console.log("All Tasks: ", allTasks);
             } catch (e) {
                 console.error("Error:", e);
             } finally {

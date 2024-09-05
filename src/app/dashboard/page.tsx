@@ -23,26 +23,8 @@ import {
     Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-
-// Interface for Project
-interface Project {
-    project_id: string;
-    project_name: string;
-    project_desc: string;
-    project_owner_id: string;
-    project_profile_pic: string | null;
-}
-
-// Data Table row data
-type TeamViewData = [string, string] | undefined;
-
-// Interface for Data Table rows
-interface RowData {
-    id: number;
-    teamView1: TeamViewData;
-    teamView2: TeamViewData;
-    teamView3: TeamViewData;
-}
+import { RowData, TeamViewData } from "./types";
+import { Project } from "../../utils/lib/types";
 
 export default function Dashboard() {
     const router = useRouter();
@@ -87,7 +69,6 @@ export default function Dashboard() {
                 } else {
                     throw new Error("Failed to fetch projects");
                 }
-                console.log("Projects:", projects);
             } catch (e) {
                 console.error("Error:", e);
             } finally {
@@ -100,8 +81,12 @@ export default function Dashboard() {
 
     // Add projects to Data Table rows
     useEffect(() => {
-        console.log("Projects updated:", projects);
+        /* Rowdata is a list of dicts with keys: id, teamView1, teamView2, teamView3
+        Each teamView is a tuple with the project name and project id
+        For example: {id: 1, teamView1: ["Project 1", "1"], teamView2: ["Project 2", "2"], teamView3: ["Project 3", "3"]}
+        This will be used to populate the Team Cards in the Data Table */
         const newRows: RowData[] = [];
+        // For every 3 projects, create a new row
         for (let i = 0; i < Math.ceil(projects.length / 3); i++) {
             const rowData: RowData = {
                 id: i + 1,
@@ -109,7 +94,7 @@ export default function Dashboard() {
                 teamView2: undefined,
                 teamView3: undefined,
             };
-
+            // For every project in the row, add it to the row data
             for (let j = 0; j < 3; j++) {
                 const projectIndex = i * 3 + j;
                 if (projectIndex < projects.length) {
@@ -118,9 +103,10 @@ export default function Dashboard() {
                     rowData[viewKey] = [project.project_name, project.project_id];
                 }
             }
-
+            // Add the row data to the rows
             newRows.push(rowData);
         }
+        // Set the rows
         setRows(newRows);
     }, [projects]);
 
