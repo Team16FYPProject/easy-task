@@ -17,8 +17,13 @@ test("should navigate correctly", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:3000/kanban-view");
     await page.goto("http://localhost:3000/dashboard");
 
-    const appBar = page.locator("nav.appbar");
-    await expect(appBar).toBeVisible();
+    // expect to be able to go to profile page
+    await page.goto("http://localhost:3000/profile");
+    await expect(page).toHaveURL("http://localhost:3000/profile");
+
+    // expect to be able to go to achievements page
+    await page.goto("http://localhost:3000/achievement");
+    await expect(page).toHaveURL("http://localhost:3000/achievement");
 
     await page.goto("http://localhost:3000/logout");
     // expect to be able to go to register page
