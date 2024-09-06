@@ -2,30 +2,53 @@ import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useState } from "react";
 
+// Types
+/**
+ * @param id: The id of the card, has to be unique
+ * @param title: The title of the card
+ * @param column: The column to which it belongs to i.e todo,doing,complete
+ */
 type CardType = {
     id: string;
     title: string;
     column: string;
 };
-
+/**
+ * @param title: The title of the card
+ * @param column: The column to which it belongs to i.e todo,doing,complete
+ * @param cards: The cards that are associated with this column
+ * @param setCards: Function to update card state
+ */
 type ColumnProps = {
     title: string;
     column: string;
     cards: CardType[];
     setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
 };
-
+/**
+ * @param id: The id of the card, has to be unique
+ * @param title: The title of the card
+ * @param column: The column to which it belongs to i.e todo,doing,complete
+ * @param handleDragStart: Function to start drag event
+ */
 type CardProp = {
     id: string;
     title: string;
     column: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardType) => void;
 };
-
+/**
+ * @param beforeId: The id of the column it is being dragged from
+ * @param column: The column to which it belongs to i.e todo,doing,complete
+ */
 type DropIndicatorProps = {
     beforeId: string | null;
     column: string;
 };
+/**
+ * Kanban Board component
+ * @returns react component of a Kanban Board
+ */
 export const KanbanBoard = () => {
     return (
         <div className="h-full w-full">
@@ -34,14 +57,19 @@ export const KanbanBoard = () => {
     );
 };
 
+/**
+ * Actual board of the Kanban Board
+ * @returns react component with board of the Kanban Board
+ */
 export const Board = () => {
-    const [cards, setCards] = useState(TestCards);
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-    const [team, setTeam] = React.useState("");
+    const [cards, setCards] = useState(TestCards); // state for the cards
+    const [open, setOpen] = React.useState(false); // state for modal task add
+    const handleOpen = () => setOpen(true); // opens modal
+    const handleClose = () => setOpen(false); // closes modal
+    const [team, setTeam] = React.useState(""); // state for selected team
     const handleChange = (event: SelectChangeEvent) => {
-        setTeam(event.target.value as string);
+        //updates team state on selection change
+        setTeam(event.target.value as string); //
     };
     return (
         <div className="flex-col">
@@ -67,6 +95,7 @@ export const Board = () => {
                     CREATE TEAM
                 </Button>
             </div>
+            {/* Renders the actual columns of the Kanban Board */}
             <div className="flex h-full w-full justify-center gap-5 p-10">
                 <Column title="TO DO" column="todo" cards={cards} setCards={setCards} />
                 <Column title="IN PROGRESS" column="doing" cards={cards} setCards={setCards} />
@@ -75,39 +104,59 @@ export const Board = () => {
         </div>
     );
 };
-
+/**
+ * Column component for the Kanban Board
+ * @param {ColumnProps}
+ * @returns react component with columns of the Kanban Board
+ */
 const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
-    const [active, setActive] = useState(false);
-    const filteredCards = cards.filter((c) => c.column === column);
+    const [active, setActive] = useState(false); // state for active drag
+    const filteredCards = cards.filter((c) => c.column === column); // filters cards to only those in the same column
+
+    // function to handle the start of a drag
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: CardType) => {
-        e.dataTransfer.setData("cardId", card.id);
+        e.dataTransfer.setData("cardId", card.id); // pass the id of the card
     };
+
+    // function to handle an active drag
+    // highlight closest indicator and set drag state to active
     const handleActiveDrag = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         highlight(e);
         setActive(true);
     };
+
+    // function to highlight the closest drop indicator
+    // get all indicators and clear them all, only set opacity of closest indicator to 1
     const highlight = (e: React.DragEvent<HTMLDivElement>) => {
         const indicator = getindicator();
         clearAllHighlights(indicator);
         const elm = getClosestIndicator(e, indicator);
         elm.element.style.opacity = "1";
     };
+
+    // function to clear all highlights when we drop an element
+    // clear all highlights by iterating through array and setting all opacities to 0
     const clearAllHighlights = (elm?: HTMLElement[]) => {
         const indicator = elm || getindicator();
         indicator.forEach((e) => {
             e.style.opacity = "0";
         });
     };
+
+    // function to get the closest drop indicator based on mouse position
     const getClosestIndicator = (e: React.DragEvent<HTMLDivElement>, indicator: HTMLElement[]) => {
         const OFFSET = 50;
 
         const elm = indicator.reduce(
             (closest, child) => {
+                // get smallest rectangle which contains the entire element
                 const box = child.getBoundingClientRect();
 
+                // calculate the offset
                 const offset = e.clientY - (box.top + OFFSET);
 
+                // if closer, update closest element, otherwise return the closest
                 if (offset < 0 && offset > closest.offset) {
                     return { offset: offset, element: child };
                 } else {
@@ -115,48 +164,55 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
                 }
             },
             {
-                offset: Number.NEGATIVE_INFINITY,
-                element: indicator[indicator.length - 1],
+                offset: Number.NEGATIVE_INFINITY, // initial offset value
+                element: indicator[indicator.length - 1], // default to last element
             },
         );
 
         return elm;
     };
-
+    // function to get all indicators in the same column
     const getindicator = (): HTMLElement[] => {
         return Array.from(document.querySelectorAll(`[data-column="${column}"]`)) as HTMLElement[];
     };
-    const handleDragInactive = () => {
-        setActive(false);
-        clearAllHighlights();
-    };
-    const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-        const cardId = e.dataTransfer.getData("cardId");
-        setActive(false);
-        clearAllHighlights();
 
+    // function to handle when we drag out the column
+    const handleDragInactive = () => {
+        setActive(false); // deactive drag state
+        clearAllHighlights(); // clear all highlights
+    };
+
+    // function to handle when we drop the card
+    const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+        const cardId = e.dataTransfer.getData("cardId"); // retrieve the data
+        setActive(false); //deactive drag state
+        clearAllHighlights(); // clear all highlights
+
+        // get all indicators and find the closest one
         const indicator = getindicator();
         const { element } = getClosestIndicator(e, indicator);
 
+        // get the id of the card before which the dropped card would be inserted
         const before = element.dataset.before || "-1";
 
+        // if card position has changed, move it
         if (before !== cardId) {
-            let copy = [...cards];
+            let copy = [...cards]; // create a copy of the cards
 
-            let cardToBeTransferred = copy.find((c) => c.id === cardId);
+            let cardToBeTransferred = copy.find((c) => c.id === cardId); // find the id of the card to be moved
             if (!cardToBeTransferred) return;
 
-            cardToBeTransferred = { ...cardToBeTransferred, column };
+            cardToBeTransferred = { ...cardToBeTransferred, column }; //update the card's column
 
-            copy = copy.filter((c) => c.id !== cardId);
+            copy = copy.filter((c) => c.id !== cardId); // get all cards other than the one we need to move
 
-            const oldPos = before === "-1";
+            const oldPos = before === "-1"; // check to see if we add to end of list
 
             if (oldPos) {
-                copy.push(cardToBeTransferred);
+                copy.push(cardToBeTransferred); // add card to the end of the list
             } else {
-                const insertIndex = copy.findIndex((elm) => elm.id === before);
-                copy.splice(insertIndex, 0, cardToBeTransferred);
+                const insertIndex = copy.findIndex((elm) => elm.id === before); //find index to insert at
+                copy.splice(insertIndex, 0, cardToBeTransferred); // insert the card at position
             }
             setCards(copy);
         }
@@ -173,6 +229,7 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
                 onDrop={handleDragEnd}
                 className={`h-full w-full rounded-md transition-colors ${active ? "bg-gray-400" : "bg-gray-100"}`}
             >
+                {/*Renders the filtered cards */}
                 {filteredCards.map((c) => {
                     return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
                 })}
@@ -181,7 +238,11 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
         </div>
     );
 };
-
+/**
+ * Card component of the columns each card represents a task
+ * @param {CardProp}
+ * @returns react component with cards of the individual columns
+ */
 const Card: React.FC<CardProp> = ({ title, id, column, handleDragStart }) => {
     return (
         <>
@@ -196,7 +257,11 @@ const Card: React.FC<CardProp> = ({ title, id, column, handleDragStart }) => {
         </>
     );
 };
-
+/**
+ * Drop indicator component, this is what gives the lines under the cards depicting where it will drop
+ * @param {DropIndicatorProps}
+ * @returns react component showing where card will drop
+ */
 const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
     return (
         <div
