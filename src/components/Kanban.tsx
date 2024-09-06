@@ -1,3 +1,5 @@
+import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useState } from "react";
 
 type CardType = {
@@ -34,11 +36,42 @@ export const KanbanBoard = () => {
 
 export const Board = () => {
     const [cards, setCards] = useState(TestCards);
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+    const [team, setTeam] = React.useState("");
+    const handleChange = (event: SelectChangeEvent) => {
+        setTeam(event.target.value as string);
+    };
     return (
-        <div className="flex h-full w-full justify-center gap-5 p-10">
-            <Column title="TO DO" column="todo" cards={cards} setCards={setCards} />
-            <Column title="IN PROGRESS" column="doing" cards={cards} setCards={setCards} />
-            <Column title="COMPLETE" column="complete" cards={cards} setCards={setCards} />
+        <div className="flex-col">
+            <div className="flex justify-between p-5">
+                <div className="flex items-center gap-3">
+                    <h3 className="text-3xl">Kanban View</h3>
+                    <FormControl sx={{ minWidth: 120 }} size="small">
+                        <InputLabel id="select-team-label">Team</InputLabel>
+                        <Select
+                            labelId="select-team-label"
+                            id="simple-team-select"
+                            value={team}
+                            label="Team"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                            <MenuItem value={30}>Thirty</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
+                <Button variant="contained" color="secondary" onClick={handleOpen}>
+                    CREATE TEAM
+                </Button>
+            </div>
+            <div className="flex h-full w-full justify-center gap-5 p-10">
+                <Column title="TO DO" column="todo" cards={cards} setCards={setCards} />
+                <Column title="IN PROGRESS" column="doing" cards={cards} setCards={setCards} />
+                <Column title="COMPLETE" column="complete" cards={cards} setCards={setCards} />
+            </div>
         </div>
     );
 };
