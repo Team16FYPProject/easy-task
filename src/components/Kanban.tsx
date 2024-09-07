@@ -43,6 +43,7 @@ type ColumnProps = {
     column: string;
     cards: CardType[];
     setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
+    setTasksDict: React.Dispatch<React.SetStateAction<Map<string, { tasks: CardType[] }>>>;
 };
 /**
  * @param project_id: The id of the project
@@ -149,9 +150,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
         //updates team state on selection change
         setTeam(event.target.value as string);
 
-        // we've changed the data in one team, store it
-
-        // set the cards to be a new array, make sure to save the old array
+        // set the cards to be a new array
         setCards(tasksDict.get(new_team).tasks);
     };
     return (
@@ -183,9 +182,27 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             </div>
             {/* Renders the actual columns of the Kanban Board */}
             <div className="flex h-full w-full justify-center gap-5 p-10 md:min-h-[750px]">
-                <Column title="TO DO" column="TODO" cards={cards} setCards={setCards} />
-                <Column title="IN PROGRESS" column="DOING" cards={cards} setCards={setCards} />
-                <Column title="COMPLETE" column="COMPLETE" cards={cards} setCards={setCards} />
+                <Column
+                    title="TO DO"
+                    column="TODO"
+                    cards={cards}
+                    setCards={setCards}
+                    setTasksDict={setTasksDict}
+                />
+                <Column
+                    title="IN PROGRESS"
+                    column="DOING"
+                    cards={cards}
+                    setCards={setCards}
+                    setTasksDict={setTasksDict}
+                />
+                <Column
+                    title="COMPLETE"
+                    column="COMPLETE"
+                    cards={cards}
+                    setCards={setCards}
+                    setTasksDict={setTasksDict}
+                />
             </div>
         </div>
     );
@@ -195,9 +212,43 @@ export const Board = ({ projects }: { projects: Project[] }) => {
  * @param {ColumnProps}
  * @returns react component with columns of the Kanban Board
  */
-const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
-    const [active, setActive] = useState(false); // state for active drag
+export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, setTasksDict }) => {
+    async function handleTaskStatus(cardToBeTransferred: CardType) {
+        if (!cardToBeTransferred) {
+            return; // if there is no card to transfer, return immediately
+        }
 
+        try {
+            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks`;
+
+            // Convert cardToBeTransferred to FormData
+            const response = await fetch(route, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    cardToBeTransferred,
+                }),
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                setError(data.data);
+                return;
+            }
+
+            // Handle success, e.g., show a success message or update state
+        } catch (e) {
+            console.error(
+                `Error fetching tasks for project ${cardToBeTransferred?.project_id}:`,
+                e,
+            );
+            setError("An error occurred while updating the task status.");
+        }
+    }
+    const [active, setActive] = useState(false); // state for active drag
+    const [error, setError] = useState<string>("");
     const filteredCards = cards.filter((c) => c.task_status === column); // filters cards to only those in the same column
 
     // function to handle the start of a drag
@@ -301,7 +352,22 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
                 const insertIndex = copy.findIndex((elm) => elm.task_id === before); //find index to insert at
                 copy.splice(insertIndex, 0, cardToBeTransferred); // insert the card at position
             }
+            // change the cards to be the new array
             setCards(copy);
+
+            // Update the tasksDict state
+            setTasksDict((tasksDict) => {
+                const projectTasks = tasksDict.get(cardToBeTransferred.project_id);
+                if (projectTasks) {
+                    projectTasks.tasks = copy;
+                    tasksDict.set(cardToBeTransferred.project_id, projectTasks);
+                }
+                return tasksDict;
+            });
+
+            // need to also change the data in the db
+            // fix here
+            handleTaskStatus(cardToBeTransferred);
         }
     };
 
@@ -345,6 +411,16 @@ const Card: React.FC<CardProp> = ({
     task_time_spent,
     handleDragStart,
 }) => {
+    const determineBgColor = (task_priority: String) => {
+        if (task_priority === "LOW") {
+            return "bg-green-200";
+        } else if (task_priority === "MEDIUM") {
+            return "bg-yellow-200";
+        } else {
+            return "bg-red-400";
+        }
+    };
+    const bgColor = determineBgColor(task_priority);
     return (
         <>
             <DropIndicator beforeId={task_id} column={task_status} />
@@ -366,9 +442,13 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                     })
                 }
-                className="cursor-grab rounded border border-neutral-700 bg-white p-3 active:cursor-grabbing"
+                className={`cursor-grab rounded border border-neutral-700 p-3 active:cursor-grabbing ${bgColor}`}
             >
-                <p className="text-sm text-black">{task_name}</p>
+                <div className="flex-col text-sm text-black">
+                    <p>{task_name}</p>
+                    <p>{task_deadline}</p>
+                    <p>{task_priority}</p>
+                </div>
             </div>
         </>
     );
@@ -387,41 +467,3 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
         />
     );
 };
-let TestCards = [
-    { title: "Create Kanban Screen", id: "1", column: "todo" },
-    { title: "Create Kanban Screen", id: "2", column: "todo" },
-    { title: "Placeholder", id: "5", column: "todo" },
-    { title: "Placeholder", id: "6", column: "complete" },
-    { title: "Placeholder", id: "7", column: "complete" },
-    { title: "Placeholder", id: "8", column: "complete" },
-    { title: "Placeholder", id: "9", column: "complete" },
-    { title: "Placeholder", id: "10", column: "complete" },
-    { title: "Placeholder", id: "11", column: "complete" },
-    { title: "Placeholder", id: "12", column: "complete" },
-    { title: "Placeholder", id: "13", column: "complete" },
-    { title: "Placeholder", id: "14", column: "complete" },
-    { title: "Placeholder", id: "15", column: "complete" },
-    { title: "Placeholder", id: "16", column: "complete" },
-    { title: "Placeholder", id: "17", column: "complete" },
-    { title: "Placeholder", id: "18", column: "complete" },
-
-    { title: "Hello", id: "3", column: "doing" },
-    { title: "Placeholder", id: "4", column: "complete" },
-];
-let TestCards2 = [
-    { title: "Testing", id: "1", column: "todo" },
-    { title: "Placeholder", id: "17", column: "complete" },
-    { title: "Placeholder", id: "18", column: "complete" },
-
-    { title: "Hello", id: "3", column: "doing" },
-    { title: "Placeholder", id: "4", column: "complete" },
-];
-
-let TestCards3 = [
-    { title: "Testing", id: "1", column: "complete" },
-    { title: "Placeholder", id: "17", column: "complete" },
-    { title: "Placeholder", id: "18", column: "complete" },
-
-    { title: "Hello", id: "3", column: "complete" },
-    { title: "Placeholder", id: "4", column: "complete" },
-];
