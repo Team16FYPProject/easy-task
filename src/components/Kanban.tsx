@@ -1,17 +1,29 @@
+/* eslint-disable prettier/prettier */
 import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
 // Types
 /**
+ * @param name: The name of the card
+ * @param due_date: The date this task is due
  * @param id: The id of the card, has to be unique
- * @param title: The title of the card
+ * @param priority: The priority of the task
  * @param column: The column to which it belongs to i.e todo,doing,complete
  */
 type CardType = {
-    id: string;
-    title: string;
-    column: string;
+    project_id: string;
+    task_creator_id: string;
+    task_deadline: string;
+    task_desc: string;
+    task_id: string;
+    task_is_meeting: string;
+    task_location: string;
+    task_name: string;
+    task_parent_id: string;
+    task_priority: string;
+    task_time_spent: number;
+    task_status: string;
 };
 /**
  * @param title: The title of the card
@@ -26,15 +38,26 @@ type ColumnProps = {
     setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
 };
 /**
+ * @param name: The name of the card
+ * @param due_date: The date this task is due
  * @param id: The id of the card, has to be unique
- * @param title: The title of the card
+ * @param priority: The priority of the task
  * @param column: The column to which it belongs to i.e todo,doing,complete
  * @param handleDragStart: Function to start drag event
  */
 type CardProp = {
-    id: string;
-    title: string;
-    column: string;
+    project_id: string;
+    task_creator_id: string;
+    task_deadline: string;
+    task_desc: string;
+    task_id: string;
+    task_is_meeting: string;
+    task_location: string;
+    task_name: string;
+    task_parent_id: string;
+    task_priority: string;
+    task_time_spent: number;
+    task_status: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardType) => void;
 };
 /**
@@ -55,7 +78,7 @@ interface KanbanBoardProps {
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projects }) => {
     return (
         <div className="h-full w-full">
-            <Board {...projects} />
+            <Board projects={projects} />
         </div>
     );
 };
@@ -64,35 +87,58 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projects }) => {
  * Actual board of the Kanban Board
  * @returns react component with board of the Kanban Board
  */
-export const Board = (projects: Project[]) => {
-    const [cards, setCards] = useState(TestCards); // state for the cards
+export const Board = ({ projects }: { projects: Project[] }) => {
+    const [cards, setCards] = useState<CardType[]>([]); // state for the cards
     const [open, setOpen] = React.useState(false); // state for modal task add
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [team, setTeam] = React.useState(""); // state for selected team
-    // convert js object into array
-    projects = Object.values(projects);
+    const [tasksDict, setTasksDict] = useState(new Map());
+    const [allProjects, setProjects] = useState(projects); // convert js object into array
+    // fetch all tasks from the database
+    useEffect(() => {
+        async function fetchTasks() {
+            // iterate through all projects and fetch tasks
+            // for each project store:
+            // {project_id:tasks}
+            const tasksDict = new Map();
+            const fetchPromises = projects.map(async (p) => {
+                try {
+                    const route = `/api/projects/${p.project_id}/tasks`;
+                    const response = await fetch(route, {
+                        method: "GET",
+                        credentials: "include",
+                    });
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.data || "Failed to fetch tasks");
+                    }
+                    if (result.success) {
+                        tasksDict.set(p.project_id, result);
+                    } else {
+                        throw new Error("Failed to fetch tasks");
+                    }
+                } catch (e) {
+                    console.error(`Error fetching tasks for project ${p.project_id}:`, e);
+                }
+            });
+            await Promise.all(fetchPromises);
+            setTasksDict(tasksDict);
+        }
+        fetchTasks();
+    }, [projects]);
+
     const handleChange = (event: SelectChangeEvent) => {
         const oldTeam = team;
+        const new_team = event.target.value;
         //updates team state on selection change
         setTeam(event.target.value as string);
 
-        if (oldTeam === "Team 1") {
-            TestCards = cards;
-        } else if (oldTeam === "Team 2") {
-            TestCards2 = cards;
-        } else {
-            TestCards3 = cards;
-        }
+        // we've changed the data in one team, store it
 
         // set the cards to be a new array, make sure to save the old array
-        if ((event.target.value as string) === "Team 1") {
-            setCards(TestCards);
-        } else if ((event.target.value as string) === "Team 2") {
-            setCards(TestCards2);
-        } else {
-            setCards(TestCards3);
-        }
+        setCards(tasksDict.get(new_team).tasks);
     };
     return (
         <div className="flex-col">
@@ -123,9 +169,9 @@ export const Board = (projects: Project[]) => {
             </div>
             {/* Renders the actual columns of the Kanban Board */}
             <div className="flex h-full w-full justify-center gap-5 p-10 md:min-h-[750px]">
-                <Column title="TO DO" column="todo" cards={cards} setCards={setCards} />
-                <Column title="IN PROGRESS" column="doing" cards={cards} setCards={setCards} />
-                <Column title="COMPLETE" column="complete" cards={cards} setCards={setCards} />
+                <Column title="TO DO" column="TODO" cards={cards} setCards={setCards} />
+                <Column title="IN PROGRESS" column="DOING" cards={cards} setCards={setCards} />
+                <Column title="COMPLETE" column="COMPLETE" cards={cards} setCards={setCards} />
             </div>
         </div>
     );
@@ -137,11 +183,12 @@ export const Board = (projects: Project[]) => {
  */
 const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
     const [active, setActive] = useState(false); // state for active drag
-    const filteredCards = cards.filter((c) => c.column === column); // filters cards to only those in the same column
+
+    const filteredCards = cards.filter((c) => c.task_status === column); // filters cards to only those in the same column
 
     // function to handle the start of a drag
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: CardType) => {
-        e.dataTransfer.setData("cardId", card.id); // pass the id of the card
+        e.dataTransfer.setData("cardId", card.task_id); // pass the id of the card
     };
 
     // function to handle an active drag
@@ -225,19 +272,19 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
         if (before !== cardId) {
             let copy = [...cards]; // create a copy of the cards
 
-            let cardToBeTransferred = copy.find((c) => c.id === cardId); // find the id of the card to be moved
+            let cardToBeTransferred = copy.find((c) => c.task_id === cardId); // find the id of the card to be moved
             if (!cardToBeTransferred) return;
 
-            cardToBeTransferred = { ...cardToBeTransferred, column }; //update the card's column
+            cardToBeTransferred = { ...cardToBeTransferred, task_status: column }; //update the card's status
 
-            copy = copy.filter((c) => c.id !== cardId); // get all cards other than the one we need to move
+            copy = copy.filter((c) => c.task_id !== cardId); // get all cards other than the one we need to move
 
             const oldPos = before === "-1"; // check to see if we add to end of list
 
             if (oldPos) {
                 copy.push(cardToBeTransferred); // add card to the end of the list
             } else {
-                const insertIndex = copy.findIndex((elm) => elm.id === before); //find index to insert at
+                const insertIndex = copy.findIndex((elm) => elm.task_id === before); //find index to insert at
                 copy.splice(insertIndex, 0, cardToBeTransferred); // insert the card at position
             }
             setCards(copy);
@@ -257,7 +304,7 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
             >
                 {/*Renders the filtered cards */}
                 {filteredCards.map((c) => {
-                    return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+                    return <Card key={c.task_id} {...c} handleDragStart={handleDragStart} />;
                 })}
                 <DropIndicator beforeId={null} column={column} />
             </div>
@@ -269,16 +316,45 @@ const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards }) => {
  * @param {CardProp}
  * @returns react component with cards of the individual columns
  */
-const Card: React.FC<CardProp> = ({ title, id, column, handleDragStart }) => {
+const Card: React.FC<CardProp> = ({
+    project_id,
+    task_creator_id,
+    task_deadline,
+    task_desc,
+    task_id,
+    task_is_meeting,
+    task_location,
+    task_name,
+    task_parent_id,
+    task_priority,
+    task_status,
+    task_time_spent,
+    handleDragStart,
+}) => {
     return (
         <>
-            <DropIndicator beforeId={id} column={column} />
+            <DropIndicator beforeId={task_id} column={task_status} />
             <div
                 draggable="true"
-                onDragStart={(e) => handleDragStart(e, { title, id, column })}
+                onDragStart={(e) =>
+                    handleDragStart(e, {
+                        project_id,
+                        task_creator_id,
+                        task_deadline,
+                        task_desc,
+                        task_id,
+                        task_is_meeting,
+                        task_location,
+                        task_name,
+                        task_parent_id,
+                        task_priority,
+                        task_status,
+                        task_time_spent,
+                    })
+                }
                 className="cursor-grab rounded border border-neutral-700 bg-white p-3 active:cursor-grabbing"
             >
-                <p className="text-sm text-black">{title}</p>
+                <p className="text-sm text-black">{task_name}</p>
             </div>
         </>
     );
