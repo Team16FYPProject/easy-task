@@ -5,11 +5,18 @@ import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
 // Types
 /**
- * @param name: The name of the card
- * @param due_date: The date this task is due
- * @param id: The id of the card, has to be unique
- * @param priority: The priority of the task
- * @param column: The column to which it belongs to i.e todo,doing,complete
+ * @param project_id: The id of the project
+ * @param task_creator_id: The creator of the task
+ * @param task_deadline: The date at which the task is due
+ * @param task_desc: Description of the task
+ * @param task_id: The id of the task
+ * @param task_is_meeting: If the task has a meeting;
+ * @param task_location: The location of the task;
+ * @param task_name: The name of the task;
+ * @param task_parent_id: The parent of the task if any;
+ * @param task_priority: The priority of the task;
+ * @param task_time_spent: How much time is spent on the task;
+ * @param task_status: Current status of the task;
  */
 type CardType = {
     project_id: string;
@@ -17,7 +24,7 @@ type CardType = {
     task_deadline: string;
     task_desc: string;
     task_id: string;
-    task_is_meeting: string;
+    task_is_meeting: boolean;
     task_location: string;
     task_name: string;
     task_parent_id: string;
@@ -26,7 +33,7 @@ type CardType = {
     task_status: string;
 };
 /**
- * @param title: The title of the card
+ * @param title: The title of the column
  * @param column: The column to which it belongs to i.e todo,doing,complete
  * @param cards: The cards that are associated with this column
  * @param setCards: Function to update card state
@@ -38,11 +45,18 @@ type ColumnProps = {
     setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
 };
 /**
- * @param name: The name of the card
- * @param due_date: The date this task is due
- * @param id: The id of the card, has to be unique
- * @param priority: The priority of the task
- * @param column: The column to which it belongs to i.e todo,doing,complete
+ * @param project_id: The id of the project
+ * @param task_creator_id: The creator of the task
+ * @param task_deadline: The date at which the task is due
+ * @param task_desc: Description of the task
+ * @param task_id: The id of the task
+ * @param task_is_meeting: If the task has a meeting;
+ * @param task_location: The location of the task;
+ * @param task_name: The name of the task;
+ * @param task_parent_id: The parent of the task if any;
+ * @param task_priority: The priority of the task;
+ * @param task_time_spent: How much time is spent on the task;
+ * @param task_status: Current status of the task;
  * @param handleDragStart: Function to start drag event
  */
 type CardProp = {
@@ -51,7 +65,7 @@ type CardProp = {
     task_deadline: string;
     task_desc: string;
     task_id: string;
-    task_is_meeting: string;
+    task_is_meeting: boolean;
     task_location: string;
     task_name: string;
     task_parent_id: string;
