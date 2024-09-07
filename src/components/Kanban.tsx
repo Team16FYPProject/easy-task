@@ -1,7 +1,7 @@
 import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import { Project } from "../utils/lib/types";
 // Types
 /**
  * @param id: The id of the card, has to be unique
@@ -45,14 +45,17 @@ type DropIndicatorProps = {
     beforeId: string | null;
     column: string;
 };
+interface KanbanBoardProps {
+    projects: Project[];
+}
 /**
  * Kanban Board component
  * @returns react component of a Kanban Board
  */
-export const KanbanBoard = () => {
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projects }) => {
     return (
         <div className="h-full w-full">
-            <Board />
+            <Board {...projects} />
         </div>
     );
 };
@@ -61,15 +64,35 @@ export const KanbanBoard = () => {
  * Actual board of the Kanban Board
  * @returns react component with board of the Kanban Board
  */
-export const Board = () => {
+export const Board = (projects: Project[]) => {
     const [cards, setCards] = useState(TestCards); // state for the cards
     const [open, setOpen] = React.useState(false); // state for modal task add
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [team, setTeam] = React.useState(""); // state for selected team
+    // convert js object into array
+    projects = Object.values(projects);
     const handleChange = (event: SelectChangeEvent) => {
+        const oldTeam = team;
         //updates team state on selection change
-        setTeam(event.target.value as string); //
+        setTeam(event.target.value as string);
+
+        if (oldTeam === "Team 1") {
+            TestCards = cards;
+        } else if (oldTeam === "Team 2") {
+            TestCards2 = cards;
+        } else {
+            TestCards3 = cards;
+        }
+
+        // set the cards to be a new array, make sure to save the old array
+        if ((event.target.value as string) === "Team 1") {
+            setCards(TestCards);
+        } else if ((event.target.value as string) === "Team 2") {
+            setCards(TestCards2);
+        } else {
+            setCards(TestCards3);
+        }
     };
     return (
         <div className="flex-col">
@@ -85,18 +108,21 @@ export const Board = () => {
                             label="Team"
                             onChange={handleChange}
                         >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
+                            {/* For each project, create a menu item for it */}
+                            {projects.map((project) => (
+                                <MenuItem key={project.project_id} value={project.project_id}>
+                                    {project.project_name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </div>
                 <Button variant="contained" color="secondary" onClick={handleOpen}>
-                    CREATE TEAM
+                    CREATE TASK
                 </Button>
             </div>
             {/* Renders the actual columns of the Kanban Board */}
-            <div className="flex h-full w-full justify-center gap-5 p-10">
+            <div className="flex h-full w-full justify-center gap-5 p-10 md:min-h-[750px]">
                 <Column title="TO DO" column="todo" cards={cards} setCards={setCards} />
                 <Column title="IN PROGRESS" column="doing" cards={cards} setCards={setCards} />
                 <Column title="COMPLETE" column="complete" cards={cards} setCards={setCards} />
@@ -271,7 +297,7 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ beforeId, column }) => {
         />
     );
 };
-const TestCards = [
+let TestCards = [
     { title: "Create Kanban Screen", id: "1", column: "todo" },
     { title: "Create Kanban Screen", id: "2", column: "todo" },
     { title: "Placeholder", id: "5", column: "todo" },
@@ -290,5 +316,22 @@ const TestCards = [
     { title: "Placeholder", id: "18", column: "complete" },
 
     { title: "Hello", id: "3", column: "doing" },
+    { title: "Placeholder", id: "4", column: "complete" },
+];
+let TestCards2 = [
+    { title: "Testing", id: "1", column: "todo" },
+    { title: "Placeholder", id: "17", column: "complete" },
+    { title: "Placeholder", id: "18", column: "complete" },
+
+    { title: "Hello", id: "3", column: "doing" },
+    { title: "Placeholder", id: "4", column: "complete" },
+];
+
+let TestCards3 = [
+    { title: "Testing", id: "1", column: "complete" },
+    { title: "Placeholder", id: "17", column: "complete" },
+    { title: "Placeholder", id: "18", column: "complete" },
+
+    { title: "Hello", id: "3", column: "complete" },
     { title: "Placeholder", id: "4", column: "complete" },
 ];
