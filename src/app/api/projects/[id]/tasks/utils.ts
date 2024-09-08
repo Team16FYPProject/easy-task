@@ -7,21 +7,21 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
-export async function setTaskSettings(
+export async function createTask(
     projectId: string,
     id: string | null,
-    data: FormData,
+    data: Record<string, any>,
     session: Session,
     create: boolean,
 ): Promise<Response> {
-    const task_name = data.get("task_name");
-    const task_desc = data.get("task_desc");
-    const task_deadline = data.get("task_deadline");
-    const task_priority = data.get("task_priority");
-    const task_parent = data.get("task_parent");
-    const task_status = data.get("task_status");
-    const task_is_meeting = data.get("task_meeting");
-    const task_location = data.get("task_location");
+    const task_name = data.task_name;
+    const task_desc = data.task_desc;
+    const task_deadline = data.task_deadline;
+    const task_priority = data.task_priority;
+    const task_parent = data.task_parent;
+    const task_status = data.task_status;
+    const task_is_meeting = data.task_meeting;
+    const task_location = data.task_location;
 
     if (!task_name) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });

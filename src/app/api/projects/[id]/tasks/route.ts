@@ -2,7 +2,7 @@ import { ProjectIdParams } from "@/app/api/projects/[id]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
 import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
-import { setTaskSettings } from "./utils";
+import { createTask } from "./utils";
 
 export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
     const { user } = await getSession();
@@ -30,6 +30,6 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
     if (!session.user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
-    const data = await request.formData();
-    return setTaskSettings(id, null, data, session, true);
+    const data = await request.json();
+    return createTask(id, null, data, session, true);
 }
