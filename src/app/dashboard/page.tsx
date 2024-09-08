@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import AddTeamModal from "@/components/AddTeamModal";
 import TeamCard from "@/components/TeamCard";
 import {
+    Box,
     Button,
     ButtonBase,
     Container,
