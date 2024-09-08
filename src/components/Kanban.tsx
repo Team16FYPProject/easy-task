@@ -217,22 +217,20 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
         if (!cardToBeTransferred) {
             return; // if there is no card to transfer, return immediately
         }
-
         try {
             const route = `/api/projects/${cardToBeTransferred.project_id}/tasks`;
-
-            // Convert cardToBeTransferred to FormData
+            // Convert cardToBeTransferred to JSON
             const response = await fetch(route, {
-                method: "POST",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    cardToBeTransferred,
+                    task_status: cardToBeTransferred.task_status,
+                    task_id: cardToBeTransferred.task_id,
                 }),
             });
             const data = await response.json();
-
             if (!response.ok || !data.success) {
                 setError(data.data);
                 return;
