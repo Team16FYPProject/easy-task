@@ -1,7 +1,12 @@
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
-import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
-import { getServiceSupabase } from "@/utils/supabase/server";
+import {
+    createdResponse,
+    internalErrorResponse,
+    okResponse,
+    unauthorizedResponse,
+} from "@/utils/server/server.responses.utils";
+import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
 import { createTask } from "./utils";
 
 export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
@@ -32,4 +37,28 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
     }
     const data = await request.json();
     return createTask(id, null, data, session, true);
+}
+
+export async function PATCH(request: Request, { params: { id } }: ProjectIdParams) {
+    const supabase = getServerSupabase();
+    const user = (await supabase.auth.getUser())?.data?.user;
+    if (!user) {
+        return unauthorizedResponse({ success: false, data: "Unauthorized" });
+    }
+    // destructure task_status from response
+    const { task_status, task_id } = await request.json();
+
+    // update in the database
+    const { error } = await supabase.from("tasks").update({ task_status }).eq("task_id", task_id);
+
+    // handle an error
+    if (error) {
+        console.error(`Error while updating task_status for task ${task_id}`, error);
+        return internalErrorResponse({
+            success: false,
+            data: "Unable to update your task status details.",
+        });
+    }
+
+    return createdResponse({ success: true, data: "Task status updated" });
 }
