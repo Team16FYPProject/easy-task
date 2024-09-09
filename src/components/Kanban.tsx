@@ -107,9 +107,9 @@ export const Board = ({ projects }: { projects: Project[] }) => {
     const [open, setOpen] = React.useState(false); // state for modal task add
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
+    const [loading, setLoading] = useState(true); // loading state for fetching tasks
     const [team, setTeam] = React.useState(""); // state for selected team
     const [tasksDict, setTasksDict] = useState(new Map());
-    const [allProjects, setProjects] = useState(projects); // convert js object into array
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -139,16 +139,19 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                 }
             });
             await Promise.all(fetchPromises);
+
             setTasksDict(tasksDict);
+            if (tasksDict.size > 0) {
+                setLoading(false);
+            }
         }
         fetchTasks();
     }, [projects]);
 
     const handleChange = (event: SelectChangeEvent) => {
-        const oldTeam = team;
         const new_team = event.target.value;
         //updates team state on selection change
-        setTeam(event.target.value as string);
+        setTeam(new_team as string);
 
         // set the cards to be a new array
         setCards(tasksDict.get(new_team).tasks);
@@ -158,7 +161,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             <div className="flex justify-between p-5">
                 <div className="flex items-center gap-3">
                     <h3 className="text-3xl">Kanban View</h3>
-                    <FormControl sx={{ minWidth: 120 }} size="small">
+                    <FormControl sx={{ minWidth: 120 }} size="small" disabled={loading}>
                         <InputLabel id="select-team-label">Team</InputLabel>
                         <Select
                             labelId="select-team-label"
@@ -175,6 +178,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                             ))}
                         </Select>
                     </FormControl>
+                    {loading && <p>Loading tasks...</p>} {/* Loading indicator */}
                 </div>
                 <Button variant="contained" color="secondary" onClick={handleOpen}>
                     CREATE TASK
@@ -218,16 +222,8 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
             console.error("No card to transfer");
             return;
         }
-        console.log("Card to be transferred:", cardToBeTransferred);
         try {
             const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
-            console.log("PATCH request route:", route);
-            console.log(
-                "PATCH request body:",
-                JSON.stringify({
-                    task_status: cardToBeTransferred.task_status,
-                }),
-            );
             const response = await fetch(route, {
                 method: "PATCH",
                 headers: {
@@ -238,12 +234,10 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
                 }),
             });
             const data = await response.json();
-            console.log("PATCH response:", data);
             if (!response.ok || !data.success) {
                 setError(data.data);
                 return;
             }
-            console.log("Task status updated successfully");
         } catch (e) {
             console.error(
                 `Error updating task status for project ${cardToBeTransferred?.project_id}:`,
@@ -372,7 +366,6 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
             });
 
             // need to also change the data in the db
-            // fix here
             handleTaskStatus(cardToBeTransferred);
         }
     };
