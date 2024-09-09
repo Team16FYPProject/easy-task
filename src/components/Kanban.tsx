@@ -215,13 +215,15 @@ export const Board = ({ projects }: { projects: Project[] }) => {
 export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, setTasksDict }) => {
     async function handleTaskStatus(cardToBeTransferred: CardType) {
         if (!cardToBeTransferred) {
-            return; // if there is no card to transfer, return immediately
+            console.error("No card to transfer");
+            return;
         }
         console.log("Card to be transferred:", cardToBeTransferred);
         try {
             const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
-            // Convert cardToBeTransferred to JSON
+            console.log("PATCH request route:", route);
             console.log(
+                "PATCH request body:",
                 JSON.stringify({
                     task_status: cardToBeTransferred.task_status,
                 }),
@@ -236,20 +238,19 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
                 }),
             });
             const data = await response.json();
+            console.log("PATCH response:", data);
             if (!response.ok || !data.success) {
                 setError(data.data);
                 return;
             }
-
-            // Handle success, e.g., show a success message or update state
+            console.log("Task status updated successfully");
         } catch (e) {
             console.error(
-                `Error fetching tasks for project ${cardToBeTransferred?.project_id}:`,
+                `Error updating task status for project ${cardToBeTransferred?.project_id}:`,
                 e,
             );
             setError("An error occurred while updating the task status.");
         }
-        console.log("call success");
     }
 
     const [active, setActive] = useState(false); // state for active drag
