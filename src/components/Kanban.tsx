@@ -218,8 +218,13 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
             return; // if there is no card to transfer, return immediately
         }
         try {
-            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks`;
+            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
             // Convert cardToBeTransferred to JSON
+            console.log(
+                JSON.stringify({
+                    task_status: cardToBeTransferred.task_status,
+                }),
+            );
             const response = await fetch(route, {
                 method: "PATCH",
                 headers: {
@@ -227,7 +232,6 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
                 },
                 body: JSON.stringify({
                     task_status: cardToBeTransferred.task_status,
-                    task_id: cardToBeTransferred.task_id,
                 }),
             });
             const data = await response.json();
@@ -244,7 +248,9 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
             );
             setError("An error occurred while updating the task status.");
         }
+        console.log("call success");
     }
+
     const [active, setActive] = useState(false); // state for active drag
     const [error, setError] = useState<string>("");
     const filteredCards = cards.filter((c) => c.task_status === column); // filters cards to only those in the same column
