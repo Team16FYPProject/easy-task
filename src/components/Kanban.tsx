@@ -217,6 +217,7 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
         if (!cardToBeTransferred) {
             return; // if there is no card to transfer, return immediately
         }
+        console.log("Card to be transferred:", cardToBeTransferred);
         try {
             const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
             // Convert cardToBeTransferred to JSON

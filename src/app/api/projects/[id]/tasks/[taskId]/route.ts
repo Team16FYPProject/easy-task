@@ -19,9 +19,18 @@ export async function PATCH(request: Request, { params: { id, taskId } }: TaskId
     if (!task_status || !["TODO", "DOING", "COMPLETE"].includes(task_status)) {
         return internalErrorResponse({
             success: false,
-            data: "Invalid task status provided.",
+            data: `Invalid task status provided: ${task_status}`,
         });
     }
+    // Validate taskId
+    if (!taskId || typeof taskId !== "string") {
+        console.error(`Invalid taskId: ${taskId}`);
+        return internalErrorResponse({
+            success: false,
+            data: `Invalid task ID provided: ${taskId}`,
+        });
+    }
+
     // update in the database
     const { error } = await supabase
         .from("task")
@@ -33,7 +42,7 @@ export async function PATCH(request: Request, { params: { id, taskId } }: TaskId
         console.error(`Error while updating task_status for task ${taskId}`, error);
         return internalErrorResponse({
             success: false,
-            data: "Unable to update your task status details.",
+            data: `Unable to update your task status details. Error: ${error.message}`,
         });
     }
 
