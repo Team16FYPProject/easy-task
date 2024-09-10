@@ -122,6 +122,7 @@ export default function Home() {
                             </Grid>
                         </Container>
                     </CustomTabPanel>
+                    {/* Settings - Notifications */}
                     <CustomTabPanel value={value} index={1}>
                         Notifications
                     </CustomTabPanel>
