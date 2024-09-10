@@ -29,6 +29,7 @@ import { Project } from "../../utils/lib/types";
 
 export default function Dashboard() {
     const router = useRouter();
+
     const { loadingUser, user } = useUser();
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
