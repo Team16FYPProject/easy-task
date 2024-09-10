@@ -83,7 +83,7 @@ export default function Home() {
                         <Container sx={{ padding: 6 }}>
                             <Grid container direction="column" spacing={2}>
                                 <Grid item xs={12}>
-                                    <Typography variant="h3">[NAME]</Typography>
+                                    <Typography variant="h3">Account</Typography>
                                 </Grid>
                                 {/* Profile Picture */}
                                 <Grid item xs={12}>
@@ -125,8 +125,28 @@ export default function Home() {
                     <CustomTabPanel value={value} index={1}>
                         Notifications
                     </CustomTabPanel>
+                    {/* Settings - Security */}
                     <CustomTabPanel value={value} index={2}>
-                        Security
+                        <Container sx={{ padding: 6 }}>
+                            <Grid container direction="column" spacing={2}>
+                                <Grid item xs={12}>
+                                    <Typography variant="h3">Security</Typography>
+                                </Grid>
+                                {/* Change Password */}
+                                <Grid item>
+                                    <TextField
+                                        id="enter-current-password"
+                                        label="Current Password"
+                                        defaultValue=""
+                                    />
+                                    <TextField
+                                        id="enter-new-password"
+                                        label="New Password"
+                                        defaultValue=""
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Container>
                     </CustomTabPanel>
                 </Box>
             </Grid>
