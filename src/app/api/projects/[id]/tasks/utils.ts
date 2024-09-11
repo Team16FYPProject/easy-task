@@ -14,14 +14,16 @@ export async function createTask(
     session: Session,
     create: boolean,
 ): Promise<Response> {
-    const task_name = data.task_name;
-    const task_desc = data.task_desc;
-    const task_deadline = data.task_deadline;
-    const task_priority = data.task_priority;
-    const task_parent = data.task_parent;
-    const task_status = data.task_status;
-    const task_is_meeting = data.task_meeting;
-    const task_location = data.task_location;
+    const {
+        task_name,
+        task_desc,
+        task_deadline,
+        task_priority,
+        task_parent,
+        task_status,
+        task_is_meeting,
+        task_location,
+    } = data;
 
     if (!task_name) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });

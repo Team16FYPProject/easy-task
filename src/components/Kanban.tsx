@@ -224,7 +224,7 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
         }
         try {
             const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
-            const response = await fetch(route, {
+            await fetch(route, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -233,11 +233,6 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
                     task_status: cardToBeTransferred.task_status,
                 }),
             });
-            const data = await response.json();
-            if (!response.ok || !data.success) {
-                setError(data.data);
-                return;
-            }
         } catch (e) {
             console.error(
                 `Error updating task status for project ${cardToBeTransferred?.project_id}:`,
