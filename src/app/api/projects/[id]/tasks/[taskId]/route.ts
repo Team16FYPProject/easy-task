@@ -1,17 +1,13 @@
 import {
-    createdResponse,
     internalErrorResponse,
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
 import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
-// import { TaskIdParams } from "./types";
 import { TaskIdParams } from "./types";
-import { getSession } from "@/utils/server/auth.server.utils";
 
 export async function PATCH(request: Request, { params: { id, taskId } }: TaskIdParams) {
-    const supabase = getServiceSupabase();
-    //const { user } = await getSession();
+    const supabase = getServerSupabase();
     const user = (await supabase.auth.getUser())?.data?.user;
     if (!user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
@@ -20,7 +16,7 @@ export async function PATCH(request: Request, { params: { id, taskId } }: TaskId
     const { task_status } = await request.json();
 
     //proceed with the update
-    const { data, error } = await supabase
+    const { data, error } = await getServiceSupabase()
         .from("task")
         .update({ task_status: task_status })
         .eq("task_id", taskId)
@@ -33,6 +29,5 @@ export async function PATCH(request: Request, { params: { id, taskId } }: TaskId
             data: `Unable to update task status. Error: ${error.message}`,
         });
     }
-
     return okResponse({ success: true, tasks: data });
 }
