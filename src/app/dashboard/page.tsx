@@ -202,6 +202,7 @@ export default function Dashboard() {
         router.push(`/team/${projectId}`);
     }
 
+    const onButtonClick = (link: String) => router.push(`/${link}`);
     return (
         <Container sx={{ padding: 6 }}>
             <Grid container direction="column" spacing={2}>
@@ -235,17 +236,32 @@ export default function Dashboard() {
                 <Grid item xs={12}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Button variant="contained" color="secondary" fullWidth>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                fullWidth
+                                onClick={() => onButtonClick("calendar")}
+                            >
                                 CALENDAR VIEW
                             </Button>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Button variant="contained" color="secondary" fullWidth>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                fullWidth
+                                onClick={() => onButtonClick("list")}
+                            >
                                 LIST VIEW
                             </Button>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Button variant="contained" color="secondary" fullWidth>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                fullWidth
+                                onClick={() => onButtonClick("kanban")}
+                            >
                                 KANBAN VIEW
                             </Button>
                         </Grid>

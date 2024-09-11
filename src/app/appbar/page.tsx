@@ -70,14 +70,14 @@ export default function ButtonAppBar() {
             </List>
             <Divider />
             <List>
-                {["Calendar View", "List View", "Kanban View"].map((text, index) => (
+                {["Calendar", "List", "Kanban"].map((text, index) => (
                     <ListItem key={text} disablePadding>
-                        <Link href="/dashboard">
+                        <Link href={`/${text.toLowerCase()}`}>
                             <ListItemButton>
                                 {/* <ListItemIcon>
                                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                             </ListItemIcon> */}
-                                <ListItemText primary={text} />
+                                <ListItemText primary={`${text} View`} />
                             </ListItemButton>
                         </Link>
                     </ListItem>
