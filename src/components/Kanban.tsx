@@ -3,6 +3,7 @@ import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
+import AddTaskModal from "./AddTaskModal";
 // Types
 /**
  * @param project_id: The id of the project
@@ -180,9 +181,12 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     </FormControl>
                     {loading && <p>Loading tasks...</p>} {/* Loading indicator */}
                 </div>
-                <Button variant="contained" color="secondary" onClick={handleOpen}>
-                    CREATE TASK
-                </Button>
+                <div>
+                    <Button variant="contained" color="secondary" onClick={handleOpen}>
+                        CREATE TASK
+                    </Button>
+                    <AddTaskModal open={open} handleClose={handleClose} />
+                </div>
             </div>
             {/* Renders the actual columns of the Kanban Board */}
             <div className="flex h-full w-full justify-center gap-5 p-10 md:min-h-[750px]">
