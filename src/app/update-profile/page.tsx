@@ -10,6 +10,7 @@ import {
     TextField,
     Avatar,
     Skeleton,
+    Button,
 } from "@mui/material";
 
 import { Inter } from "next/font/google";
@@ -53,10 +54,11 @@ export default function Profile() {
     const { loadingUser, user } = useUser();
     const router = useRouter();
     useEffectAsync(async () => {
-        if (loadingUser) return;
-        router.push(user ? "/dashboard" : "/login");
+        if (!loadingUser && !user) {
+            await router.push("/login");
+            return;
+        }
     }, [loadingUser, user]);
-
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -65,7 +67,7 @@ export default function Profile() {
 
     return (
         <Container sx={{ padding: 6 }}>
-            <Grid item xs={12}>
+            <Grid item xs={12} padding={1}>
                 <Typography variant="h3">Settings</Typography>
             </Grid>
             <Grid container direction="column" spacing={2}>
@@ -78,73 +80,113 @@ export default function Profile() {
                             <Tab label="Security" {...a11yProps(2)} />
                         </Tabs>
                     </Box>
+
                     {/* Settings - Accounts */}
                     <CustomTabPanel value={value} index={0}>
-                        <Container sx={{ padding: 6 }}>
+                        <Container sx={{ padding: 1 }}>
                             <Grid container direction="column" spacing={2}>
-                                <Grid item xs={12}>
-                                    <Typography variant="h3">Account</Typography>
+                                <Grid item xs={12} padding={3}>
+                                    <Typography variant="h4">Account</Typography>
                                 </Grid>
                                 {/* Profile Picture */}
-                                <Grid item xs={12}>
-                                    <Avatar></Avatar>
+                                <Grid container spacing={2} padding={1}>
+                                    <Grid item>
+                                        <Avatar></Avatar>
+                                    </Grid>
+                                    <Grid item>
+                                        <input
+                                            accept="image/*"
+                                            style={{ display: "none" }}
+                                            id="raised-button-file"
+                                            type="file"
+                                        />
+                                        <label htmlFor="raised-button-file">
+                                            <Button variant="contained" component="span">
+                                                Upload Picture
+                                            </Button>
+                                        </label>
+                                    </Grid>
                                 </Grid>
                                 {/* Profile Info */}
-                                <Grid item>
-                                    <TextField
-                                        id="edit-full-name"
-                                        label="Full Name"
-                                        defaultValue="[NAME]"
-                                    />
-                                    <TextField
-                                        id="edit-email-address"
-                                        label="Email Address *" /* Note: the asteriks to become automatic */
-                                        defaultValue="[EMAIL ADDRESS]"
-                                    />
+
+                                <Grid container>
+                                    <Grid item spacing={2} padding={1}>
+                                        <TextField
+                                            id="edit-full-name"
+                                            label="Full Name"
+                                            defaultValue="[NAME]"
+                                        />
+                                    </Grid>
+                                    <Grid item spacing={2} padding={1}>
+                                        <TextField
+                                            id="edit-email-address"
+                                            label="Email Address *" /* Note: the asteriks to become automatic */
+                                            defaultValue="[EMAIL ADDRESS]"
+                                        />
+                                    </Grid>
                                 </Grid>
-                                <Grid item>
-                                    <TextField id="edit-bio" label="Bio" defaultValue="[BIO]" />
+                                <Grid container>
+                                    <Grid item spacing={2} padding={1}>
+                                        <TextField id="edit-bio" label="Bio" defaultValue="[BIO]" />
+                                    </Grid>
+                                    <Grid item spacing={2} padding={1}>
+                                        <TextField
+                                            id="edit-customised-link"
+                                            label="Customised Link"
+                                            defaultValue="[CUSTOMISED LINK]"
+                                        />
+                                    </Grid>
                                 </Grid>
-                                <Grid item>
-                                    <TextField
-                                        id="edit-customised-link"
-                                        label="Customised Link"
-                                        defaultValue="[CUSTOMISED LINK]"
-                                    />
-                                </Grid>
+
                                 {/* Preview */}
                                 <Grid item>
-                                    <Typography variant="h3">Preview</Typography>
+                                    <Typography variant="h5">Preview</Typography>
                                 </Grid>
                                 <Grid item>
-                                    <Skeleton variant="rectangular" width={210} height={60} />
+                                    <Skeleton variant="rectangular" width={500} height={200} />
                                 </Grid>
                             </Grid>
                         </Container>
                     </CustomTabPanel>
+
                     {/* Settings - Notifications */}
                     <CustomTabPanel value={value} index={1}>
-                        Notifications
+                        <Container sx={{ padding: 1 }}>
+                            <Grid container direction="column" spacing={2}>
+                                <Grid item xs={12} padding={3}>
+                                    <Typography variant="h4">Notifications</Typography>
+                                </Grid>
+                            </Grid>
+                        </Container>
                     </CustomTabPanel>
                     {/* Settings - Security */}
                     <CustomTabPanel value={value} index={2}>
-                        <Container sx={{ padding: 6 }}>
+                        <Container sx={{ padding: 1 }}>
                             <Grid container direction="column" spacing={2}>
                                 <Grid item xs={12}>
-                                    <Typography variant="h3">Security</Typography>
+                                    <Typography variant="h4">Security</Typography>
                                 </Grid>
                                 {/* Change Password */}
+                                <Grid item>Enter your current password</Grid>
                                 <Grid item>
                                     <TextField
                                         id="enter-current-password"
                                         label="Current Password"
                                         defaultValue=""
                                     />
+                                </Grid>
+                                <Grid item>Enter your new password</Grid>
+                                <Grid item>
                                     <TextField
                                         id="enter-new-password"
                                         label="New Password"
                                         defaultValue=""
                                     />
+                                </Grid>
+                                <Grid item>
+                                    <Button variant="contained" color="secondary">
+                                        SAVE PASSWORD
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </Container>
