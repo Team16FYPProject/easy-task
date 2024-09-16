@@ -6,20 +6,16 @@ import {
     Grid,
     Tabs,
     Typography,
-    IconButton,
     TextField,
     Avatar,
     Skeleton,
     Button,
 } from "@mui/material";
 
-import { Inter } from "next/font/google";
 import { useUser } from "@/hooks/useUser";
 import React from "react";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useRouter } from "next/navigation";
-
-const inter = Inter({ subsets: ["latin"] });
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -50,7 +46,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default function Profile() {
+export default function UpdateProfile() {
     const { loadingUser, user } = useUser();
     const router = useRouter();
     useEffectAsync(async () => {

@@ -31,11 +31,7 @@ export default function Profile() {
                             <Typography variant="h3">Profile</Typography>
                         </Grid>
                         <Grid item>
-                            <Button
-                                href="update-profile/page"
-                                variant="contained"
-                                color="secondary"
-                            >
+                            <Button href="/update-profile" variant="contained" color="secondary">
                                 EDIT PROFILE
                             </Button>
                         </Grid>
