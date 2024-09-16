@@ -6,6 +6,7 @@ import {
     Modal,
     Select,
     SelectChangeEvent,
+    TextField,
     Typography,
 } from "@mui/material";
 import { FormEvent, useState } from "react";
@@ -29,13 +30,20 @@ export default function AddTaskModal({
     open: boolean;
     handleClose: () => void;
 }) {
-    const [taskName, setTaskName] = useState<string>("");
-    const [taskDescription, setTaskDescription] = useState<string>("");
+    // form states
+    const [taskName, setTaskName] = useState("");
+    const [taskDescription, setTaskDescription] = useState("");
     const [taskDeadline, setTaskDeadline] = useState<Date | null>(new Date());
+    const [taskParent, setTaskParent] = useState("");
+    const [taskStatus, setTaskStatus] = useState("");
+    const [taskPriority, setTaskPriority] = useState("");
+    const [taskReminder, setTaskReminder] = useState("");
+    const [taskLocation, setTaskLocation] = useState("");
+    const [taskMeetingBool, setTaskMeetingBool] = useState("");
+    const [taskDuration, setTaskDuration] = useState("");
     const [parent, setParent] = useState("");
-    const handleChange = (event: SelectChangeEvent) => {
-        setParent(event.target.value as string);
-    };
+    const [assignee, setTaskAssignees] = useState("");
+
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
         return;
@@ -50,8 +58,8 @@ export default function AddTaskModal({
             >
                 <Box sx={style}>
                     <label className="p-5 text-2xl">Create Task</label>
-                    <form className="flex flex-row gap-2" onSubmit={handleSubmit}>
-                        <div className="flex w-11/12 flex-col gap-1 px-5 text-black">
+                    <form className="flex flex-row gap-2 py-10" onSubmit={handleSubmit}>
+                        <div className="flex h-full w-full flex-col gap-1 px-5 text-black">
                             <label>Task Name</label>
                             <input
                                 className="rounded-md border-2 border-solid border-gray-600 p-2"
@@ -81,7 +89,11 @@ export default function AddTaskModal({
                                 <div className="flex w-full flex-col">
                                     <label>Task Parent</label>
                                     <FormControl fullWidth>
-                                        <Select value={parent} onChange={handleChange} displayEmpty>
+                                        <Select
+                                            value={parent}
+                                            onChange={(e) => setTaskParent(e.target.value)}
+                                            displayEmpty
+                                        >
                                             <MenuItem value="">
                                                 <em>None</em>
                                             </MenuItem>
@@ -91,6 +103,135 @@ export default function AddTaskModal({
                                         </Select>
                                     </FormControl>
                                 </div>
+                            </div>
+                            <div className="flex flex-row justify-between gap-10">
+                                <div className="flex w-full flex-col">
+                                    <label>Task Status</label>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={parent}
+                                            onChange={(e) => setTaskStatus(e.target.value)}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={10}>TODO</MenuItem>
+                                            <MenuItem value={20}>IN PROGRESS</MenuItem>
+                                            <MenuItem value={30}>COMPLETE</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex w-full flex-col">
+                                    <label>Task Priority</label>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={parent}
+                                            onChange={(e) => setTaskPriority(e.target.value)}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem>LOW</MenuItem>
+                                            <MenuItem>MEDIUM</MenuItem>
+                                            <MenuItem>HIGH</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                            </div>
+                            <div className="flex flex-row justify-between gap-10">
+                                <div className="flex w-full flex-col">
+                                    <label>Reminder</label>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={parent}
+                                            onChange={(e) => setTaskReminder(e.target.value)}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={10}>Ten</MenuItem>
+                                            <MenuItem value={20}>Twenty</MenuItem>
+                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex w-full flex-col">
+                                    <label>Location</label>
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            id="outlined-location"
+                                            variant="outlined"
+                                            onChange={(e) => setTaskLocation(e.target.value)}
+                                        />
+                                    </FormControl>
+                                </div>
+                            </div>
+                            <div className="flex flex-row justify-between gap-10">
+                                <div className="flex w-full flex-col">
+                                    <label>Desinate Meeting</label>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={parent}
+                                            onChange={(e) => setTaskMeetingBool(e.target.value)}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={10}>Ten</MenuItem>
+                                            <MenuItem value={20}>Twenty</MenuItem>
+                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex w-full flex-col">
+                                    <label>Meeting Duration</label>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={parent}
+                                            onChange={(e) => setTaskDuration(e.target.value)}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={10}>Ten</MenuItem>
+                                            <MenuItem value={20}>Twenty</MenuItem>
+                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                            </div>
+                            <FormControl fullWidth>
+                                <Select
+                                    value={parent}
+                                    onChange={(e) => setTaskAssignees(e.target.value)}
+                                    displayEmpty
+                                >
+                                    <MenuItem value="Task Assignees">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value={10}>Ten</MenuItem>
+                                    <MenuItem value={20}>Twenty</MenuItem>
+                                    <MenuItem value={30}>Thirty</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <div className="flex w-full justify-end">
+                                <button
+                                    type="submit"
+                                    className="my-3 rounded-md p-2 text-xl text-purple-500"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="my-3 rounded-md p-2 text-xl text-purple-500"
+                                >
+                                    Submit
+                                </button>
                             </div>
                         </div>
                     </form>
