@@ -9,6 +9,9 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Dayjs } from "dayjs";
 import { FormEvent, useState } from "react";
 
 const style = {
@@ -40,9 +43,10 @@ export default function AddTaskModal({
     const [taskReminder, setTaskReminder] = useState("");
     const [taskLocation, setTaskLocation] = useState("");
     const [taskMeetingBool, setTaskMeetingBool] = useState("");
-    const [taskDuration, setTaskDuration] = useState("");
+    const [taskDuration, setTaskDuration] = useState<string | null>(null);
     const [parent, setParent] = useState("");
     const [assignee, setTaskAssignees] = useState("");
+    const [selectedTime, setSelectedTime] = useState(null);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -64,39 +68,34 @@ export default function AddTaskModal({
                             <input
                                 className="rounded-md border-2 border-solid border-gray-600 p-2"
                                 value={taskName}
-                                onChange={(e) => setTaskName(e.target.value)}
+                                onChange={(e) => {
+                                    setTaskName(e.target.value);
+                                }}
                             />
                             <label>Task Description</label>
                             <input
                                 className="rounded-md border-2 border-solid border-gray-600 p-2"
                                 value={taskDescription}
-                                onChange={(e) => setTaskDescription(e.target.value)}
+                                onChange={(e) => {
+                                    setTaskDescription(e.target.value);
+                                }}
                             />
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>Task Deadline</label>
-                                    <input
-                                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                                        type="date"
-                                        value={
-                                            taskDeadline
-                                                ? taskDeadline.toISOString().split("T")[0]
-                                                : ""
-                                        }
-                                        onChange={(e) => setTaskDeadline(e.target.valueAsDate)}
-                                    />
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker></DatePicker>
+                                    </LocalizationProvider>
                                 </div>
                                 <div className="flex w-full flex-col">
                                     <label>Task Parent</label>
                                     <FormControl fullWidth>
                                         <Select
                                             value={parent}
-                                            onChange={(e) => setTaskParent(e.target.value)}
-                                            displayEmpty
+                                            onChange={(e) => {
+                                                setTaskParent(e.target.value);
+                                            }}
                                         >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
                                             <MenuItem value={10}>Ten</MenuItem>
                                             <MenuItem value={20}>Twenty</MenuItem>
                                             <MenuItem value={30}>Thirty</MenuItem>
@@ -109,13 +108,11 @@ export default function AddTaskModal({
                                     <label>Task Status</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={parent}
-                                            onChange={(e) => setTaskStatus(e.target.value)}
-                                            displayEmpty
+                                            value={taskStatus}
+                                            onChange={(e) => {
+                                                setTaskStatus(e.target.value);
+                                            }}
                                         >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
                                             <MenuItem value={10}>TODO</MenuItem>
                                             <MenuItem value={20}>IN PROGRESS</MenuItem>
                                             <MenuItem value={30}>COMPLETE</MenuItem>
@@ -127,12 +124,11 @@ export default function AddTaskModal({
                                     <FormControl fullWidth>
                                         <Select
                                             value={parent}
-                                            onChange={(e) => setTaskPriority(e.target.value)}
+                                            onChange={(e) => {
+                                                setTaskPriority(e.target.value);
+                                            }}
                                             displayEmpty
                                         >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
                                             <MenuItem>LOW</MenuItem>
                                             <MenuItem>MEDIUM</MenuItem>
                                             <MenuItem>HIGH</MenuItem>
@@ -145,13 +141,11 @@ export default function AddTaskModal({
                                     <label>Reminder</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={parent}
-                                            onChange={(e) => setTaskReminder(e.target.value)}
-                                            displayEmpty
+                                            value={taskReminder}
+                                            onChange={(e) => {
+                                                setTaskReminder(e.target.value);
+                                            }}
                                         >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
                                             <MenuItem value={10}>Ten</MenuItem>
                                             <MenuItem value={20}>Twenty</MenuItem>
                                             <MenuItem value={30}>Thirty</MenuItem>
@@ -164,7 +158,9 @@ export default function AddTaskModal({
                                         <TextField
                                             id="outlined-location"
                                             variant="outlined"
-                                            onChange={(e) => setTaskLocation(e.target.value)}
+                                            onChange={(e) => {
+                                                setTaskLocation(e.target.value);
+                                            }}
                                         />
                                     </FormControl>
                                 </div>
@@ -174,46 +170,40 @@ export default function AddTaskModal({
                                     <label>Desinate Meeting</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={parent}
-                                            onChange={(e) => setTaskMeetingBool(e.target.value)}
-                                            displayEmpty
+                                            value={taskMeetingBool}
+                                            onChange={(e) => {
+                                                setTaskDescription(e.target.value);
+                                            }}
                                         >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                            <MenuItem value={1}>True</MenuItem>
+                                            <MenuItem value={0}>False</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
                                 <div className="flex w-full flex-col">
                                     <label>Meeting Duration</label>
-                                    <FormControl fullWidth>
-                                        <Select
-                                            value={parent}
-                                            onChange={(e) => setTaskDuration(e.target.value)}
-                                            displayEmpty
-                                        >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <TimePicker
+                                            value={selectedTime}
+                                            onChange={() => {
+                                                setTaskDuration(
+                                                    taskDuration
+                                                        ? taskDuration.toString().split("T")[0]
+                                                        : "",
+                                                );
+                                            }}
+                                            ampm={false} // 24-hour format
+                                        />
+                                    </LocalizationProvider>
                                 </div>
                             </div>
                             <FormControl fullWidth>
                                 <Select
-                                    value={parent}
-                                    onChange={(e) => setTaskAssignees(e.target.value)}
-                                    displayEmpty
+                                    value={assignee}
+                                    onChange={(e) => {
+                                        setTaskAssignees(e.target.value);
+                                    }}
                                 >
-                                    <MenuItem value="Task Assignees">
-                                        <em>None</em>
-                                    </MenuItem>
                                     <MenuItem value={10}>Ten</MenuItem>
                                     <MenuItem value={20}>Twenty</MenuItem>
                                     <MenuItem value={30}>Thirty</MenuItem>
