@@ -49,7 +49,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default function Home() {
+export default function Profile() {
     const { loadingUser, user } = useUser();
     const router = useRouter();
     useEffectAsync(async () => {
