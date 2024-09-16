@@ -29,29 +29,58 @@ const style = {
 export default function AddTaskModal({
     open,
     handleClose,
+    project_id,
 }: {
     open: boolean;
     handleClose: () => void;
+    project_id: string;
 }) {
     // form states
     const [taskName, setTaskName] = useState("");
     const [taskDescription, setTaskDescription] = useState("");
-    const [taskDeadline, setTaskDeadline] = useState<Date | null>(new Date());
     const [taskParent, setTaskParent] = useState("");
+    const [taskDeadline, setTaskDeadline] = useState<Date | null>(null);
     const [taskStatus, setTaskStatus] = useState("");
     const [taskPriority, setTaskPriority] = useState("");
     const [taskReminder, setTaskReminder] = useState("");
     const [taskLocation, setTaskLocation] = useState("");
-    const [taskMeetingBool, setTaskMeetingBool] = useState("");
+    const [taskMeetingBool, setTaskMeetingBool] = useState<string | number>("");
     const [taskDuration, setTaskDuration] = useState<string | null>(null);
-    const [parent, setParent] = useState("");
     const [assignee, setTaskAssignees] = useState("");
-    const [selectedTime, setSelectedTime] = useState(null);
-
+    const [error, setError] = useState<string>("");
+    const [isError, setIsError] = useState<boolean>(false);
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
-        return;
+        const route = `/api/projects/${project_id}/tasks`;
+        const response = await fetch(route, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                taskName,
+                taskDescription,
+                taskDeadline,
+                taskPriority,
+                taskParent,
+                taskStatus,
+                taskMeetingBool,
+                taskLocation,
+                taskDuration,
+            }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            setError(data.data);
+            setIsError(true);
+            setTimeout(() => {
+                setIsError(false);
+            }, 5000);
+        } else {
+            handleClose();
+        }
     }
+
     return (
         <div>
             <Modal
@@ -62,6 +91,9 @@ export default function AddTaskModal({
             >
                 <Box sx={style}>
                     <label className="p-5 text-2xl">Create Task</label>
+                    <label hidden={!isError} className="text-red-600">
+                        {error}
+                    </label>
                     <form className="flex flex-row gap-2 py-10" onSubmit={handleSubmit}>
                         <div className="flex h-full w-full flex-col gap-1 px-5 text-black">
                             <label>Task Name</label>
@@ -84,14 +116,23 @@ export default function AddTaskModal({
                                 <div className="flex w-full flex-col">
                                     <label>Task Deadline</label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker></DatePicker>
+                                        <DatePicker
+                                            disablePast
+                                            onChange={(newValue) =>
+                                                setTaskDeadline(
+                                                    newValue
+                                                        ? new Date(newValue.toISOString())
+                                                        : null,
+                                                )
+                                            }
+                                        ></DatePicker>
                                     </LocalizationProvider>
                                 </div>
                                 <div className="flex w-full flex-col">
                                     <label>Task Parent</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={parent}
+                                            value={taskParent}
                                             onChange={(e) => {
                                                 setTaskParent(e.target.value);
                                             }}
@@ -123,15 +164,14 @@ export default function AddTaskModal({
                                     <label>Task Priority</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={parent}
+                                            value={taskPriority}
                                             onChange={(e) => {
                                                 setTaskPriority(e.target.value);
                                             }}
-                                            displayEmpty
                                         >
-                                            <MenuItem>LOW</MenuItem>
-                                            <MenuItem>MEDIUM</MenuItem>
-                                            <MenuItem>HIGH</MenuItem>
+                                            <MenuItem value={10}>LOW</MenuItem>
+                                            <MenuItem value={20}>MEDIUM</MenuItem>
+                                            <MenuItem value={30}>HIGH</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
@@ -167,12 +207,12 @@ export default function AddTaskModal({
                             </div>
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
-                                    <label>Desinate Meeting</label>
+                                    <label>Designate Meeting</label>
                                     <FormControl fullWidth>
                                         <Select
                                             value={taskMeetingBool}
                                             onChange={(e) => {
-                                                setTaskDescription(e.target.value);
+                                                setTaskMeetingBool(e.target.value);
                                             }}
                                         >
                                             <MenuItem value={1}>True</MenuItem>
@@ -184,7 +224,6 @@ export default function AddTaskModal({
                                     <label>Meeting Duration</label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <TimePicker
-                                            value={selectedTime}
                                             onChange={() => {
                                                 setTaskDuration(
                                                     taskDuration
@@ -213,12 +252,14 @@ export default function AddTaskModal({
                                 <button
                                     type="submit"
                                     className="my-3 rounded-md p-2 text-xl text-purple-500"
+                                    onClick={handleClose}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     className="my-3 rounded-md p-2 text-xl text-purple-500"
+                                    onClick={handleSubmit}
                                 >
                                     Submit
                                 </button>
