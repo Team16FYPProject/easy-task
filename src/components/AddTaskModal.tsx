@@ -108,7 +108,9 @@ export default function AddTaskModal({
                     </label>
                     <form className="flex flex-row gap-2 py-10" onSubmit={handleSubmit}>
                         <div className="flex h-full w-full flex-col gap-1 px-5 text-black">
-                            <label>Task Name</label>
+                            <label>
+                                Task Name <span className="text-red-600">*</span>
+                            </label>
                             <input
                                 className="rounded-md border-2 border-solid border-gray-600 p-2"
                                 value={taskName}
@@ -126,7 +128,9 @@ export default function AddTaskModal({
                             />
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
-                                    <label>Task Deadline</label>
+                                    <label>
+                                        Task Deadline<span className="text-red-600">*</span>
+                                    </label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
                                             disablePast
@@ -158,7 +162,9 @@ export default function AddTaskModal({
                             </div>
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
-                                    <label>Task Status</label>
+                                    <label>
+                                        Task Status<span className="text-red-600">*</span>
+                                    </label>
                                     <FormControl fullWidth>
                                         <Select
                                             value={taskStatus}
@@ -173,7 +179,9 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                                 <div className="flex w-full flex-col">
-                                    <label>Task Priority</label>
+                                    <label>
+                                        Task Priority<span className="text-red-600">*</span>
+                                    </label>
                                     <FormControl fullWidth>
                                         <Select
                                             value={taskPriority}
