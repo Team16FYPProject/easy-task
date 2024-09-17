@@ -15,26 +15,36 @@ export async function createTask(
     create: boolean,
 ): Promise<Response> {
     const {
-        task_name,
-        task_desc,
-        task_deadline,
-        task_priority,
-        task_parent,
-        task_status,
-        task_is_meeting,
-        task_location,
+        taskName,
+        taskDescription,
+        taskDeadline,
+        taskPriority,
+        taskParent,
+        taskStatus,
+        taskMeetingBool,
+        taskLocation,
     } = data;
-
-    if (!task_name) {
+    if (!taskName) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });
     }
-    if (!task_deadline) {
+    if (!taskDeadline) {
         return badRequestResponse({
             success: false,
             data: "Task deadline is a required field",
         });
     }
-
+    if (!taskStatus) {
+        return badRequestResponse({
+            success: false,
+            data: "Task status is a required field",
+        });
+    }
+    if (!taskPriority) {
+        return badRequestResponse({
+            success: false,
+            data: "Task priority is a required field",
+        });
+    }
     const { user } = session;
 
     let taskId: string;
@@ -48,26 +58,28 @@ export async function createTask(
     }
 
     const supabase = getServiceSupabase();
-
+    console.log(taskId);
+    console.log(projectId);
+    console.log(data);
     const { data: taskData, error: taskError } = await supabase
         .from("task")
         .upsert({
             task_id: taskId,
             project_id: projectId,
-            task_name: task_name,
-            project_desc: task_desc,
-            task_deadline: task_deadline,
+            task_name: taskName,
+            task_desc: taskDescription,
+            task_deadline: taskDeadline,
             task_time_spent: 0,
-            task_creater_id: user.id,
-            task_parent_id: task_parent,
-            task_status: task_status,
-            task_priority: task_priority,
-            task_location: task_location,
-            task_is_meeting: task_is_meeting,
+            task_creator_id: user.id,
+            task_parent_id: taskParent,
+            task_status: taskStatus,
+            task_priority: taskPriority,
+            task_location: taskLocation,
+            task_is_meeting: taskMeetingBool,
         })
         .select("task_id")
         .single();
-
+    console.log(taskError);
     if (taskError || !data) {
         console.error("Unable to insert task to database", taskError);
         return internalErrorResponse({

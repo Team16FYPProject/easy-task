@@ -37,19 +37,31 @@ export default function AddTaskModal({
 }) {
     // form states
     const [taskName, setTaskName] = useState("");
-    const [taskDescription, setTaskDescription] = useState("");
+    const [taskDescription, setTaskDescription] = useState<string | null>(null);
     const [taskParent, setTaskParent] = useState("");
     const [taskDeadline, setTaskDeadline] = useState<Date | null>(null);
     const [taskStatus, setTaskStatus] = useState("");
     const [taskPriority, setTaskPriority] = useState("");
     const [taskReminder, setTaskReminder] = useState("");
     const [taskLocation, setTaskLocation] = useState("");
-    const [taskMeetingBool, setTaskMeetingBool] = useState<string | number>("");
-    const [taskDuration, setTaskDuration] = useState<string | null>(null);
+    const [taskMeetingBool, setTaskMeetingBool] = useState<string>("");
+    const [taskDuration, setTaskDuration] = useState<string>("");
     const [assignee, setTaskAssignees] = useState("");
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
+    // Helper function to replace empty strings with null
+    function emptyStringToNull(value: string | null): string | null {
+        return value === "" ? null : value;
+    }
     async function handleSubmit(event: FormEvent) {
+        // change string "true" or "false" into booleans
+        let meetingBool = false;
+        if (taskMeetingBool == "true") {
+            meetingBool = true;
+        } else {
+            meetingBool = false;
+        }
+
         event.preventDefault();
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {
@@ -59,13 +71,13 @@ export default function AddTaskModal({
             },
             body: JSON.stringify({
                 taskName,
-                taskDescription,
+                taskDescription: emptyStringToNull(taskDescription),
                 taskDeadline,
                 taskPriority,
-                taskParent,
+                taskParent: emptyStringToNull(taskParent),
                 taskStatus,
-                taskMeetingBool,
-                taskLocation,
+                meetingBool,
+                taskLocation: emptyStringToNull(taskLocation),
                 taskDuration,
             }),
         });
@@ -107,7 +119,7 @@ export default function AddTaskModal({
                             <label>Task Description</label>
                             <input
                                 className="rounded-md border-2 border-solid border-gray-600 p-2"
-                                value={taskDescription}
+                                value={taskDescription ?? ""}
                                 onChange={(e) => {
                                     setTaskDescription(e.target.value);
                                 }}
@@ -154,9 +166,9 @@ export default function AddTaskModal({
                                                 setTaskStatus(e.target.value);
                                             }}
                                         >
-                                            <MenuItem value={10}>TODO</MenuItem>
-                                            <MenuItem value={20}>IN PROGRESS</MenuItem>
-                                            <MenuItem value={30}>COMPLETE</MenuItem>
+                                            <MenuItem value={"TODO"}>TODO</MenuItem>
+                                            <MenuItem value={"DOING"}>IN PROGRESS</MenuItem>
+                                            <MenuItem value={"COMPLETE"}>COMPLETE</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
@@ -169,9 +181,9 @@ export default function AddTaskModal({
                                                 setTaskPriority(e.target.value);
                                             }}
                                         >
-                                            <MenuItem value={10}>LOW</MenuItem>
-                                            <MenuItem value={20}>MEDIUM</MenuItem>
-                                            <MenuItem value={30}>HIGH</MenuItem>
+                                            <MenuItem value={"LOW"}>LOW</MenuItem>
+                                            <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
+                                            <MenuItem value={"HIGH"}>HIGH</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
