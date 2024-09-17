@@ -72,8 +72,7 @@ export default function UpdateProfile() {
                     <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                             <Tab label="Accounts" {...a11yProps(0)} />
-                            <Tab label="Notifications" {...a11yProps(1)} />
-                            <Tab label="Security" {...a11yProps(2)} />
+                            <Tab label="Security" {...a11yProps(1)} />
                         </Tabs>
                     </Box>
 
@@ -145,16 +144,6 @@ export default function UpdateProfile() {
                         </Container>
                     </CustomTabPanel>
 
-                    {/* Settings - Notifications */}
-                    <CustomTabPanel value={value} index={1}>
-                        <Container sx={{ padding: 1 }}>
-                            <Grid container direction="column" spacing={2}>
-                                <Grid item xs={12} padding={3}>
-                                    <Typography variant="h4">Notifications</Typography>
-                                </Grid>
-                            </Grid>
-                        </Container>
-                    </CustomTabPanel>
                     {/* Settings - Security */}
                     <CustomTabPanel value={value} index={2}>
                         <Container sx={{ padding: 1 }}>
