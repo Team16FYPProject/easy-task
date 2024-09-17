@@ -184,7 +184,12 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     {loading && <p>Loading tasks...</p>} {/* Loading indicator */}
                 </div>
                 <div>
-                    <Button variant="contained" color="secondary" onClick={handleOpen}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleOpen}
+                        disabled={team == ""}
+                    >
                         CREATE TASK
                     </Button>
                     <AddTaskModal open={open} handleClose={handleClose} project_id={`${teamId}`} />
