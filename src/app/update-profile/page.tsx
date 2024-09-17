@@ -145,7 +145,7 @@ export default function UpdateProfile() {
                     </CustomTabPanel>
 
                     {/* Settings - Security */}
-                    <CustomTabPanel value={value} index={2}>
+                    <CustomTabPanel value={value} index={1}>
                         <Container sx={{ padding: 1 }}>
                             <Grid container direction="column" spacing={2}>
                                 <Grid item xs={12}>
