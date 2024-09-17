@@ -113,6 +113,27 @@ export const Board = ({ projects }: { projects: Project[] }) => {
     const [teamId, setTeamId] = React.useState(""); // state for selected team id
     const [tasksDict, setTasksDict] = useState(new Map());
     const [newTask, setNewTask] = useState("");
+    useEffect(() => {
+        async function handleUpdate() {
+            if (team && newTask && tasksDict) {
+                // get the tasks array for the current team
+                const updatedTasks = [...(tasksDict.get(team)?.tasks || [])];
+
+                // add the new task to the copied tasks array
+                updatedTasks.push(newTask);
+
+                // update the tasks array in the dictionary
+                tasksDict.set(team, { ...tasksDict.get(team), tasks: updatedTasks });
+
+                // update the state with the new array of tasks
+                setCards(updatedTasks);
+
+                // update taskDict state
+                setTasksDict(tasksDict);
+            }
+        }
+        handleUpdate();
+    }, [newTask]);
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -197,7 +218,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         open={open}
                         handleClose={handleClose}
                         project_id={`${teamId}`}
-                        newTaskId={newTask}
+                        setNewTask={setNewTask}
                     />
                 </div>
             </div>

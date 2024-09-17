@@ -18,12 +18,12 @@ export default function AddTaskModal({
     open,
     handleClose,
     project_id,
-    newTaskId,
+    setNewTask,
 }: {
     open: boolean;
     handleClose: () => void;
     project_id: string;
-    newTaskId: string;
+    setNewTask: (newTask: string) => void;
 }) {
     // form states
     const [taskName, setTaskName] = useState<string>("");
@@ -79,6 +79,7 @@ export default function AddTaskModal({
                 setIsError(false);
             }, 5000);
         } else {
+            setNewTask(data.data.taskData);
             handleClose();
         }
     }

@@ -58,9 +58,6 @@ export async function createTask(
     }
 
     const supabase = getServiceSupabase();
-    console.log(taskId);
-    console.log(projectId);
-    console.log(data);
     const { data: taskData, error: taskError } = await supabase
         .from("task")
         .upsert({
@@ -77,9 +74,8 @@ export async function createTask(
             task_location: taskLocation,
             task_is_meeting: taskMeetingBool,
         })
-        .select("task_id")
+        .select("*")
         .single();
-    console.log(taskError);
     if (taskError || !data) {
         console.error("Unable to insert task to database", taskError);
         return internalErrorResponse({
@@ -89,7 +85,7 @@ export async function createTask(
     }
 
     if (create) {
-        return createdResponse({ success: true, data: { id: taskData.task_id } });
+        return createdResponse({ success: true, data: { taskData } });
     } else {
         return okResponse({ success: true, data: "Successfully updated your tasks" });
     }
