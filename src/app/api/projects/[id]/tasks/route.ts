@@ -1,12 +1,7 @@
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
-import {
-    createdResponse,
-    internalErrorResponse,
-    okResponse,
-    unauthorizedResponse,
-} from "@/utils/server/server.responses.utils";
-import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
+import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import { createTask } from "./utils";
 
 export async function GET(request: Request, { params: { id } }: ProjectIdParams) {

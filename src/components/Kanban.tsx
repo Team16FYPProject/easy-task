@@ -112,6 +112,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
     const [team, setTeam] = React.useState(""); // state for selected team name
     const [teamId, setTeamId] = React.useState(""); // state for selected team id
     const [tasksDict, setTasksDict] = useState(new Map());
+    const [newTask, setNewTask] = useState("");
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -192,7 +193,12 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     >
                         CREATE TASK
                     </Button>
-                    <AddTaskModal open={open} handleClose={handleClose} project_id={`${teamId}`} />
+                    <AddTaskModal
+                        open={open}
+                        handleClose={handleClose}
+                        project_id={`${teamId}`}
+                        newTaskId={newTask}
+                    />
                 </div>
             </div>
             {/* Renders the actual columns of the Kanban Board */}

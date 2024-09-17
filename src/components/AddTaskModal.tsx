@@ -1,17 +1,6 @@
-import {
-    Box,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Modal,
-    Select,
-    SelectChangeEvent,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Box, FormControl, MenuItem, Modal, Select, TextField } from "@mui/material";
 import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
 import { FormEvent, useState } from "react";
 
 const style = {
@@ -30,23 +19,25 @@ export default function AddTaskModal({
     open,
     handleClose,
     project_id,
+    newTaskId,
 }: {
     open: boolean;
     handleClose: () => void;
     project_id: string;
+    newTaskId: string;
 }) {
     // form states
-    const [taskName, setTaskName] = useState("");
+    const [taskName, setTaskName] = useState<string>("");
     const [taskDescription, setTaskDescription] = useState<string | null>(null);
-    const [taskParent, setTaskParent] = useState("");
+    const [taskParent, setTaskParent] = useState<string>("");
     const [taskDeadline, setTaskDeadline] = useState<Date | null>(null);
-    const [taskStatus, setTaskStatus] = useState("");
-    const [taskPriority, setTaskPriority] = useState("");
-    const [taskReminder, setTaskReminder] = useState("");
-    const [taskLocation, setTaskLocation] = useState("");
+    const [taskStatus, setTaskStatus] = useState<string>("");
+    const [taskPriority, setTaskPriority] = useState<string>("");
+    const [taskReminder, setTaskReminder] = useState<string>("");
+    const [taskLocation, setTaskLocation] = useState<string>("");
     const [taskMeetingBool, setTaskMeetingBool] = useState<string>("");
     const [taskDuration, setTaskDuration] = useState<string>("");
-    const [assignee, setTaskAssignees] = useState("");
+    const [assignee, setTaskAssignees] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
     // Helper function to replace empty strings with null
