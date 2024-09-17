@@ -2,7 +2,7 @@ import { Box, FormControl, MenuItem, Modal, Select, TextField } from "@mui/mater
 import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FormEvent, useState } from "react";
-
+import { Dayjs } from "dayjs";
 const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -125,7 +125,7 @@ export default function AddTaskModal({
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
                                             disablePast
-                                            onChange={(newValue) =>
+                                            onChange={(newValue: Dayjs | null) =>
                                                 setTaskDeadline(
                                                     newValue
                                                         ? new Date(newValue.toISOString())
