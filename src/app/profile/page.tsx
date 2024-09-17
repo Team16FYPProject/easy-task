@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import { Avatar, Button, Container, Grid, Link, Typography } from "@mui/material";
+import { Button, Container, Grid, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts";
 import TeamCard from "@/components/TeamCard";
 
@@ -31,7 +31,7 @@ export default function Profile() {
                             <Typography variant="h3">Profile</Typography>
                         </Grid>
                         <Grid item>
-                            <Button href="/update-profile" variant="contained" color="secondary">
+                            <Button variant="contained" color="secondary">
                                 EDIT PROFILE
                             </Button>
                         </Grid>
@@ -40,17 +40,7 @@ export default function Profile() {
 
                 {/* Profile Information */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                        <Grid item>
-                            <Avatar></Avatar>
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="h5">[NAME]</Typography>
-                        </Grid>
-                    </Grid>
-                    <Grid item xs={12}>
-                        [BIO]
-                    </Grid>
+                    <Typography variant="h5">Profile Info</Typography>
                 </Grid>
 
                 {/* Achievements */}
