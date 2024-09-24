@@ -1,0 +1,2 @@
+ALTER TABLE profile
+    ADD COLUMN points INTEGER DEFAULT 0;
