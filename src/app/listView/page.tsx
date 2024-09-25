@@ -23,7 +23,7 @@ import {
 import AddTeamModal from "@/components/AddTeamModal";
 import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
-import { Task } from "./types";
+import { Task } from "@/utils/lib/types";
 
 export default function ListView() {
     const router = useRouter();

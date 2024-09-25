@@ -26,6 +26,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { RowData, TeamViewData } from "./types";
 import { Project } from "../../utils/lib/types";
+import { Task } from "@/utils/lib/types";
 
 export default function Dashboard() {
     const router = useRouter();

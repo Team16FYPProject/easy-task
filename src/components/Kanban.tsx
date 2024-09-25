@@ -4,6 +4,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
 import AddTaskModal from "./AddTaskModal";
+import ViewTaskModal from "./ViewTaskModal";
 // Types
 /**
  * @param project_id: The id of the project
@@ -106,6 +107,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projects }) => {
 export const Board = ({ projects }: { projects: Project[] }) => {
     const [cards, setCards] = useState<CardType[]>([]); // state for the cards
     const [open, setOpen] = React.useState(false); // state for modal task add
+
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [loading, setLoading] = useState(true); // loading state for fetching tasks
@@ -165,6 +167,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             await Promise.all(fetchPromises);
 
             setTasksDict(tasksDict);
+            console.log(tasksDict);
             if (tasksDict.size > 0) {
                 setLoading(false);
             }
@@ -181,6 +184,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
         // set the cards to be a new array
         setCards(tasksDict.get(new_team).tasks);
     };
+
     return (
         <div className="flex-col">
             <div className="flex justify-between p-5">
@@ -452,7 +456,15 @@ const Card: React.FC<CardProp> = ({
             return "bg-red-400";
         }
     };
+    const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
     const bgColor = determineBgColor(task_priority);
+    const handleCardClick = () => {
+        setViewTaskOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setViewTaskOpen(false);
+    };
     return (
         <>
             <DropIndicator beforeId={task_id} column={task_status} />
@@ -474,6 +486,7 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                     })
                 }
+                onClick={handleCardClick}
                 className={`cursor-grab rounded border border-neutral-700 p-3 active:cursor-grabbing ${bgColor}`}
             >
                 <div className="flex-col text-sm text-black">
@@ -482,6 +495,26 @@ const Card: React.FC<CardProp> = ({
                     <p>{task_priority}</p>
                 </div>
             </div>
+            {viewTaskOpen && (
+                <ViewTaskModal
+                    open={viewTaskOpen}
+                    onClose={handleCloseModal}
+                    task={{
+                        project_id,
+                        task_creator_id,
+                        task_deadline,
+                        task_desc,
+                        task_id,
+                        task_is_meeting,
+                        task_location,
+                        task_name,
+                        task_parent_id,
+                        task_priority,
+                        task_status,
+                        task_time_spent,
+                    }}
+                />
+            )}
         </>
     );
 };
