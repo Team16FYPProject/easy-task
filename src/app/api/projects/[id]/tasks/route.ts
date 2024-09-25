@@ -1,12 +1,7 @@
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
-import {
-    createdResponse,
-    internalErrorResponse,
-    okResponse,
-    unauthorizedResponse,
-} from "@/utils/server/server.responses.utils";
-import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
+import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import { createTask } from "./utils";
 
 export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
@@ -19,7 +14,12 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
     // query the database to find all tasks that match a project id
     const { data: taskData, error: taskError } = await supabase
         .from("task")
-        .select("*")
+        .select(
+            `
+            *,
+            assignees:task_assignee(user_id)
+        `,
+        )
         .eq("project_id", id);
 
     // handle query errors
