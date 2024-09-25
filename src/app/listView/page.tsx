@@ -5,15 +5,12 @@ import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 
 import {
-    Box,
     Button,
-    ButtonGroup,
+    Chip,
     Container,
     Grid,
-    Pagination,
     Paper,
     Skeleton,
-    Stack,
     Table,
     TableBody,
     TableCell,
@@ -21,13 +18,11 @@ import {
     TableHead,
     TableRow,
     Typography,
+    useTheme,
 } from "@mui/material";
 import AddTeamModal from "@/components/AddTeamModal";
 import React, { useEffect, useState } from "react";
-import { a } from "vitest/dist/chunks/suite.CcK46U-P.js";
-import { zhCN } from "@mui/material/locale";
 import { PieChart } from "@mui/x-charts";
-import { Project } from "../../utils/lib/types";
 import { Task } from "./types";
 
 export default function ListView() {
@@ -38,6 +33,13 @@ export default function ListView() {
     const handleClose = () => setOpen(false);
     const [tasks, setTasks] = React.useState<Task[]>([]);
     const [loadingTasks, setLoadingTasks] = useState(true);
+    const [pieChartProgressData, setPieChartProgressData] = useState<
+        { id: number; value: number; color: string; label: string }[]
+    >([]);
+    const [pieChartAssignmentData, setPieChartAssignmentData] = useState<
+        { id: number; value: number; color: string; label: string }[]
+    >([]);
+    const theme = useTheme(); // Access the MUI theme
 
     // Redirect to login if user is not logged in
     useEffectAsync(async () => {
@@ -63,23 +65,36 @@ export default function ListView() {
                     throw new Error(result.data || "Failed to fetch projects");
                 }
 
-                const projectIDs = result.projects.map(
-                    (project: { project_id: any }) => project.project_id,
-                );
-                const fetchPromises = projectIDs.map((project_id: any) =>
-                    fetch(`/api/projects/${project_id}/tasks`, {
-                        method: "GET",
-                        credentials: "include",
-                    }).then((response) => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
+                // Fetch projects and their names
+                const projectIDsAndNames = result.projects.map(
+                    (project: { project_id: any; project_name: string }) => ({
+                        project_id: project.project_id,
+                        project_name: project.project_name,
                     }),
                 );
 
+                // Fetch tasks for each project
+                const fetchPromises = projectIDsAndNames.map(
+                    ({ project_id, project_name }: { project_id: string; project_name: string }) =>
+                        fetch(`/api/projects/${project_id}/tasks`, {
+                            method: "GET",
+                            credentials: "include",
+                        }).then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json().then((data) => ({
+                                tasks: data.tasks,
+                                project_name,
+                            }));
+                        }),
+                );
+
                 const results = await Promise.all(fetchPromises);
-                const allTasks = results.flatMap((result) => result.tasks);
+                // Flatten the results and include project names with tasks
+                const allTasks = results.flatMap(({ tasks, project_name }) =>
+                    tasks.map((task: any) => ({ ...task, project_name })),
+                );
                 setTasks(allTasks);
             } catch (e) {
                 console.error("Error:", e);
@@ -91,19 +106,109 @@ export default function ListView() {
         fetchTasks();
     }, []);
 
+    useEffect(() => {
+        // Count the number of tasks in each status
+        const statusCounts = tasks.reduce(
+            (counts, task) => {
+                if (task.task_status === "COMPLETE") {
+                    counts.completed += 1;
+                } else if (task.task_status === "DOING") {
+                    counts.inProgress += 1;
+                } else if (task.task_status === "TODO") {
+                    counts.notStarted += 1;
+                }
+                return counts;
+            },
+            { completed: 0, inProgress: 0, notStarted: 0 },
+        );
+
+        // Count the number of tasks in each status
+        const assignmentCounts = tasks.reduce(
+            (counts, task) => {
+                if (task.assignees.length > 0) {
+                    counts.assigned += 1;
+                } else if (task.assignees.length == 0) {
+                    counts.notAssigned += 1;
+                }
+                return counts;
+            },
+            { assigned: 0, notAssigned: 0 },
+        );
+
+        // Update the pie chart data
+        setPieChartProgressData([
+            {
+                id: 0,
+                value: statusCounts.completed,
+                color: theme.palette.secondary.main,
+                label: "Completed",
+            },
+            {
+                id: 1,
+                value: statusCounts.inProgress,
+                color: theme.palette.tertiary?.main,
+                label: "In Progress",
+            },
+            {
+                id: 2,
+                value: statusCounts.notStarted,
+                color: theme.palette.primary.main,
+                label: "Not Started",
+            },
+        ]);
+        // Update the pie chart data
+        setPieChartAssignmentData([
+            {
+                id: 0,
+                value: assignmentCounts.assigned,
+                color: theme.palette.secondary.main,
+                label: "Assigned",
+            },
+            {
+                id: 1,
+                value: assignmentCounts.notAssigned,
+                color: theme.palette.primary.main,
+                label: "Not Assigned",
+            },
+        ]);
+    }, [tasks]);
+
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
     }
 
+    const determineBgColor = (task_priority: String) => {
+        if (task_priority === "LOW") {
+            return "bg-green-200";
+        } else if (task_priority === "MEDIUM") {
+            return "bg-yellow-200";
+        } else {
+            return "bg-red-400";
+        }
+    };
+
     // Generate rows for the table
     function generateRowFunction(tasks: Task[]): React.ReactNode {
         return tasks.map((task, index) => (
             <TableRow key={index}>
-                <TableCell>{task.task_deadline}</TableCell>
+                <TableCell>
+                    {new Intl.DateTimeFormat("en-AU", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    }).format(new Date(task.task_deadline))}
+                </TableCell>
                 <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
-                <TableCell>{task.task_priority}</TableCell>
-                <TableCell>{task.task_creator_id}</TableCell>
+                <TableCell>
+                    <Chip
+                        className={`${determineBgColor(task.task_priority)}`}
+                        label={task.task_priority}
+                    />
+                </TableCell>
+                <TableCell>{task.task_is_meeting ? "Yes" : "No"}</TableCell>
                 <TableCell>{task.task_status}</TableCell>
             </TableRow>
         ));
@@ -129,39 +234,23 @@ export default function ListView() {
                 {/* Insights */}
                 <Grid item xs={12}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={6}>
+                        <Grid item xs={12} sm={6} md={6} style={{ height: "300px" }}>
                             {/* stats chart */}
                             <PieChart
                                 series={[
                                     {
-                                        data: [
-                                            {
-                                                id: 0,
-                                                value: 10,
-                                                color: "primary",
-                                                label: "Completed",
-                                            },
-                                            {
-                                                id: 1,
-                                                value: 15,
-                                                color: "secondary",
-                                                label: "In Progress",
-                                            },
-                                            {
-                                                id: 2,
-                                                value: 20,
-                                                color: "tertiary",
-                                                label: "Not Started",
-                                            },
-                                        ],
-                                        innerRadius: 30,
+                                        data: pieChartProgressData,
+                                        innerRadius: 70,
                                         outerRadius: 100,
-                                        paddingAngle: 5,
-                                        cornerRadius: 5,
+                                        paddingAngle: 1,
+                                        cornerRadius: 1,
                                         startAngle: 0,
                                         endAngle: 360,
                                         cx: 150,
                                         cy: 150,
+                                        arcLabel: (item) => `${item.value}`,
+                                        arcLabelMinAngle: 35,
+                                        arcLabelRadius: "40%",
                                     },
                                 ]}
                                 slotProps={
@@ -173,6 +262,7 @@ export default function ListView() {
                                     }
                                 }
                                 width={400}
+                                // height={200}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={6}>
@@ -180,34 +270,18 @@ export default function ListView() {
                             <PieChart
                                 series={[
                                     {
-                                        data: [
-                                            {
-                                                id: 0,
-                                                value: 10,
-                                                color: "primary",
-                                                label: "Completed",
-                                            },
-                                            {
-                                                id: 1,
-                                                value: 15,
-                                                color: "secondary",
-                                                label: "In Progress",
-                                            },
-                                            {
-                                                id: 2,
-                                                value: 20,
-                                                color: "tertiary",
-                                                label: "Not Started",
-                                            },
-                                        ],
-                                        innerRadius: 30,
+                                        data: pieChartAssignmentData,
+                                        innerRadius: 70,
                                         outerRadius: 100,
-                                        paddingAngle: 5,
-                                        cornerRadius: 5,
+                                        paddingAngle: 1,
+                                        cornerRadius: 1,
                                         startAngle: 0,
                                         endAngle: 360,
                                         cx: 150,
                                         cy: 150,
+                                        arcLabel: (item) => `${item.value}`,
+                                        arcLabelMinAngle: 35,
+                                        arcLabelRadius: "40%",
                                     },
                                 ]}
                                 slotProps={
@@ -219,6 +293,7 @@ export default function ListView() {
                                     }
                                 }
                                 width={400}
+                                // height={200}
                             />
                         </Grid>
                     </Grid>
@@ -229,7 +304,7 @@ export default function ListView() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Date and Time</TableCell>
+                                    <TableCell>Due Date</TableCell>
                                     <TableCell>Team/Task</TableCell>
                                     <TableCell>Priority</TableCell>
                                     <TableCell>Meeting</TableCell>

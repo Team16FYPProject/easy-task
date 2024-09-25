@@ -11,4 +11,11 @@ export interface Task {
     task_creator_id: string;
     task_status: string;
     task_priority: string;
+    task_is_meeting: string;
+    assignees: Assignee[];
+}
+
+// Interface for Assignee
+export interface Assignee {
+    user_id: string;
 }
