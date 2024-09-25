@@ -3,7 +3,7 @@ import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-picker
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FormEvent, useState } from "react";
 const style = {
-    position: "absolute" as "absolute",
+    position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
@@ -34,24 +34,13 @@ export default function AddTaskModal({
     const [taskPriority, setTaskPriority] = useState<string>("");
     const [taskReminder, setTaskReminder] = useState<string>("");
     const [taskLocation, setTaskLocation] = useState<string>("");
-    const [taskMeetingBool, setTaskMeetingBool] = useState<string>("");
+    const [taskMeetingBool, setTaskMeetingBool] = useState<boolean>(false);
     const [taskDuration, setTaskDuration] = useState<string>("");
     const [assignee, setTaskAssignees] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
-    // Helper function to replace empty strings with null
-    function emptyStringToNull(value: string | null): string | null {
-        return value === "" ? null : value;
-    }
-    async function handleSubmit(event: FormEvent) {
-        // change string "true" or "false" into booleans
-        let meetingBool = false;
-        if (taskMeetingBool == "true") {
-            meetingBool = true;
-        } else {
-            meetingBool = false;
-        }
 
+    async function handleSubmit(event: FormEvent) {
         event.preventDefault();
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {
@@ -61,13 +50,13 @@ export default function AddTaskModal({
             },
             body: JSON.stringify({
                 taskName,
-                taskDescription: emptyStringToNull(taskDescription),
+                taskDescription: taskDescription || null,
                 taskDeadline,
                 taskPriority,
-                taskParent: emptyStringToNull(taskParent),
+                taskParent: taskParent || null,
                 taskStatus,
-                meetingBool,
-                taskLocation: emptyStringToNull(taskLocation),
+                taskMeetingBool,
+                taskLocation: taskLocation || null,
                 taskDuration,
             }),
         });
@@ -223,11 +212,13 @@ export default function AddTaskModal({
                                         <Select
                                             value={taskMeetingBool}
                                             onChange={(e) => {
-                                                setTaskMeetingBool(e.target.value);
+                                                setTaskMeetingBool(
+                                                    e.target.value === "true" ? true : false,
+                                                );
                                             }}
                                         >
-                                            <MenuItem value={1}>True</MenuItem>
-                                            <MenuItem value={0}>False</MenuItem>
+                                            <MenuItem value={"true"}>True</MenuItem>
+                                            <MenuItem value={"false"}>False</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
