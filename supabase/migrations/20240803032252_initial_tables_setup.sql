@@ -63,7 +63,7 @@ CREATE TABLE project_invite_link
 ALTER TABLE project_invite_link
     ENABLE ROW LEVEL SECURITY;
 
-CREATE TYPE task_status_enum AS ENUM ('TODO', 'IN_PROGRESS', 'DONE');
+CREATE TYPE task_status_enum AS ENUM ('TODO', 'DOING', 'COMPLETE');
 CREATE TYPE task_priority_enum AS ENUM ('LOW', 'MEDIUM', 'HIGH');
 
 CREATE TABLE task
