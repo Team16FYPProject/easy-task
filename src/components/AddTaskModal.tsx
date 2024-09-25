@@ -25,7 +25,6 @@ export default function AddTaskModal({
     project_id: string;
     setNewTask: (newTask: string) => void;
 }) {
-    // form states
     const [taskName, setTaskName] = useState<string>("");
     const [taskDescription, setTaskDescription] = useState<string | null>(null);
     const [taskParent, setTaskParent] = useState<string>("");
