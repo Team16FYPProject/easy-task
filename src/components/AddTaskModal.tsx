@@ -57,7 +57,7 @@ export default function AddTaskModal({
                 taskStatus,
                 taskMeetingBool,
                 taskLocation: taskLocation || null,
-                taskDuration,
+                taskDuration: taskDuration || null,
             }),
         });
         const data = await response.json();
