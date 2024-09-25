@@ -3,6 +3,7 @@ import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
+import AddTaskModal from "./AddTaskModal";
 // Types
 /**
  * @param project_id: The id of the project
@@ -108,8 +109,31 @@ export const Board = ({ projects }: { projects: Project[] }) => {
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [loading, setLoading] = useState(true); // loading state for fetching tasks
-    const [team, setTeam] = React.useState(""); // state for selected team
+    const [team, setTeam] = React.useState(""); // state for selected team name
+    const [teamId, setTeamId] = React.useState(""); // state for selected team id
     const [tasksDict, setTasksDict] = useState(new Map());
+    const [newTask, setNewTask] = useState("");
+    useEffect(() => {
+        async function handleUpdate() {
+            if (team && newTask && tasksDict) {
+                // get the tasks array for the current team
+                const updatedTasks = [...(tasksDict.get(team)?.tasks || [])];
+
+                // add the new task to the copied tasks array
+                updatedTasks.push(newTask);
+
+                // update the tasks array in the dictionary
+                tasksDict.set(team, { ...tasksDict.get(team), tasks: updatedTasks });
+
+                // update the state with the new array of tasks
+                setCards(updatedTasks);
+
+                // update taskDict state
+                setTasksDict(tasksDict);
+            }
+        }
+        handleUpdate();
+    }, [newTask]);
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -152,6 +176,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
         const new_team = event.target.value;
         //updates team state on selection change
         setTeam(new_team as string);
+        setTeamId(new_team);
 
         // set the cards to be a new array
         setCards(tasksDict.get(new_team).tasks);
@@ -180,9 +205,22 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     </FormControl>
                     {loading && <p>Loading tasks...</p>} {/* Loading indicator */}
                 </div>
-                <Button variant="contained" color="secondary" onClick={handleOpen}>
-                    CREATE TASK
-                </Button>
+                <div>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleOpen}
+                        disabled={team == ""}
+                    >
+                        CREATE TASK
+                    </Button>
+                    <AddTaskModal
+                        open={open}
+                        handleClose={handleClose}
+                        project_id={`${teamId}`}
+                        setNewTask={setNewTask}
+                    />
+                </div>
             </div>
             {/* Renders the actual columns of the Kanban Board */}
             <div className="flex h-full w-full justify-center gap-5 p-10 md:min-h-[750px]">

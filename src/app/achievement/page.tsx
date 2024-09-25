@@ -7,6 +7,7 @@ import {
     Container,
     Grid,
     Paper,
+    Skeleton,
     Table,
     TableBody,
     TableCell,
@@ -113,20 +114,17 @@ export default function Achievements() {
                             </TableHead>
                             {/* Achievement Table Contents */}
                             <TableBody>
-                                {/* {rows.map((row) => (
-                                <TableRow
-                                    key={row.name}
-                                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        {row.name}
+                                <TableRow>
+                                    <TableCell>
+                                        <Skeleton variant="text" />
                                     </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    <TableCell align="right">{row.fat}</TableCell>
-                                    <TableCell align="right">{row.carbs}</TableCell>
-                                    <TableCell align="right">{row.protein}</TableCell>
+                                    <TableCell>
+                                        <Skeleton variant="text" />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Skeleton variant="text" />
+                                    </TableCell>
                                 </TableRow>
-                            ))} */}
                             </TableBody>
                         </Table>
                     </TableContainer>

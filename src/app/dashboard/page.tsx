@@ -252,7 +252,7 @@ export default function Dashboard() {
                                 variant="contained"
                                 color="secondary"
                                 fullWidth
-                                onClick={() => onButtonClick("list")}
+                                onClick={() => onButtonClick("listView")}
                             >
                                 LIST VIEW
                             </Button>
