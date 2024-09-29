@@ -58,9 +58,11 @@ type DropIndicatorProps = {
     beforeId: string | null;
     column: string;
 };
+
 interface KanbanBoardProps {
     projects: Project[];
 }
+
 /**
  * Kanban Board component
  * @returns react component of a Kanban Board
@@ -83,21 +85,20 @@ export const Board = ({ projects }: { projects: Project[] }) => {
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [loading, setLoading] = useState(true); // loading state for fetching tasks
-    const [team, setTeam] = React.useState(""); // state for selected team name
     const [teamId, setTeamId] = React.useState(""); // state for selected team id
     const [tasksDict, setTasksDict] = useState(new Map());
     const [newTask, setNewTask] = useState("");
     useEffect(() => {
         async function handleUpdate() {
-            if (team && newTask && tasksDict) {
+            if (teamId && newTask && tasksDict) {
                 // get the tasks array for the current team
-                const updatedTasks = [...(tasksDict.get(team)?.tasks || [])];
+                const updatedTasks = [...(tasksDict.get(teamId)?.tasks || [])];
 
                 // add the new task to the copied tasks array
                 updatedTasks.push(newTask);
 
                 // update the tasks array in the dictionary
-                tasksDict.set(team, { ...tasksDict.get(team), tasks: updatedTasks });
+                tasksDict.set(teamId, { ...tasksDict.get(teamId), tasks: updatedTasks });
 
                 // update the state with the new array of tasks
                 setCards(updatedTasks);
@@ -106,6 +107,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                 setTasksDict(tasksDict);
             }
         }
+
         handleUpdate();
     }, [newTask]);
     // fetch all tasks from the database
@@ -141,20 +143,27 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             setTasksDict(tasksDict);
             if (tasksDict.size > 0) {
                 setLoading(false);
+                setTeamId(projects[0].project_id);
             }
         }
+
         fetchTasks();
     }, [projects]);
 
-    const handleChange = (event: SelectChangeEvent) => {
-        const new_team = event.target.value;
-        //updates team state on selection change
-        setTeam(new_team as string);
-        setTeamId(new_team);
+    // Set cards to selected team
+    useEffect(() => {
+        if (tasksDict.has(teamId)) {
+            // set the cards to be a new array
+            setCards(tasksDict.get(teamId).tasks);
+        }
+    }, [teamId]);
 
-        // set the cards to be a new array
-        setCards(tasksDict.get(new_team).tasks);
+    const handleChange = (event: SelectChangeEvent) => {
+        const newTeamId = event.target.value;
+        //updates team state on selection change
+        setTeamId(newTeamId);
     };
+
     return (
         <div className="flex-col">
             <div className="flex justify-between p-5">
@@ -165,7 +174,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         <Select
                             labelId="select-team-label"
                             id="simple-team-select"
-                            value={team}
+                            value={teamId}
                             label="Team"
                             onChange={handleChange}
                         >
@@ -184,7 +193,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         variant="contained"
                         color="secondary"
                         onClick={handleOpen}
-                        disabled={team == ""}
+                        disabled={teamId == ""}
                     >
                         CREATE TASK
                     </Button>

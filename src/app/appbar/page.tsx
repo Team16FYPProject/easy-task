@@ -20,8 +20,8 @@ const NAVIGATION_LINKS: NavigationLink[][] = [
     [{ name: "Dashboard" }, { name: "Profile" }, { name: "Achievements" }],
     [
         { name: "Calendar View", link: "/calendar" },
-        { name: "List View", link: "/list" },
-        { name: "Kanban View", link: "/kanbar" },
+        { name: "List View", link: "/listView" },
+        { name: "Kanban View", link: "/kanban" },
     ],
 ];
 

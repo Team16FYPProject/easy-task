@@ -63,7 +63,7 @@ export default function ProfilePage() {
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        {profile.bio ?? ""}
+                        {profile.bio || ""}
                     </Grid>
                 </Grid>
 
