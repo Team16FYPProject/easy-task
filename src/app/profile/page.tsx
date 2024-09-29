@@ -3,22 +3,34 @@
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import { Avatar, Button, Container, Grid, Link, Typography } from "@mui/material";
+import { Avatar, Button, Container, Grid, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts";
 import TeamCard from "@/components/TeamCard";
+import { useState } from "react";
+import type { ApiResponse, Profile } from "@/utils/types";
 
-export default function Profile() {
+export default function ProfilePage() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
+    const [profile, setProfile] = useState<Profile | null>(null);
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
             await router.push("/login");
             return;
         }
+        if (user) {
+            const response = await fetch("/api/user/profile");
+            const data: ApiResponse<Profile> = await response.json();
+            if (!data.success) {
+                alert("Unable to load your profile data.");
+                return;
+            }
+            setProfile(data.data);
+        }
     }, [loadingUser, user]);
 
-    if (!user) {
+    if (!user || !profile) {
         return <></>;
     }
 
@@ -45,11 +57,13 @@ export default function Profile() {
                             <Avatar></Avatar>
                         </Grid>
                         <Grid item>
-                            <Typography variant="h5">[NAME]</Typography>
+                            <Typography variant="h5">
+                                {profile.first_name} {profile.last_name}
+                            </Typography>
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        [BIO]
+                        {profile.bio}
                     </Grid>
                 </Grid>
 

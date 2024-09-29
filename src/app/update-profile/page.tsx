@@ -13,9 +13,10 @@ import {
 } from "@mui/material";
 
 import { useUser } from "@/hooks/useUser";
-import React from "react";
+import React, { useState } from "react";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useRouter } from "next/navigation";
+import type { ApiResponse, Profile } from "@/utils/types";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -49,16 +50,52 @@ function a11yProps(index: number) {
 export default function UpdateProfile() {
     const { loadingUser, user } = useUser();
     const router = useRouter();
+    const [firstName, setFirstName] = useState<string>("");
+    const [lastName, setLastName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [bio, setBio] = useState<string>("");
+
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
             await router.push("/login");
             return;
+        }
+        if (user) {
+            const response = await fetch("/api/user/profile");
+            const data: ApiResponse<Profile> = await response.json();
+            if (!data.success) {
+                alert("Unable to load your profile data.");
+                return;
+            }
+            const profile = data.data;
+            setFirstName(profile.first_name);
+            setLastName(profile.first_name);
+            setEmail(profile.email);
+            setBio(profile.bio);
         }
     }, [loadingUser, user]);
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
+    };
+
+    const handleUpdate = async () => {
+        const formData = new FormData();
+        formData.append("first_name", firstName);
+        formData.append("last_name", lastName);
+        formData.append("email", email);
+        formData.append("bio", bio);
+        const response = await fetch("/api/user/profile", {
+            method: "PATCH",
+            body: formData,
+        });
+        const data: ApiResponse<string> = await response.json();
+        if (!response.ok || !data.success) {
+            alert("Unable to update your profile details.");
+            return;
+        }
+        alert("Profile details updated.");
     };
 
     return (
@@ -86,20 +123,13 @@ export default function UpdateProfile() {
                                 {/* Profile Picture */}
                                 <Grid container spacing={2} padding={1}>
                                     <Grid item>
-                                        <Avatar></Avatar>
-                                    </Grid>
-                                    <Grid item>
-                                        <input
-                                            accept="image/*"
-                                            style={{ display: "none" }}
-                                            id="raised-button-file"
-                                            type="file"
-                                        />
-                                        <label htmlFor="raised-button-file">
-                                            <Button variant="contained" component="span">
-                                                Upload Picture
-                                            </Button>
-                                        </label>
+                                        <Button
+                                            variant="contained"
+                                            component="span"
+                                            onClick={handleUpdate}
+                                        >
+                                            Update
+                                        </Button>
                                     </Grid>
                                 </Grid>
                                 {/* Profile Info */}
@@ -108,37 +138,37 @@ export default function UpdateProfile() {
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
                                             id="edit-full-name"
-                                            label="Full Name"
-                                            defaultValue="[NAME]"
+                                            label="First Name"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
                                         />
                                     </Grid>
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
                                             id="edit-email-address"
-                                            label="Email Address *" /* Note: the asteriks to become automatic */
-                                            defaultValue="[EMAIL ADDRESS]"
+                                            label="Last Name"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
                                         />
                                     </Grid>
                                 </Grid>
                                 <Grid container>
                                     <Grid item spacing={2} padding={1}>
-                                        <TextField id="edit-bio" label="Bio" defaultValue="[BIO]" />
+                                        <TextField
+                                            id="edit-email-address"
+                                            label="Email Address *" /* Note: the asteriks to become automatic */
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
                                     </Grid>
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
-                                            id="edit-customised-link"
-                                            label="Customised Link"
-                                            defaultValue="[CUSTOMISED LINK]"
+                                            id="edit-bio"
+                                            label="Bio"
+                                            value={bio}
+                                            onChange={(e) => setBio(e.target.value)}
                                         />
                                     </Grid>
-                                </Grid>
-
-                                {/* Preview */}
-                                <Grid item>
-                                    <Typography variant="h5">Preview</Typography>
-                                </Grid>
-                                <Grid item>
-                                    <Skeleton variant="rectangular" width={500} height={200} />
                                 </Grid>
                             </Grid>
                         </Container>

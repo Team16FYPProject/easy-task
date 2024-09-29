@@ -25,6 +25,9 @@ export async function GET() {
     return okResponse({
         success: true,
         data: {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
             display_name: data.profile_display_name,
             bio: data.profile_bio,
             avatar: data.profile_avatar,
@@ -58,11 +61,32 @@ export async function PATCH(request: Request) {
         }
     }
 
+    if (data.get("first_name")) {
+        updateData.first_name = data.get("first_name") as string;
+    }
+    if (data.get("last_name")) {
+        updateData.last_name = data.get("last_name") as string;
+    }
     if (data.get("display_name")) {
         updateData.profile_display_name = data.get("display_name") as string;
     }
     if (data.get("bio")) {
         updateData.profile_bio = data.get("bio") as string;
+    }
+
+    const { error: authError } = await supabase.auth.admin.updateUserById(user.id, {
+        email: data.has("email") ? (data.get("email") as string) : undefined,
+        user_metadata: {
+            first_name: data.has("first_name") ? (data.get("first_name") as string) : undefined,
+            last_name: data.has("last_name") ? (data.get("last_name") as string) : undefined,
+        },
+    });
+    if (authError) {
+        console.error(`Error while updating user details ${user.id}`, authError);
+        return internalErrorResponse({
+            success: false,
+            data: "Unable to update your profile details.",
+        });
     }
 
     const { error } = await supabase.from("profile").update(updateData).eq("user_id", user.id);
