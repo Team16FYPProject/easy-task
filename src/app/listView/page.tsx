@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
+import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
 
 import {
     Button,
@@ -171,22 +172,17 @@ export default function ListView() {
                 label: "Not Assigned",
             },
         ]);
-    }, [tasks]);
+    }, [
+        tasks,
+        theme.palette.primary.main,
+        theme.palette.secondary.main,
+        theme.palette.tertiary?.main,
+    ]);
 
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
     }
-
-    const determineBgColor = (task_priority: String) => {
-        if (task_priority === "LOW") {
-            return "bg-green-200";
-        } else if (task_priority === "MEDIUM") {
-            return "bg-yellow-200";
-        } else {
-            return "bg-red-400";
-        }
-    };
 
     // Generate rows for the table
     function generateRowFunction(tasks: Task[]): React.ReactNode {
@@ -204,7 +200,10 @@ export default function ListView() {
                 <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
                 <TableCell>
                     <Chip
-                        className={`${determineBgColor(task.task_priority)}`}
+                        style={{
+                            backgroundColor: determineBgColor(task.task_priority),
+                            color: determineTextColor(task.task_priority),
+                        }}
                         label={task.task_priority}
                     />
                 </TableCell>

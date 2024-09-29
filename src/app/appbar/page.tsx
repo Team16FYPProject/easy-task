@@ -8,21 +8,11 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import {
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Divider,
-    Drawer,
-} from "@mui/material";
-import { usePathname, useRouter } from "next/navigation";
-import path from "path";
+import { List, ListItem, ListItemButton, ListItemText, Divider, Drawer } from "@mui/material";
+import { usePathname } from "next/navigation";
 
 export default function ButtonAppBar() {
     const [open, setOpen] = React.useState(false);
-    const router = useRouter();
     const [shouldShowIconButton, setShouldShowIconButton] = React.useState(true);
 
     const toggleDrawer = (newOpen: boolean) => () => {
@@ -70,18 +60,36 @@ export default function ButtonAppBar() {
             </List>
             <Divider />
             <List>
-                {["Calendar", "List", "Kanban"].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <Link href={`/${text.toLowerCase()}`}>
-                            <ListItemButton>
-                                {/* <ListItemIcon>
+                <ListItem key="Calendar" disablePadding>
+                    <Link href="/calendar">
+                        <ListItemButton>
+                            {/* <ListItemIcon>
                                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                             </ListItemIcon> */}
-                                <ListItemText primary={`${text} View`} />
-                            </ListItemButton>
-                        </Link>
-                    </ListItem>
-                ))}
+                            <ListItemText primary="Calendar" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
+                <ListItem key="List" disablePadding>
+                    <Link href="/listView">
+                        <ListItemButton>
+                            {/* <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon> */}
+                            <ListItemText primary="List" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
+                <ListItem key="Kanban" disablePadding>
+                    <Link href="/kanban">
+                        <ListItemButton>
+                            {/* <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon> */}
+                            <ListItemText primary="Kanban" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
             </List>
         </Box>
     );
