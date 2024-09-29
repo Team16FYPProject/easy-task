@@ -1,9 +1,12 @@
 CREATE TABLE public.profile
 (
     user_id              UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
-    profile_display_name TEXT DEFAULT NULL,
-    profile_bio          TEXT DEFAULT NULL,
-    profile_avatar       TEXT DEFAULT NULL,
+    email                TEXT NOT NULL,
+    first_name           TEXT NOT NULL DEFAULT '',
+    last_name            TEXT NOT NULL DEFAULT '',
+    profile_display_name TEXT          DEFAULT NULL,
+    profile_bio          TEXT          DEFAULT NULL,
+    profile_avatar       TEXT          DEFAULT NULL,
     PRIMARY KEY (user_id)
 );
 
@@ -29,8 +32,8 @@ CREATE FUNCTION public.create_profile_for_new_user()
 AS
 $$
 BEGIN
-    INSERT INTO public.profile (user_id)
-    VALUES (new.id);
+    INSERT INTO public.profile (user_id, email, first_name, last_name)
+    VALUES (new.id, new.email, new.raw_user_meta_data ->> 'first_name', new.raw_user_meta_data ->> 'last_name');
     RETURN new;
 END;
 $$;
