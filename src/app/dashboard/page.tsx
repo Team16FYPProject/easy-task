@@ -8,9 +8,9 @@ import { useRouter } from "next/navigation";
 import AddTeamModal from "@/components/AddTeamModal";
 import TeamCard from "@/components/TeamCard";
 import {
-    Box,
     Button,
     ButtonBase,
+    Chip,
     Container,
     Grid,
     Paper,
@@ -24,7 +24,7 @@ import {
     Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { RowData, TeamViewData } from "./types";
+import { RowData, TeamViewData, Task } from "./types";
 import { Project } from "../../utils/lib/types";
 import { Task } from "@/utils/lib/types";
 
@@ -39,7 +39,7 @@ export default function Dashboard() {
     const [rows, setRows] = useState<RowData[]>([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [loadingTasks, setLoadingTasks] = useState(true);
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = React.useState<Task[]>([]);
     const dataTableHeight = 300;
     const paginationModel = { page: 0, pageSize: 1 };
 
@@ -113,6 +113,62 @@ export default function Dashboard() {
         setRows(newRows);
     }, [projects]);
 
+    // Fetch tasks
+    useEffect(() => {
+        async function fetchTasks() {
+            try {
+                setLoadingTasks(true);
+                const response = await fetch("/api/projects", {
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.data || "Failed to fetch projects");
+                }
+
+                // Fetch projects and their names
+                const projectIDsAndNames = result.projects.map(
+                    (project: { project_id: any; project_name: string }) => ({
+                        project_id: project.project_id,
+                        project_name: project.project_name,
+                    }),
+                );
+
+                // Fetch tasks for each project
+                const fetchPromises = projectIDsAndNames.map(
+                    ({ project_id, project_name }: { project_id: string; project_name: string }) =>
+                        fetch(`/api/projects/${project_id}/tasks`, {
+                            method: "GET",
+                            credentials: "include",
+                        }).then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json().then((data) => ({
+                                tasks: data.tasks,
+                                project_name,
+                            }));
+                        }),
+                );
+
+                const results = await Promise.all(fetchPromises);
+                // Flatten the results and include project names with tasks
+                const allTasks = results.flatMap(({ tasks, project_name }) =>
+                    tasks.map((task: any) => ({ ...task, project_name })),
+                );
+                setTasks(allTasks);
+            } catch (e) {
+                console.error("Error:", e);
+            } finally {
+                setLoadingTasks(false);
+            }
+        }
+
+        fetchTasks();
+    }, []);
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
@@ -195,9 +251,40 @@ export default function Dashboard() {
         );
     }
 
-    // Generate rows for Upcoming Tasks Table
-    function generateRowFunction(tasks: never[]): React.ReactNode {
-        throw new Error("Function not implemented.");
+    const determineBgColor = (task_priority: String) => {
+        if (task_priority === "LOW") {
+            return "bg-green-200";
+        } else if (task_priority === "MEDIUM") {
+            return "bg-yellow-200";
+        } else {
+            return "bg-red-400";
+        }
+    };
+
+    // Generate rows for the table
+    function generateRowFunction(tasks: Task[]): React.ReactNode {
+        return tasks.map((task, index) => (
+            <TableRow key={index}>
+                <TableCell>
+                    {new Intl.DateTimeFormat("en-AU", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    }).format(new Date(task.task_deadline))}
+                </TableCell>
+                <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
+                <TableCell>
+                    <Chip
+                        className={`${determineBgColor(task.task_priority)}`}
+                        label={task.task_priority}
+                    />
+                </TableCell>
+                <TableCell>{task.task_is_meeting ? "Yes" : "No"}</TableCell>
+                <TableCell>{task.task_status}</TableCell>
+            </TableRow>
+        ));
     }
 
     // Handle card click for Team Cards

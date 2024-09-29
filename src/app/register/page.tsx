@@ -3,6 +3,16 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+    Container,
+    Typography,
+    TextField,
+    Button,
+    Box,
+    Link as MuiLink,
+    Alert,
+    Grid,
+} from "@mui/material";
 
 export default function Login() {
     const router = useRouter();
@@ -37,60 +47,88 @@ export default function Login() {
     }
 
     return (
-        <div className="flex h-screen w-screen flex-col items-center justify-center bg-white">
-            {error && <p className="text-red-400">{error}</p>}
-            <form className="flex w-2/5 flex-col gap-2" onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-1">
-                    <label className="text-3xl font-bold text-black">Sign Up</label>
-                </div>
+        <Container component="main" maxWidth="xs">
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                {error && (
+                    <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
+                <Typography component="h1" variant="h2">
+                    Sign Up
+                </Typography>
 
-                <div>
-                    <label className="text-black">Already have an account? </label>
-                    <Link href="/login" className="text-purple-500">
-                        Login
-                    </Link>
-                </div>
-                <div className="flex flex-col gap-1 text-black">
-                    <label>First Name</label>
-                    <input
-                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                        placeholder="John"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                    />
-                </div>
-                <div className="flex flex-col gap-1 text-black">
-                    <label>Last Name</label>
-                    <input
-                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                        placeholder="Doe"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                    />
-                </div>
-                <div className="flex flex-col gap-1 text-black">
-                    <label>Email</label>
-                    <input
-                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                        placeholder="john@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div className="flex flex-col gap-1 text-black">
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <button type="submit" className="mx-14 my-3 rounded-md bg-purple-500 p-2">
-                    Submit
-                </button>
-            </form>
-        </div>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                    <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
+                        Already have an account?{" "}
+                        <MuiLink component={Link} href="/login" color="secondary">
+                            Login
+                        </MuiLink>
+                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                autoComplete="given-name"
+                                name="firstName"
+                                required
+                                fullWidth
+                                id="firstName"
+                                label="First Name"
+                                autoFocus
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                required
+                                fullWidth
+                                id="lastName"
+                                label="Last Name"
+                                name="lastName"
+                                autoComplete="family-name"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="new-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                        Sign Up
+                    </Button>
+                </Box>
+            </Box>
+        </Container>
     );
 }
