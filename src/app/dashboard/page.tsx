@@ -8,9 +8,9 @@ import { useRouter } from "next/navigation";
 import AddTeamModal from "@/components/AddTeamModal";
 import TeamCard from "@/components/TeamCard";
 import {
-    Box,
     Button,
     ButtonBase,
+    Chip,
     Container,
     Grid,
     Paper,
@@ -191,9 +191,40 @@ export default function Dashboard() {
         );
     }
 
-    // Generate rows for Upcoming Tasks Table
+    const determineBgColor = (task_priority: String) => {
+        if (task_priority === "LOW") {
+            return "bg-green-200";
+        } else if (task_priority === "MEDIUM") {
+            return "bg-yellow-200";
+        } else {
+            return "bg-red-400";
+        }
+    };
+
+    // Generate rows for the table
     function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
-        throw new Error("Function not implemented.");
+        return tasks.map((task, index) => (
+            <TableRow key={index}>
+                <TableCell>
+                    {new Intl.DateTimeFormat("en-AU", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    }).format(new Date(task.task_deadline))}
+                </TableCell>
+                <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
+                <TableCell>
+                    <Chip
+                        className={`${determineBgColor(task.task_priority)}`}
+                        label={task.task_priority}
+                    />
+                </TableCell>
+                <TableCell>{task.task_is_meeting ? "Yes" : "No"}</TableCell>
+                <TableCell>{task.task_status}</TableCell>
+            </TableRow>
+        ));
     }
 
     // Handle card click for Team Cards
