@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
-import { Container, Grid, Typography } from "@mui/material";
+import { Button, Container, Grid, Paper, Typography } from "@mui/material";
 // import AddTaskModal from "@/components/AddTaskModal";
 import React, { useEffect, useState } from "react";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Task } from "@/app/calendar/types";
 import moment from "moment";
-import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import { momentLocalizer, Views } from "react-big-calendar";
+import MUICalendar from "@/components/MUICalendar";
 
 export default function CalendarView() {
     const router = useRouter();
@@ -23,7 +24,7 @@ export default function CalendarView() {
     const [loadingTasks, setLoadingTasks] = useState(true);
     const localizer = momentLocalizer(moment);
     // const [newTask, setNewTask] = useState("");
-    const [view, setView] = useState(Views.MONTH);
+    const [view, setView] = useState<"month" | "week" | "day">(Views.MONTH);
     const [date, setDate] = useState(new Date());
 
     // Redirect to login if user is not logged in
@@ -124,35 +125,60 @@ export default function CalendarView() {
         handleOpen(); // This will open your AddTaskModal
     };
 
+    // const EventComponent = ({ event }: { event: any }) => {
+    //     const bgColor = determineBgColor(event.task_priority);
+    //     const textColor = determineTextColor(event.task_priority);
+    //     console.log(bgColor);
+    //     return (
+    //         <div
+    //             style={{
+    //                 backgroundColor: bgColor,
+    //                 color: textColor,
+    //                 padding: "2px 2px",
+    //                 borderRadius: "2px",
+    //                 fontSize: "0.6em",
+    //                 outline: "none",
+    //                 boxShadow: "none",
+    //             }}
+    //         >
+    //             <strong>{event.title}</strong>
+    //             <div>{event.start.toLocaleDateString()}</div> {/* Display the due date */}
+    //         </div>
+    //     );
+    // };
+
     const EventComponent = ({ event }: { event: any }) => {
         const bgColor = determineBgColor(event.task_priority);
         const textColor = determineTextColor(event.task_priority);
-        console.log(bgColor);
         return (
-            <div
-                style={{
-                    backgroundColor: bgColor,
-                    color: textColor,
+            <Paper
+                elevation={1}
+                sx={{
+                    p: 1,
+                    backgroundColor: (theme) => bgColor || theme.palette.primary.main,
+                    color: (theme) => textColor || theme.palette.primary.contrastText,
                     padding: "2px 2px",
                     borderRadius: "2px",
-                    fontSize: "0.6em",
                     outline: "none",
-                    boxShadow: "none",
                 }}
             >
-                <strong>{event.title}</strong>
-                <div>{event.start.toLocaleDateString()}</div> {/* Display the due date */}
-            </div>
+                <Typography sx={{ fontSize: "0.6em", fontWeight: "bold" }}>
+                    {event.title}
+                </Typography>
+                <Typography sx={{ fontSize: "0.6em" }}>
+                    {event.start.toLocaleDateString()}
+                </Typography>
+            </Paper>
         );
     };
 
     const eventStyleGetter = (
-        event: { task_priority: String },
+        event: { task_priority?: string },
         start: any,
         end: any,
         isSelected: any,
     ) => {
-        const bgColor = determineBgColor(event.task_priority);
+        const bgColor = determineBgColor(event.task_priority || "");
         const style = {
             backgroundColor: bgColor || "#3174ad",
             borderRadius: "3px",
@@ -166,19 +192,163 @@ export default function CalendarView() {
         };
     };
 
+    const components = {
+        toolbar: (props: {
+            onNavigate: (navigate: "PREV" | "NEXT" | "TODAY" | "DATE", date?: Date) => void;
+            label:
+                | string
+                | number
+                | bigint
+                | boolean
+                | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                | Iterable<React.ReactNode>
+                | React.ReactPortal
+                | Promise<React.AwaitedReactNode>
+                | null
+                | undefined;
+        }) => (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "1rem",
+                }}
+            >
+                <div>
+                    <Button variant="contained" onClick={() => props.onNavigate("TODAY")}>
+                        Today
+                    </Button>
+                    <Button variant="contained" onClick={() => props.onNavigate("PREV")}>
+                        Back
+                    </Button>
+                    <Button variant="contained" onClick={() => props.onNavigate("NEXT")}>
+                        Next
+                    </Button>
+                </div>
+                <Typography variant="h6">{props.label}</Typography>
+                <div>
+                    <Button variant="contained" onClick={() => setView(Views.MONTH)}>
+                        Month
+                    </Button>
+                    <Button variant="contained" onClick={() => setView(Views.WEEK)}>
+                        Week
+                    </Button>
+                    <Button variant="contained" onClick={() => setView(Views.DAY)}>
+                        Day
+                    </Button>
+                </div>
+            </div>
+        ),
+        views: {
+            month: {
+                header: (props: {
+                    label:
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | Promise<React.AwaitedReactNode>
+                        | null
+                        | undefined;
+                }) => <Typography variant="subtitle1">{props.label}</Typography>,
+            },
+            week: {
+                header: (props: {
+                    label:
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | Promise<React.AwaitedReactNode>
+                        | null
+                        | undefined;
+                }) => <Typography variant="subtitle1">{props.label}</Typography>,
+            },
+            day: {
+                header: (props: {
+                    label:
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | Promise<React.AwaitedReactNode>
+                        | null
+                        | undefined;
+                }) => <Typography variant="subtitle1">{props.label}</Typography>,
+            },
+            // Add more custom components as needed
+        },
+        month: {
+            header: (props: {
+                label:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                    | Iterable<React.ReactNode>
+                    | React.ReactPortal
+                    | Promise<React.AwaitedReactNode>
+                    | null
+                    | undefined;
+            }) => <Typography variant="subtitle1">{props.label}</Typography>,
+        },
+        week: {
+            header: (props: {
+                label:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                    | Iterable<React.ReactNode>
+                    | React.ReactPortal
+                    | Promise<React.AwaitedReactNode>
+                    | null
+                    | undefined;
+            }) => <Typography variant="subtitle1">{props.label}</Typography>,
+        },
+        day: {
+            header: (props: {
+                label:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                    | Iterable<React.ReactNode>
+                    | React.ReactPortal
+                    | Promise<React.AwaitedReactNode>
+                    | null
+                    | undefined;
+            }) => <Typography variant="subtitle1">{props.label}</Typography>,
+        },
+        // Add more custom components as needed
+    };
+
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
     }
 
     return (
-        <Container sx={{ padding: 3 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid container direction="column" spacing={2}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+                    <Grid container spacing={0} alignItems="center" justifyContent="space-between">
                         <Grid item>
-                            <Typography variant="h4">Calendar View</Typography>
+                            <Typography variant="h5">Calendar View</Typography>
                         </Grid>
                         <Grid item>
                             {/* <Button variant="contained" color="secondary" onClick={handleOpen}>
@@ -195,14 +365,14 @@ export default function CalendarView() {
                 </Grid>
                 {/* Upcoming Tasks Table */}
                 <Grid item xs={12}>
-                    <Calendar
+                    <MUICalendar
                         localizer={localizer}
                         events={taskEventsList}
-                        startAccessor="start"
-                        endAccessor="end"
-                        style={{ height: "calc(100vh - 200px)", minHeight: 200 }}
+                        startAccessor={(event: any) => new Date(event.start)}
+                        endAccessor={(event: any) => new Date(event.end)}
+                        style={{ height: "calc(100vh - 150px)", minHeight: 200 }}
                         view={view}
-                        // onView={setView}
+                        onView={setView}
                         date={date}
                         onNavigate={setDate}
                         defaultView={Views.MONTH}
@@ -212,6 +382,7 @@ export default function CalendarView() {
                         selectable
                         popup
                         components={{
+                            ...components,
                             event: EventComponent,
                         }}
                         eventPropGetter={eventStyleGetter}
