@@ -8,17 +8,22 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import {
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Divider,
-    Drawer,
-} from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText, Divider, Drawer } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
-import path from "path";
+
+type NavigationLink = {
+    name: string;
+    link?: string;
+};
+
+const NAVIGATION_LINKS: NavigationLink[][] = [
+    [{ name: "Dashboard" }, { name: "Profile" }, { name: "Achievements" }],
+    [
+        { name: "Calendar View", link: "/calendar" },
+        { name: "List View", link: "/list" },
+        { name: "Kanban View", link: "/kanbar" },
+    ],
+];
 
 export default function ButtonAppBar() {
     const [open, setOpen] = React.useState(false);
@@ -36,53 +41,27 @@ export default function ButtonAppBar() {
 
     const DrawerList = (
         <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
-            <List>
-                <ListItem key="Dashboard" disablePadding>
-                    <Link href="/dashboard">
-                        <ListItemButton>
-                            {/* <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon> */}
-                            <ListItemText primary="Dashboard" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem>
-                <ListItem key="Profile" disablePadding>
-                    <Link href="/profile">
-                        <ListItemButton>
-                            {/* <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon> */}
-                            <ListItemText primary="Profile" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem>
-                <ListItem key="Achievements" disablePadding>
-                    <Link href="/achievement">
-                        <ListItemButton>
-                            {/* <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon> */}
-                            <ListItemText primary="Achievements" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                {["Calendar", "List", "Kanban"].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <Link href={`/${text.toLowerCase()}`}>
-                            <ListItemButton>
-                                {/* <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon> */}
-                                <ListItemText primary={`${text} View`} />
-                            </ListItemButton>
-                        </Link>
-                    </ListItem>
-                ))}
-            </List>
+            {NAVIGATION_LINKS.map((navigationGroup, idx) => {
+                return (
+                    <>
+                        <List key={`nav_group_${idx}`}>
+                            {navigationGroup.map((navLink) => (
+                                <ListItem key={navLink.name} className="w-full">
+                                    <Link
+                                        href={navLink.link ?? `/${navLink.name.toLowerCase()}`}
+                                        className="w-full"
+                                    >
+                                        <ListItemButton className="w-full rounded-lg">
+                                            <ListItemText primary={navLink.name} />
+                                        </ListItemButton>
+                                    </Link>
+                                </ListItem>
+                            ))}
+                        </List>
+                        {idx !== NAVIGATION_LINKS.length - 1 && <Divider />}
+                    </>
+                );
+            })}
         </Box>
     );
 
