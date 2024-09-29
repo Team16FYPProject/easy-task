@@ -7,25 +7,6 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
-export async function DELETE(request: Request, { params: { id } }: ProjectIdParams) {
-    const session = await getSession();
-    if (!session) {
-        return unauthorizedResponse({ success: false, data: "Unauthorized" });
-    }
-
-    const { error } = await getServiceSupabase()
-        .from("project_member")
-        .delete()
-        .eq("user_id", session.user.id)
-        .eq("project_id", id);
-
-    if (error) {
-        console.error(error);
-        return internalErrorResponse({ success: false, data: "Unable to leave that team" });
-    }
-    return okResponse({ success: true, data: "Successfully left that team" });
-}
-
 export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
     console.log("Fetching members for project", id);
     const session = await getSession();
@@ -56,4 +37,23 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
         return okResponse({ success: false, users: [] });
     }
     return okResponse({ success: true, users: userData });
+}
+
+export async function DELETE(request: Request, { params: { id } }: ProjectIdParams) {
+    const session = await getSession();
+    if (!session) {
+        return unauthorizedResponse({ success: false, data: "Unauthorized" });
+    }
+
+    const { error } = await getServiceSupabase()
+        .from("project_member")
+        .delete()
+        .eq("user_id", session.user.id)
+        .eq("project_id", id);
+
+    if (error) {
+        console.error(error);
+        return internalErrorResponse({ success: false, data: "Unable to leave that team" });
+    }
+    return okResponse({ success: true, data: "Successfully left that team" });
 }

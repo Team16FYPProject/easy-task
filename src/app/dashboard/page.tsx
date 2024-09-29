@@ -25,7 +25,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { RowData, TeamViewData } from "./types";
-import { Project } from "../../utils/lib/types";
+import { Project } from "@/utils/lib/types";
+import { ApiResponse, DashboardResponse, ProjectTask } from "@/utils/types";
 
 export default function Dashboard() {
     const router = useRouter();
@@ -38,7 +39,7 @@ export default function Dashboard() {
     const [rows, setRows] = useState<RowData[]>([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [loadingTasks, setLoadingTasks] = useState(true);
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState<ProjectTask[]>([]);
     const dataTableHeight = 300;
     const paginationModel = { page: 0, pageSize: 1 };
 
@@ -55,22 +56,18 @@ export default function Dashboard() {
         async function fetchProjects() {
             try {
                 setLoadingProjects(true);
-                const response = await fetch("/api/projects", {
+                const response = await fetch("/api/user/dashboard", {
                     method: "GET",
                     credentials: "include",
                 });
 
-                const result = await response.json();
+                const result: ApiResponse<DashboardResponse> = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(result.data || "Failed to fetch projects");
+                if (!response.ok || !result.success) {
+                    throw new Error((result.data as string) || "Failed to fetch projects");
                 }
-
-                if (result.success) {
-                    setProjects(result.projects);
-                } else {
-                    throw new Error("Failed to fetch projects");
-                }
+                setProjects(result.data.projects);
+                setTasks(result.data.tasks);
             } catch (e) {
                 console.error("Error:", e);
             } finally {
@@ -195,7 +192,7 @@ export default function Dashboard() {
     }
 
     // Generate rows for Upcoming Tasks Table
-    function generateRowFunction(tasks: never[]): React.ReactNode {
+    function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
         throw new Error("Function not implemented.");
     }
 

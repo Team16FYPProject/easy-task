@@ -1,4 +1,17 @@
+export type ApiSuccessResponse<T> = {
+    success: true;
+    data: T;
+};
+
+export type ApiFailureResponse = {
+    success: false;
+    data: string;
+};
+
+export type ApiResponse<T> = ApiFailureResponse | ApiSuccessResponse<T>;
+
 export interface Profile {
+    user_id: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -15,17 +28,18 @@ export interface ProfileResponse extends Profile {
     };
 }
 
-export type ApiSuccessResponse<T> = {
-    success: true;
-    data: T;
-};
+export interface DashboardResponse {
+    projects: Project[];
+    tasks: ProjectTask[];
+}
 
-export type ApiFailureResponse = {
-    success: false;
-    data: string;
-};
-
-export type ApiResponse<T> = ApiFailureResponse | ApiSuccessResponse<T>;
+export interface Project {
+    project_id: string;
+    project_name: string;
+    project_owner_id: string;
+    project_profile_pic: string;
+    project_desc: string;
+}
 
 /**
  * @param project_id: The id of the project
