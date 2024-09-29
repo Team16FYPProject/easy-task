@@ -14,12 +14,7 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
     // query the database to find all tasks that match a project id
     const { data: taskData, error: taskError } = await supabase
         .from("task")
-        .select(
-            `
-            *,
-            assignees:task_assignee(user_id)
-        `,
-        )
+        .select("*,assignees:task_assignee(user_id)")
         .eq("project_id", id);
 
     // handle query errors
