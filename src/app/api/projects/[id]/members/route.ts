@@ -7,8 +7,7 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
-export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
-    console.log("Fetching members for project", id);
+export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });

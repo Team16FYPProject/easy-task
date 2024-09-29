@@ -201,6 +201,10 @@ export default function Dashboard() {
         }
     };
 
+    const getProjectById = (projectId: string): Project | undefined => {
+        return projects.find((project) => project.project_id === projectId);
+    };
+
     // Generate rows for the table
     function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
         return tasks.map((task, index) => (
@@ -214,7 +218,11 @@ export default function Dashboard() {
                         minute: "2-digit",
                     }).format(new Date(task.task_deadline))}
                 </TableCell>
-                <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
+                <TableCell>
+                    {(getProjectById(task.project_id)?.project_name ?? "Unknown Project") +
+                        ": " +
+                        task.task_name}
+                </TableCell>
                 <TableCell>
                     <Chip
                         className={`${determineBgColor(task.task_priority)}`}
