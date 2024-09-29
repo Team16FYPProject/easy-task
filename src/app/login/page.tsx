@@ -3,6 +3,15 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+    Container,
+    Typography,
+    TextField,
+    Button,
+    Box,
+    Link as MuiLink,
+    Alert,
+} from "@mui/material";
 
 export default function Login() {
     const router = useRouter();
@@ -32,56 +41,67 @@ export default function Login() {
     }
 
     return (
-        <div className="flex h-screen w-screen flex-col items-center justify-center bg-white">
-            {error && <p className="text-red-400">{error}</p>}
-            <form className="flex w-2/5 flex-col gap-2" onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-1">
-                    <label className="text-3xl font-bold text-black">Sign in</label>
-                </div>
-                <div className="flex flex-col gap-1">
-                    <label className="text-black">
+        <Container component="main" maxWidth="xs">
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                {error && <Alert severity="error">{error}</Alert>}
+                <Typography component="h1" variant="h2">
+                    Sign in
+                </Typography>
+
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <Typography variant="body2">
                         New User?{" "}
-                        <Link href="/register" className="text-purple-500">
+                        <MuiLink component={Link} href="/register" color="secondary">
                             Create an account
-                        </Link>
-                    </label>
-                </div>
-                <div className="flex flex-col gap-1 text-black">
-                    <label>Email</label>
-                    <input
-                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                        placeholder="john@example.com"
+                        </MuiLink>
+                    </Typography>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                </div>
-                <div className="flex flex-col gap-1 text-black">
-                    <label>Password</label>
-                    <input
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
                         type="password"
-                        className="rounded-md border-2 border-solid border-gray-600 p-2"
-                        placeholder="Password"
+                        id="password"
+                        autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                </div>
-                <div className="text-black">
-                    <label>
+                    <Typography variant="body2">
                         Forgot your{" "}
-                        <Link href="/register" className="text-purple-500">
+                        <MuiLink component={Link} href="/forgot-email" color="secondary">
                             email
-                        </Link>{" "}
+                        </MuiLink>{" "}
                         or{" "}
-                        <Link href="/register" className="text-purple-500">
+                        <MuiLink component={Link} href="/forgot-password" color="secondary">
                             password
-                        </Link>
+                        </MuiLink>
                         ?
-                    </label>
-                </div>
-                <button type="submit" className="mx-14 my-3 rounded-md bg-purple-500 p-2">
-                    Submit
-                </button>
-            </form>
-        </div>
+                    </Typography>
+                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                        Sign In
+                    </Button>
+                </Box>
+            </Box>
+        </Container>
     );
 }
