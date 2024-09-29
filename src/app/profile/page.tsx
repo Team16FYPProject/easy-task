@@ -7,12 +7,12 @@ import { Avatar, Button, Container, Grid, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts";
 import TeamCard from "@/components/TeamCard";
 import { useState } from "react";
-import type { ApiResponse, Profile } from "@/utils/types";
+import type { ApiResponse, Profile, ProfileResponse } from "@/utils/types";
 
 export default function ProfilePage() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
-    const [profile, setProfile] = useState<Profile | null>(null);
+    const [profile, setProfile] = useState<ProfileResponse | null>(null);
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -21,7 +21,7 @@ export default function ProfilePage() {
         }
         if (user) {
             const response = await fetch("/api/user/profile");
-            const data: ApiResponse<Profile> = await response.json();
+            const data: ApiResponse<ProfileResponse> = await response.json();
             if (!data.success) {
                 alert("Unable to load your profile data.");
                 return;
@@ -63,7 +63,7 @@ export default function ProfilePage() {
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        {profile.bio}
+                        {profile.bio ?? ""}
                     </Grid>
                 </Grid>
 
@@ -78,19 +78,19 @@ export default function ProfilePage() {
                                         data: [
                                             {
                                                 id: 0,
-                                                value: 10,
+                                                value: profile.task.completed,
                                                 color: "primary",
                                                 label: "Completed",
                                             },
                                             {
                                                 id: 1,
-                                                value: 15,
+                                                value: profile.task.doing,
                                                 color: "secondary",
                                                 label: "In Progress",
                                             },
                                             {
                                                 id: 2,
-                                                value: 20,
+                                                value: profile.task.todo,
                                                 color: "tertiary",
                                                 label: "Not Started",
                                             },

@@ -14,13 +14,35 @@ export async function GET() {
     if (!user) {
         return badRequestResponse({ success: false, data: "Unauthorized" });
     }
-    const { data, error } = await getServiceSupabase()
+    const serviceSupabase = getServiceSupabase();
+    const { data, error } = await serviceSupabase
         .from("profile")
         .select("*")
         .eq("user_id", user.id)
         .single();
     if (error) {
         return internalErrorResponse({ success: false, data: "Unable to load profile data" });
+    }
+
+    const { data: taskData, error: taskError } = await serviceSupabase
+        .from("task_assignee")
+        .select("task_id, task!inner(*)")
+        .eq("user_id", user.id);
+
+    let completedTasks = 0;
+    let inProgressTasks = 0;
+    let notStartTasks = 0;
+
+    if (taskData) {
+        completedTasks = taskData.filter(
+            (task) => (task?.task as any)?.task_status === "COMPLETE",
+        ).length;
+        inProgressTasks = taskData.filter(
+            (task) => (task?.task as any)?.task_status === "DOING",
+        ).length;
+        notStartTasks = taskData.filter(
+            (task) => (task?.task as any)?.task_status === "TODO",
+        ).length;
     }
 
     return okResponse({
@@ -32,6 +54,11 @@ export async function GET() {
             display_name: data.profile_display_name,
             bio: data.profile_bio,
             avatar: data.profile_avatar,
+            tasks: {
+                todo: notStartTasks,
+                doing: inProgressTasks,
+                completed: completedTasks,
+            },
         },
     });
 }
