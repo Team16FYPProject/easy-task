@@ -69,7 +69,7 @@ export default function UpdateProfile() {
             }
             const profile = data.data;
             setFirstName(profile.first_name);
-            setLastName(profile.first_name);
+            setLastName(profile.last_name);
             setEmail(profile.email);
             setBio(profile.bio);
         }

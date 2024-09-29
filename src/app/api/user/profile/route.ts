@@ -1,4 +1,4 @@
-import { getServerSupabase } from "@/utils/supabase/server";
+import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
 import {
     badRequestResponse,
     createdResponse,
@@ -6,14 +6,15 @@ import {
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
+import { getSession } from "@/utils/server/auth.server.utils";
 
 export async function GET() {
-    const supabase = getServerSupabase();
-    const user = (await supabase.auth.getUser())?.data?.user;
+    const { user } = await getSession();
+
     if (!user) {
         return badRequestResponse({ success: false, data: "Unauthorized" });
     }
-    const { data, error } = await supabase
+    const { data, error } = await getServiceSupabase()
         .from("profile")
         .select("*")
         .eq("user_id", user.id)
@@ -36,18 +37,18 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-    const supabase = getServerSupabase();
-    const user = (await supabase.auth.getUser())?.data?.user;
+    const { user } = await getSession();
     if (!user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
     const data = await request.formData();
     const updateData: Record<string, string | undefined> = {};
+    const serviceSupabase = getServiceSupabase();
 
     if (data.has("avatar_image")) {
         const avatarImage = data.get("avatar_image");
         if (avatarImage instanceof File) {
-            const { data, error } = await supabase.storage
+            const { data, error } = await serviceSupabase.storage
                 .from("avatars")
                 .upload(user.id, avatarImage, {
                     cacheControl: "3600",
@@ -74,7 +75,7 @@ export async function PATCH(request: Request) {
         updateData.profile_bio = data.get("bio") as string;
     }
 
-    const { error: authError } = await supabase.auth.admin.updateUserById(user.id, {
+    const { error: authError } = await serviceSupabase.auth.admin.updateUserById(user.id, {
         email: data.has("email") ? (data.get("email") as string) : undefined,
         user_metadata: {
             first_name: data.has("first_name") ? (data.get("first_name") as string) : undefined,
@@ -89,7 +90,10 @@ export async function PATCH(request: Request) {
         });
     }
 
-    const { error } = await supabase.from("profile").update(updateData).eq("user_id", user.id);
+    const { error } = await serviceSupabase
+        .from("profile")
+        .update(updateData)
+        .eq("user_id", user.id);
 
     if (error) {
         console.error(`Error while updating profile details for user ${user.id}`, error);
