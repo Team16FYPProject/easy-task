@@ -1,4 +1,4 @@
-import { getServerSupabase } from "@/utils/supabase/server";
+import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
 import {
     badRequestResponse,
     createdResponse,
@@ -6,14 +6,17 @@ import {
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
+import { getSession } from "@/utils/server/auth.server.utils";
+import { ProfileResponse } from "@/utils/types";
 
 export async function GET() {
-    const supabase = getServerSupabase();
-    const user = (await supabase.auth.getUser())?.data?.user;
+    const { user } = await getSession();
+
     if (!user) {
         return badRequestResponse({ success: false, data: "Unauthorized" });
     }
-    const { data, error } = await supabase
+    const serviceSupabase = getServiceSupabase();
+    const { data, error } = await serviceSupabase
         .from("profile")
         .select("*")
         .eq("user_id", user.id)
@@ -22,29 +25,60 @@ export async function GET() {
         return internalErrorResponse({ success: false, data: "Unable to load profile data" });
     }
 
+    const { data: taskData, error: taskError } = await serviceSupabase
+        .from("task_assignee")
+        .select("task_id, task!inner(*)")
+        .eq("user_id", user.id);
+
+    let completedTasks = 0;
+    let inProgressTasks = 0;
+    let notStartTasks = 0;
+
+    if (taskData) {
+        completedTasks = taskData.filter(
+            (task) => (task?.task as any)?.task_status === "COMPLETE",
+        ).length;
+        inProgressTasks = taskData.filter(
+            (task) => (task?.task as any)?.task_status === "DOING",
+        ).length;
+        notStartTasks = taskData.filter(
+            (task) => (task?.task as any)?.task_status === "TODO",
+        ).length;
+    }
+
+    const responseData: ProfileResponse = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        display_name: data.profile_display_name || "",
+        bio: data.profile_bio || "",
+        avatar: data.profile_avatar || "",
+        tasks: {
+            todo: notStartTasks,
+            doing: inProgressTasks,
+            completed: completedTasks,
+        },
+    };
+
     return okResponse({
         success: true,
-        data: {
-            display_name: data.profile_display_name,
-            bio: data.profile_bio,
-            avatar: data.profile_avatar,
-        },
+        data: responseData,
     });
 }
 
 export async function PATCH(request: Request) {
-    const supabase = getServerSupabase();
-    const user = (await supabase.auth.getUser())?.data?.user;
+    const { user } = await getSession();
     if (!user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
     const data = await request.formData();
     const updateData: Record<string, string | undefined> = {};
+    const serviceSupabase = getServiceSupabase();
 
     if (data.has("avatar_image")) {
         const avatarImage = data.get("avatar_image");
         if (avatarImage instanceof File) {
-            const { data, error } = await supabase.storage
+            const { data, error } = await serviceSupabase.storage
                 .from("avatars")
                 .upload(user.id, avatarImage, {
                     cacheControl: "3600",
@@ -58,6 +92,12 @@ export async function PATCH(request: Request) {
         }
     }
 
+    if (data.get("first_name")) {
+        updateData.first_name = data.get("first_name") as string;
+    }
+    if (data.get("last_name")) {
+        updateData.last_name = data.get("last_name") as string;
+    }
     if (data.get("display_name")) {
         updateData.profile_display_name = data.get("display_name") as string;
     }
@@ -65,7 +105,25 @@ export async function PATCH(request: Request) {
         updateData.profile_bio = data.get("bio") as string;
     }
 
-    const { error } = await supabase.from("profile").update(updateData).eq("user_id", user.id);
+    const { error: authError } = await serviceSupabase.auth.admin.updateUserById(user.id, {
+        email: data.has("email") ? (data.get("email") as string) : undefined,
+        user_metadata: {
+            first_name: data.has("first_name") ? (data.get("first_name") as string) : undefined,
+            last_name: data.has("last_name") ? (data.get("last_name") as string) : undefined,
+        },
+    });
+    if (authError) {
+        console.error(`Error while updating user details ${user.id}`, authError);
+        return internalErrorResponse({
+            success: false,
+            data: "Unable to update your profile details.",
+        });
+    }
+
+    const { error } = await serviceSupabase
+        .from("profile")
+        .update(updateData)
+        .eq("user_id", user.id);
 
     if (error) {
         console.error(`Error while updating profile details for user ${user.id}`, error);
