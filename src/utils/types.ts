@@ -8,7 +8,7 @@ export interface Profile {
 }
 
 export interface ProfileResponse extends Profile {
-    task: {
+    tasks: {
         todo: number;
         doing: number;
         completed: number;

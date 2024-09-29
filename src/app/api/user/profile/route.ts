@@ -7,6 +7,7 @@ import {
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
 import { getSession } from "@/utils/server/auth.server.utils";
+import { ProfileResponse } from "@/utils/types";
 
 export async function GET() {
     const { user } = await getSession();
@@ -45,21 +46,23 @@ export async function GET() {
         ).length;
     }
 
+    const responseData: ProfileResponse = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        display_name: data.profile_display_name,
+        bio: data.profile_bio,
+        avatar: data.profile_avatar,
+        tasks: {
+            todo: notStartTasks,
+            doing: inProgressTasks,
+            completed: completedTasks,
+        },
+    };
+
     return okResponse({
         success: true,
-        data: {
-            first_name: data.first_name,
-            last_name: data.last_name,
-            email: data.email,
-            display_name: data.profile_display_name,
-            bio: data.profile_bio,
-            avatar: data.profile_avatar,
-            tasks: {
-                todo: notStartTasks,
-                doing: inProgressTasks,
-                completed: completedTasks,
-            },
-        },
+        data: responseData,
     });
 }
 

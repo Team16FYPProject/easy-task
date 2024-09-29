@@ -78,19 +78,19 @@ export default function ProfilePage() {
                                         data: [
                                             {
                                                 id: 0,
-                                                value: profile.task.completed,
+                                                value: profile.tasks.completed,
                                                 color: "primary",
                                                 label: "Completed",
                                             },
                                             {
                                                 id: 1,
-                                                value: profile.task.doing,
+                                                value: profile.tasks.doing,
                                                 color: "secondary",
                                                 label: "In Progress",
                                             },
                                             {
                                                 id: 2,
-                                                value: profile.task.todo,
+                                                value: profile.tasks.todo,
                                                 color: "tertiary",
                                                 label: "Not Started",
                                             },
