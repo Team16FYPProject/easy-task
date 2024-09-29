@@ -87,30 +87,18 @@ export default function AddTeamModal({
                                 id="outlined-basic"
                                 label="Team Name"
                                 variant="outlined"
+                                className="w-full"
                                 value={teamName}
                                 onChange={handleInputChange}
                             />
                         </Grid>
-                        <Grid container spacing={2}>
-                            <Grid item>
-                                <input
-                                    accept="image/*"
-                                    style={{ display: "none" }}
-                                    id="raised-button-file"
-                                    type="file"
-                                    onChange={handleImageChange}
-                                />
-                            </Grid>
-                            <Grid item>
-                                <label htmlFor="raised-button-file">
-                                    <Button variant="contained" component="span">
-                                        Upload
-                                    </Button>
-                                </label>
-                            </Grid>
-                        </Grid>
                         <Grid item>
-                            <Button variant="contained" color="secondary" onClick={handleSubmit}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleSubmit}
+                                className="w-full"
+                            >
                                 Create
                             </Button>
                         </Grid>
