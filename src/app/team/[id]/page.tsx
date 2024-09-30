@@ -1,5 +1,5 @@
 "use client";
-
+import TeamSettingsModal from "@/components/TeamSettingsModal";
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
@@ -31,6 +31,9 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const [loadingMembers, setLoadingMembers] = React.useState(true);
     const [members, setMembers] = React.useState<Profile[]>([]);
     const [displayedMembers, setDisplayedMembers] = React.useState<Profile[]>([]);
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     const [search, setSearch] = useState<string>("");
 
@@ -175,9 +178,15 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             <Button variant="contained" color="secondary" sx={{ mr: 2 }}>
                                 INVITE MEMBER
                             </Button>
-                            <IconButton color="default" size="medium" sx={{ mr: 2 }}>
+                            <IconButton
+                                color="default"
+                                size="medium"
+                                sx={{ mr: 2 }}
+                                onClick={handleOpen}
+                            >
                                 <SettingsFilled />
                             </IconButton>
+                            <TeamSettingsModal open={open} handleClose={handleClose} />
                         </Grid>
                     </Grid>
                 </Grid>
