@@ -5,35 +5,9 @@ import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
 import AddTaskModal from "./AddTaskModal";
 import { determineBgColor, determineTextColor } from "../utils/colourUtils";
+import { ProjectTask } from "@/utils/types";
 // Types
-/**
- * @param project_id: The id of the project
- * @param task_creator_id: The creator of the task
- * @param task_deadline: The date at which the task is due
- * @param task_desc: Description of the task
- * @param task_id: The id of the task
- * @param task_is_meeting: If the task has a meeting;
- * @param task_location: The location of the task;
- * @param task_name: The name of the task;
- * @param task_parent_id: The parent of the task if any;
- * @param task_priority: The priority of the task;
- * @param task_time_spent: How much time is spent on the task;
- * @param task_status: Current status of the task;
- */
-type CardType = {
-    project_id: string;
-    task_creator_id: string;
-    task_deadline: string;
-    task_desc: string;
-    task_id: string;
-    task_is_meeting: boolean;
-    task_location: string;
-    task_name: string;
-    task_parent_id: string;
-    task_priority: string;
-    task_time_spent: number;
-    task_status: string;
-};
+
 /**
  * @param title: The title of the column
  * @param column: The column to which it belongs to i.e todo,doing,complete
@@ -43,9 +17,9 @@ type CardType = {
 type ColumnProps = {
     title: string;
     column: string;
-    cards: CardType[];
-    setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
-    setTasksDict: React.Dispatch<React.SetStateAction<Map<string, { tasks: CardType[] }>>>;
+    cards: ProjectTask[];
+    setCards: React.Dispatch<React.SetStateAction<ProjectTask[]>>;
+    setTasksDict: React.Dispatch<React.SetStateAction<Map<string, { tasks: ProjectTask[] }>>>;
 };
 /**
  * @param project_id: The id of the project
@@ -75,7 +49,7 @@ type CardProp = {
     task_priority: string;
     task_time_spent: number;
     task_status: string;
-    handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardType) => void; // handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardType) => void;
+    handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => void;
 };
 /**
  * @param beforeId: The id of the column it is being dragged from
@@ -85,9 +59,11 @@ type DropIndicatorProps = {
     beforeId: string | null;
     column: string;
 };
+
 interface KanbanBoardProps {
     projects: Project[];
 }
+
 /**
  * Kanban Board component
  * @returns react component of a Kanban Board
@@ -105,26 +81,25 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projects }) => {
  * @returns react component with board of the Kanban Board
  */
 export const Board = ({ projects }: { projects: Project[] }) => {
-    const [cards, setCards] = useState<CardType[]>([]); // state for the cards
+    const [cards, setCards] = useState<ProjectTask[]>([]); // state for the cards
     const [open, setOpen] = React.useState(false); // state for modal task add
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [loading, setLoading] = useState(true); // loading state for fetching tasks
-    const [team, setTeam] = React.useState(""); // state for selected team name
     const [teamId, setTeamId] = React.useState(""); // state for selected team id
     const [tasksDict, setTasksDict] = useState(new Map());
     const [newTask, setNewTask] = useState("");
     useEffect(() => {
         async function handleUpdate() {
-            if (team && newTask && tasksDict) {
+            if (teamId && newTask && tasksDict) {
                 // get the tasks array for the current team
-                const updatedTasks = [...(tasksDict.get(team)?.tasks || [])];
+                const updatedTasks = [...(tasksDict.get(teamId)?.tasks || [])];
 
                 // add the new task to the copied tasks array
                 updatedTasks.push(newTask);
 
                 // update the tasks array in the dictionary
-                tasksDict.set(team, { ...tasksDict.get(team), tasks: updatedTasks });
+                tasksDict.set(teamId, { ...tasksDict.get(teamId), tasks: updatedTasks });
 
                 // update the state with the new array of tasks
                 setCards(updatedTasks);
@@ -133,8 +108,9 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                 setTasksDict(tasksDict);
             }
         }
+
         handleUpdate();
-    }, [newTask, tasksDict, team]);
+    }, [newTask, tasksDict, teamId]);
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -168,20 +144,27 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             setTasksDict(tasksDict);
             if (tasksDict.size > 0) {
                 setLoading(false);
+                setTeamId(projects[0].project_id);
             }
         }
+
         fetchTasks();
     }, [projects]);
 
-    const handleChange = (event: SelectChangeEvent) => {
-        const new_team = event.target.value;
-        //updates team state on selection change
-        setTeam(new_team as string);
-        setTeamId(new_team);
+    // Set cards to selected team
+    useEffect(() => {
+        if (tasksDict.has(teamId)) {
+            // set the cards to be a new array
+            setCards(tasksDict.get(teamId).tasks);
+        }
+    }, [teamId]);
 
-        // set the cards to be a new array
-        setCards(tasksDict.get(new_team).tasks);
+    const handleChange = (event: SelectChangeEvent) => {
+        const newTeamId = event.target.value;
+        //updates team state on selection change
+        setTeamId(newTeamId);
     };
+
     return (
         <div className="flex-col">
             <div className="flex justify-between p-5">
@@ -192,7 +175,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         <Select
                             labelId="select-team-label"
                             id="simple-team-select"
-                            value={team}
+                            value={teamId}
                             label="Team"
                             onChange={handleChange}
                         >
@@ -211,7 +194,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         variant="contained"
                         color="secondary"
                         onClick={handleOpen}
-                        disabled={team == ""}
+                        disabled={teamId == ""}
                     >
                         CREATE TASK
                     </Button>
@@ -220,6 +203,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         handleClose={handleClose}
                         project_id={`${teamId}`}
                         setNewTask={setNewTask}
+                        projectTasks={cards}
                     />
                 </div>
             </div>
@@ -256,7 +240,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
  * @returns react component with columns of the Kanban Board
  */
 export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, setTasksDict }) => {
-    async function handleTaskStatus(cardToBeTransferred: CardType) {
+    async function handleTaskStatus(cardToBeTransferred: ProjectTask) {
         if (!cardToBeTransferred) {
             console.error("No card to transfer");
             return;
@@ -286,7 +270,7 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
     const filteredCards = cards.filter((c) => c.task_status === column); // filters cards to only those in the same column
 
     // function to handle the start of a drag
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: CardType) => {
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => {
         e.dataTransfer.setData("cardId", card.task_id); // pass the id of the card
     };
 

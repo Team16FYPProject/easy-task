@@ -17,7 +17,7 @@ const style = {
     p: 4,
 };
 
-export default function AddTeamModal({
+export default function TeamSettings({
     open,
     handleClose,
 }: {
@@ -79,13 +79,13 @@ export default function AddTeamModal({
                     <Grid container direction="column" spacing={2}>
                         <Grid item>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Create Team
+                                Team Settings
                             </Typography>
                         </Grid>
                         <Grid item>
                             <TextField
                                 id="outlined-basic"
-                                label="Team Name"
+                                label="Edit Team Name"
                                 variant="outlined"
                                 className="w-full"
                                 value={teamName}
@@ -99,7 +99,7 @@ export default function AddTeamModal({
                                 onClick={handleSubmit}
                                 className="w-full"
                             >
-                                Create
+                                Update
                             </Button>
                         </Grid>
                     </Grid>

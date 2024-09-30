@@ -17,7 +17,7 @@ const style = {
     p: 4,
 };
 
-export default function AddTeamModal({
+export default function InviteMemberModal({
     open,
     handleClose,
 }: {
@@ -29,12 +29,6 @@ export default function AddTeamModal({
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamName(event.target.value);
-    };
-
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            setImage(event.target.files[0]);
-        }
     };
 
     const handleSubmit = async () => {
@@ -76,30 +70,31 @@ export default function AddTeamModal({
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <Grid container direction="column" spacing={2}>
+                    <Grid container spacing={2}>
                         <Grid item>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Create Team
+                                Invite Member
                             </Typography>
                         </Grid>
                         <Grid item>
                             <TextField
                                 id="outlined-basic"
-                                label="Team Name"
+                                label="Email"
                                 variant="outlined"
                                 className="w-full"
-                                value={teamName}
                                 onChange={handleInputChange}
                             />
                         </Grid>
+
                         <Grid item>
                             <Button
                                 variant="contained"
                                 color="secondary"
                                 onClick={handleSubmit}
                                 className="w-full"
+                                sx={{ mr: 2 }}
                             >
-                                Create
+                                INVITE
                             </Button>
                         </Grid>
                     </Grid>

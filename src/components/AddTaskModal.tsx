@@ -2,6 +2,7 @@ import { Box, FormControl, MenuItem, Modal, Select, TextField } from "@mui/mater
 import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FormEvent, useState } from "react";
+import { ProjectTask } from "@/utils/types";
 const style = {
     position: "absolute",
     top: "50%",
@@ -19,11 +20,13 @@ export default function AddTaskModal({
     handleClose,
     project_id,
     setNewTask,
+    projectTasks,
 }: {
     open: boolean;
     handleClose: () => void;
     project_id: string;
     setNewTask: (newTask: string) => void;
+    projectTasks: ProjectTask[];
 }) {
     const [taskName, setTaskName] = useState<string>("");
     const [taskDescription, setTaskDescription] = useState<string | null>(null);
@@ -132,9 +135,11 @@ export default function AddTaskModal({
                                                 setTaskParent(e.target.value);
                                             }}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                            {projectTasks.map((task) => (
+                                                <MenuItem key={task.task_id} value={task.task_id}>
+                                                    {task.task_name}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                     </FormControl>
                                 </div>
