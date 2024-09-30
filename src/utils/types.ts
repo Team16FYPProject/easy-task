@@ -15,9 +15,9 @@ export interface Profile {
     first_name: string;
     last_name: string;
     email: string;
-    bio: string;
-    display_name: string;
-    avatar: string;
+    profile_bio: string;
+    profile_display_name: string;
+    profile_avatar: string;
 }
 
 export interface ProfileResponse extends Profile {
