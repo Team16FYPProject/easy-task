@@ -59,7 +59,7 @@ export default function AddTaskModal({
     const [taskLocation, setTaskLocation] = useState<string>("");
     const [taskMeetingBool, setTaskMeetingBool] = useState<boolean>(false);
     const [taskDuration, setTaskDuration] = useState<string>("");
-    const [assignee, setTaskAssignees] = useState<string[]>([]);
+    const [taskAssignee, setTaskAssignees] = useState<string[]>([]);
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
     const [names, setNames] = useState<
@@ -84,6 +84,7 @@ export default function AddTaskModal({
                 taskMeetingBool,
                 taskLocation: taskLocation || null,
                 taskDuration: taskDuration || null,
+                taskAssignee: taskAssignee || null,
             }),
         });
         const data = await response.json();
@@ -98,7 +99,7 @@ export default function AddTaskModal({
             handleClose();
         }
     }
-    const handleChange = (event: SelectChangeEvent<typeof assignee>) => {
+    const handleChange = (event: SelectChangeEvent<typeof taskAssignee>) => {
         const {
             target: { value },
         } = event;
@@ -118,8 +119,6 @@ export default function AddTaskModal({
                     });
                     const result = await response.json();
                     setNames(result.users);
-                    console.log(names);
-                    //setNames(result.users.map((u)=> u.first_name,u.user_id))
                 } catch (e) {
                     console.error(`Error fetching members for project ${project_id}`, e);
                 }
@@ -173,9 +172,7 @@ export default function AddTaskModal({
                                             disablePast
                                             onChange={(newValue) =>
                                                 setTaskDeadline(
-                                                    newValue
-                                                        ? new Date(newValue.toISOString())
-                                                        : null,
+                                                    newValue ? new Date(newValue.toDate()) : null,
                                                 )
                                             }
                                         ></DateTimePicker>
@@ -302,23 +299,30 @@ export default function AddTaskModal({
                                 <Select
                                     fullWidth
                                     multiple
-                                    value={assignee}
+                                    value={taskAssignee}
                                     onChange={handleChange}
                                     input={<OutlinedInput label="Chip" />}
                                     renderValue={(selected) => (
                                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                            {selected.map((value) => (
-                                                <Chip key={value} label={value} />
-                                            ))}
+                                            {selected.map((value) => {
+                                                const user = names.find((u) => u.user_id === value);
+                                                return (
+                                                    <Chip
+                                                        key={value}
+                                                        label={
+                                                            user
+                                                                ? `${user.first_name} ${user.last_name}`
+                                                                : value
+                                                        }
+                                                    />
+                                                );
+                                            })}
                                         </Box>
                                     )}
                                     MenuProps={MenuProps}
                                 >
                                     {names.map((user) => (
-                                        <MenuItem
-                                            key={user.user_id}
-                                            value={user.first_name + " " + user.last_name}
-                                        >
+                                        <MenuItem key={user.user_id} value={user.user_id}>
                                             {user.first_name + " " + user.last_name}
                                         </MenuItem>
                                     ))}
