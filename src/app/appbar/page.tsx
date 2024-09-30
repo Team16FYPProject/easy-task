@@ -27,7 +27,6 @@ const NAVIGATION_LINKS: NavigationLink[][] = [
 
 export default function ButtonAppBar() {
     const [open, setOpen] = React.useState(false);
-    const router = useRouter();
     const [shouldShowIconButton, setShouldShowIconButton] = React.useState(true);
 
     const toggleDrawer = (newOpen: boolean) => () => {

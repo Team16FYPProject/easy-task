@@ -4,6 +4,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
 import AddTaskModal from "./AddTaskModal";
+import { determineBgColor, determineTextColor } from "../utils/colourUtils";
 import { ProjectTask } from "@/utils/types";
 import ViewTaskModal from "@/components/ViewTaskModal";
 // Types
@@ -111,7 +112,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
         }
 
         handleUpdate();
-    }, [newTask]);
+    }, [newTask, tasksDict, teamId]);
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -263,12 +264,12 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
                 `Error updating task status for project ${cardToBeTransferred?.project_id}:`,
                 e,
             );
-            setError("An error occurred while updating the task status.");
+            // setError("An error occurred while updating the task status.");
         }
     }
 
     const [active, setActive] = useState(false); // state for active drag
-    const [error, setError] = useState<string>("");
+    // const [error, setError] = useState<string>("");
     const filteredCards = cards.filter((c) => c.task_status === column); // filters cards to only those in the same column
 
     // function to handle the start of a drag
@@ -430,17 +431,9 @@ const Card: React.FC<CardProp> = ({
     task_time_spent,
     handleDragStart,
 }) => {
-    const determineBgColor = (task_priority: String) => {
-        if (task_priority === "LOW") {
-            return "bg-green-200";
-        } else if (task_priority === "MEDIUM") {
-            return "bg-yellow-200";
-        } else {
-            return "bg-red-400";
-        }
-    };
-    const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
     const bgColor = determineBgColor(task_priority);
+    const textColor = determineTextColor(task_priority);
+    const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
     const handleCardClick = () => {
         setViewTaskOpen(true);
     };
@@ -470,11 +463,17 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                     })
                 }
+                style={{
+                    backgroundColor: bgColor,
+                    color: textColor,
+                    marginLeft: "6px",
+                    marginRight: "6px",
+                }}
                 onClick={handleCardClick}
-                className={`cursor-grab rounded border border-neutral-700 p-3 active:cursor-grabbing ${bgColor}`}
+                className={`0 active:cursor-grabbing} cursor-grab rounded p-3`}
             >
-                <div className="flex-col text-sm text-black">
-                    <p>{task_name}</p>
+                <div className="flex-col text-sm" style={{ color: textColor }}>
+                    <strong>{task_name}</strong>
                     <p>{task_deadline}</p>
                     <p>{task_priority}</p>
                 </div>
