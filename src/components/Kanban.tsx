@@ -448,6 +448,7 @@ const Card: React.FC<CardProp> = ({
     const handleCloseModal = () => {
         setViewTaskOpen(false);
     };
+
     return (
         <>
             <DropIndicator beforeId={task_id} column={task_status} />

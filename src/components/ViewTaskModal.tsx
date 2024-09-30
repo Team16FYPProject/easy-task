@@ -4,11 +4,11 @@ import { Task } from "@/utils/lib/types";
 
 interface ViewTaskModalProps {
     open: boolean;
-    handleClose: () => void;
+    handleCloseModal: () => void;
     task: Task; // You'll need to pass the task data as a prop
 }
 
-const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleClose, task }) => {
+const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, task }) => {
     const modalStyle = {
         position: "absolute" as "absolute",
         top: "50%",
@@ -27,7 +27,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleClose, task }
     };
 
     return (
-        <Modal open={open} onClose={handleClose}>
+        <Modal open={open} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
                 <Typography variant="h5" component="h2" gutterBottom>
                     {`${task.project_name}: ${task.task_name}`}
