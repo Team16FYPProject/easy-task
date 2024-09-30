@@ -1,7 +1,18 @@
-import { Box, FormControl, MenuItem, Modal, Select, TextField } from "@mui/material";
+import {
+    Box,
+    Chip,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Modal,
+    OutlinedInput,
+    Select,
+    SelectChangeEvent,
+    TextField,
+} from "@mui/material";
 import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ProjectTask } from "@/utils/types";
 const style = {
     position: "absolute",
@@ -14,6 +25,16 @@ const style = {
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+};
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
 };
 export default function AddTaskModal({
     open,
@@ -38,9 +59,12 @@ export default function AddTaskModal({
     const [taskLocation, setTaskLocation] = useState<string>("");
     const [taskMeetingBool, setTaskMeetingBool] = useState<boolean>(false);
     const [taskDuration, setTaskDuration] = useState<string>("");
-    const [assignee, setTaskAssignees] = useState<string>("");
+    const [assignee, setTaskAssignees] = useState<string[]>([]);
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
+    const [names, setNames] = useState<
+        { user_id: string; first_name: string; last_name: string }[]
+    >([]);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -74,6 +98,35 @@ export default function AddTaskModal({
             handleClose();
         }
     }
+    const handleChange = (event: SelectChangeEvent<typeof assignee>) => {
+        const {
+            target: { value },
+        } = event;
+        setTaskAssignees(
+            // On autofill we get a stringified value.
+            typeof value === "string" ? value.split(",") : value,
+        );
+    };
+    useEffect(() => {
+        async function fetchTeamMembers() {
+            if (project_id && open) {
+                try {
+                    const route = `/api/projects/${project_id}/members`;
+                    const response = await fetch(route, {
+                        method: "GET",
+                        credentials: "include",
+                    });
+                    const result = await response.json();
+                    setNames(result.users);
+                    console.log(names);
+                    //setNames(result.users.map((u)=> u.first_name,u.user_id))
+                } catch (e) {
+                    console.error(`Error fetching members for project ${project_id}`, e);
+                }
+            }
+        }
+        fetchTeamMembers();
+    }, [handleClose]);
 
     return (
         <div>
@@ -245,15 +298,30 @@ export default function AddTaskModal({
                                 </div>
                             </div>
                             <FormControl fullWidth>
+                                <label>Task Assignee</label>
                                 <Select
+                                    fullWidth
+                                    multiple
                                     value={assignee}
-                                    onChange={(e) => {
-                                        setTaskAssignees(e.target.value);
-                                    }}
+                                    onChange={handleChange}
+                                    input={<OutlinedInput label="Chip" />}
+                                    renderValue={(selected) => (
+                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                            {selected.map((value) => (
+                                                <Chip key={value} label={value} />
+                                            ))}
+                                        </Box>
+                                    )}
+                                    MenuProps={MenuProps}
                                 >
-                                    <MenuItem value={10}>Ten</MenuItem>
-                                    <MenuItem value={20}>Twenty</MenuItem>
-                                    <MenuItem value={30}>Thirty</MenuItem>
+                                    {names.map((user) => (
+                                        <MenuItem
+                                            key={user.user_id}
+                                            value={user.first_name + " " + user.last_name}
+                                        >
+                                            {user.first_name + " " + user.last_name}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                             <div className="flex w-full justify-end">
