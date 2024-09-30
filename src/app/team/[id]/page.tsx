@@ -24,6 +24,7 @@ import { TeamIdParams } from "@/app/team/[id]/types";
 import { useEffect, useState } from "react";
 import React from "react";
 import { ApiResponse, Profile } from "@/utils/types";
+import InviteMemberModal from "@/components/InviteMemberModal";
 
 export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const router = useRouter();
@@ -31,6 +32,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const [loadingMembers, setLoadingMembers] = React.useState(true);
     const [members, setMembers] = React.useState<Profile[]>([]);
     const [displayedMembers, setDisplayedMembers] = React.useState<Profile[]>([]);
+    const [open, setOpen] = React.useState(false);
 
     const [search, setSearch] = useState<string>("");
 
@@ -40,6 +42,9 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
             return;
         }
     }, [loadingUser, user]);
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     // Fetch member profiles
     useEffect(() => {
@@ -172,9 +177,15 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             >
                                 LEAVE TEAM
                             </Button>
-                            <Button variant="contained" color="secondary" sx={{ mr: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                sx={{ mr: 2 }}
+                                onClick={handleOpen}
+                            >
                                 INVITE MEMBER
                             </Button>
+                            <InviteMemberModal open={open} handleClose={handleClose} />
                             <IconButton color="default" size="medium" sx={{ mr: 2 }}>
                                 <SettingsFilled />
                             </IconButton>
@@ -222,4 +233,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
             </Grid>
         </Container>
     );
+}
+function setOpen(arg0: boolean) {
+    throw new Error("Function not implemented.");
 }
