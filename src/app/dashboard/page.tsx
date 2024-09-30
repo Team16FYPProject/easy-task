@@ -24,9 +24,9 @@ import {
     Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { RowData, TeamViewData, Task } from "./types";
-import { Project } from "../../utils/lib/types";
-import { Task } from "@/utils/lib/types";
+import { RowData, TeamViewData } from "./types";
+import { Project } from "@/utils/lib/types";
+import { ApiResponse, DashboardResponse, ProjectTask } from "@/utils/types";
 
 export default function Dashboard() {
     const router = useRouter();
@@ -39,7 +39,7 @@ export default function Dashboard() {
     const [rows, setRows] = useState<RowData[]>([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [loadingTasks, setLoadingTasks] = useState(true);
-    const [tasks, setTasks] = React.useState<Task[]>([]);
+    const [tasks, setTasks] = useState<ProjectTask[]>([]);
     const dataTableHeight = 300;
     const paginationModel = { page: 0, pageSize: 1 };
 
@@ -56,22 +56,18 @@ export default function Dashboard() {
         async function fetchProjects() {
             try {
                 setLoadingProjects(true);
-                const response = await fetch("/api/projects", {
+                const response = await fetch("/api/user/dashboard", {
                     method: "GET",
                     credentials: "include",
                 });
 
-                const result = await response.json();
+                const result: ApiResponse<DashboardResponse> = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(result.data || "Failed to fetch projects");
+                if (!response.ok || !result.success) {
+                    throw new Error((result.data as string) || "Failed to fetch projects");
                 }
-
-                if (result.success) {
-                    setProjects(result.projects);
-                } else {
-                    throw new Error("Failed to fetch projects");
-                }
+                setProjects(result.data.projects);
+                setTasks(result.data.tasks);
             } catch (e) {
                 console.error("Error:", e);
             } finally {
@@ -113,62 +109,6 @@ export default function Dashboard() {
         setRows(newRows);
     }, [projects]);
 
-    // Fetch tasks
-    useEffect(() => {
-        async function fetchTasks() {
-            try {
-                setLoadingTasks(true);
-                const response = await fetch("/api/projects", {
-                    method: "GET",
-                    credentials: "include",
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.data || "Failed to fetch projects");
-                }
-
-                // Fetch projects and their names
-                const projectIDsAndNames = result.projects.map(
-                    (project: { project_id: any; project_name: string }) => ({
-                        project_id: project.project_id,
-                        project_name: project.project_name,
-                    }),
-                );
-
-                // Fetch tasks for each project
-                const fetchPromises = projectIDsAndNames.map(
-                    ({ project_id, project_name }: { project_id: string; project_name: string }) =>
-                        fetch(`/api/projects/${project_id}/tasks`, {
-                            method: "GET",
-                            credentials: "include",
-                        }).then((response) => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.json().then((data) => ({
-                                tasks: data.tasks,
-                                project_name,
-                            }));
-                        }),
-                );
-
-                const results = await Promise.all(fetchPromises);
-                // Flatten the results and include project names with tasks
-                const allTasks = results.flatMap(({ tasks, project_name }) =>
-                    tasks.map((task: any) => ({ ...task, project_name })),
-                );
-                setTasks(allTasks);
-            } catch (e) {
-                console.error("Error:", e);
-            } finally {
-                setLoadingTasks(false);
-            }
-        }
-
-        fetchTasks();
-    }, []);
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
@@ -261,8 +201,12 @@ export default function Dashboard() {
         }
     };
 
+    const getProjectById = (projectId: string): Project | undefined => {
+        return projects.find((project) => project.project_id === projectId);
+    };
+
     // Generate rows for the table
-    function generateRowFunction(tasks: Task[]): React.ReactNode {
+    function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
         return tasks.map((task, index) => (
             <TableRow key={index}>
                 <TableCell>
@@ -274,7 +218,11 @@ export default function Dashboard() {
                         minute: "2-digit",
                     }).format(new Date(task.task_deadline))}
                 </TableCell>
-                <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
+                <TableCell>
+                    {(getProjectById(task.project_id)?.project_name ?? "Unknown Project") +
+                        ": " +
+                        task.task_name}
+                </TableCell>
                 <TableCell>
                     <Chip
                         className={`${determineBgColor(task.task_priority)}`}

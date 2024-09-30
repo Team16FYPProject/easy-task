@@ -21,19 +21,18 @@ import {
 } from "@mui/material";
 import SettingsFilled from "@mui/icons-material/Settings";
 import { TeamIdParams } from "@/app/team/[id]/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
-
-interface Profile {
-    user_id: string;
-    profile_display_name: string;
-}
+import { ApiResponse, Profile } from "@/utils/types";
 
 export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const router = useRouter();
     const { loadingUser, user } = useUser();
     const [loadingMembers, setLoadingMembers] = React.useState(true);
     const [members, setMembers] = React.useState<Profile[]>([]);
+    const [displayedMembers, setDisplayedMembers] = React.useState<Profile[]>([]);
+
+    const [search, setSearch] = useState<string>("");
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -73,9 +72,49 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         fetchMembers();
     }, []);
 
+    // Set displayed members
+    useEffect(() => {
+        const searchQuery = search.toLowerCase() || "";
+        setDisplayedMembers(
+            members.filter(
+                (member) =>
+                    member.first_name.toLowerCase().includes(searchQuery) ||
+                    member.last_name.toLowerCase().includes(searchQuery) ||
+                    member.email.toLowerCase().includes(searchQuery),
+            ),
+        );
+    }, [search, members]);
+
     // If user is not logged in, return empty
     if (!user) {
         return <></>;
+    }
+
+    async function handleLeaveTeam() {
+        if (!confirm("Are you sure you want to leave this team?")) return;
+        const response = await fetch(`/api/projects/${id}/members`, { method: "DELETE" });
+        const data: ApiResponse<void> = await response.json();
+        if (!data.success) {
+            return alert("Unable to leave team. Please try again.");
+        }
+        router.push("/dashboard");
+    }
+
+    async function handleInviteMember() {}
+
+    async function handleRemoveMember(userId: string) {
+        if (!confirm("Are you sure you want to remove that member?")) return;
+        const response = await fetch(`/api/projects/${id}/members/remove`, {
+            method: "POST",
+            body: JSON.stringify({
+                userId: userId,
+            }),
+        });
+        const data: ApiResponse<void> = await response.json();
+        if (!data.success) {
+            return alert("Unable to remove that member. Please try again.");
+        }
+        setMembers((_members) => _members.filter((member) => member.user_id !== userId));
     }
 
     // Generate table row function
@@ -85,10 +124,16 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         }
         return users.map((user: Profile) => (
             <TableRow key={user.user_id}>
-                <TableCell>{user.profile_display_name}</TableCell>
-                <TableCell>{}</TableCell> {/* Email */}
                 <TableCell>
-                    <Button variant="contained" color="secondary">
+                    {user.first_name} {user.last_name}
+                </TableCell>
+                <TableCell>{user.email}</TableCell> {/* Email */}
+                <TableCell>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleRemoveMember(user.user_id)}
+                    >
                         REMOVE
                     </Button>
                 </TableCell>
@@ -112,12 +157,19 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             <TextField
                                 id="search-team-member"
                                 label="Search"
-                                defaultValue="Enter Team Member..."
+                                placeholder="Enter Team Member..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                             />
                         </Grid>
                         {/* Leave Team, Invite Member, Settings */}
                         <Grid item>
-                            <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                sx={{ mr: 2 }}
+                                onClick={handleLeaveTeam}
+                            >
                                 LEAVE TEAM
                             </Button>
                             <Button variant="contained" color="secondary" sx={{ mr: 2 }}>
@@ -162,7 +214,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                               </TableCell>
                                           </TableRow>
                                       ))
-                                    : generateRowFunction(members)}
+                                    : generateRowFunction(displayedMembers)}
                             </TableBody>
                         </Table>
                     </TableContainer>
