@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Project } from "../utils/lib/types";
 import AddTaskModal from "./AddTaskModal";
 import { ProjectTask } from "@/utils/types";
-import { ViewTaskModal } from "@/components/ViewTaskModal";
+import ViewTaskModal from "@/components/ViewTaskModal";
 // Types
 
 /**

@@ -89,25 +89,24 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleClose, task }
                     <Typography variant="h6" gutterBottom>
                         Assignees
                     </Typography>
-                    {/* <Paper variant="outlined">
-                        {task.assignees.map((assignee, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    p: 1,
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    borderBottom:
-                                        index < task.assignees.length - 1
-                                            ? "1px solid #e0e0e0"
-                                            : "none",
-                                }}
-                            >
-                                <Typography>{assignee.name}</Typography>
-                                <Typography color="text.secondary">{assignee.email}</Typography>
-                            </Box>
-                        ))}
-                    </Paper> */}
+                    <Paper variant="outlined">
+                        {task.assignees && Array.isArray(task.assignees) ? (
+                            task.assignees.map((assignee, index) => (
+                                <Box
+                                    key={index}
+                                    sx={
+                                        {
+                                            /* styles here */
+                                        }
+                                    }
+                                >
+                                    {/* render assignee data here */}
+                                </Box>
+                            ))
+                        ) : (
+                            <Typography>No assignees</Typography>
+                        )}
+                    </Paper>
                 </Box>
 
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
