@@ -461,7 +461,16 @@ const Card: React.FC<CardProp> = ({
             >
                 <div className="flex-col text-sm" style={{ color: textColor }}>
                     <strong>{task_name}</strong>
-                    <p>{task_deadline}</p>
+                    <p>
+                        {" "}
+                        {new Intl.DateTimeFormat("en-AU", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }).format(new Date(task_deadline))}
+                    </p>
                     <p>{task_priority}</p>
                 </div>
             </div>
