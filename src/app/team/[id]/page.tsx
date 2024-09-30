@@ -1,5 +1,5 @@
 "use client";
-
+import TeamSettingsModal from "@/components/TeamSettingsModal";
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
@@ -185,10 +185,17 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             >
                                 INVITE MEMBER
                             </Button>
+                            <IconButton
+                                color="default"
+                                size="medium"
+                                sx={{ mr: 2 }}
+                                onClick={handleOpen}
+                            ></IconButton>
                             <InviteMemberModal open={open} handleClose={handleClose} />
                             <IconButton color="default" size="medium" sx={{ mr: 2 }}>
                                 <SettingsFilled />
                             </IconButton>
+                            <TeamSettingsModal open={open} handleClose={handleClose} />
                         </Grid>
                     </Grid>
                 </Grid>
