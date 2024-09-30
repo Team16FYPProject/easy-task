@@ -33,9 +33,6 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const [members, setMembers] = React.useState<Profile[]>([]);
     const [displayedMembers, setDisplayedMembers] = React.useState<Profile[]>([]);
     const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
 
     const [search, setSearch] = useState<string>("");
 
@@ -193,7 +190,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 size="medium"
                                 sx={{ mr: 2 }}
                                 onClick={handleOpen}
-                            >
+                            ></IconButton>
                             <InviteMemberModal open={open} handleClose={handleClose} />
                             <IconButton color="default" size="medium" sx={{ mr: 2 }}>
                                 <SettingsFilled />
