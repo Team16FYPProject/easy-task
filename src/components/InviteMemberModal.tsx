@@ -70,15 +70,10 @@ export default function InviteMemberModal({
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <Grid container direction="column" spacing={2}>
+                    <Grid container spacing={2}>
                         <Grid item>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 Invite Member
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography id="modal-modal-title" variant="h6" component="h3">
-                                Inviting to: {teamName}
                             </Typography>
                         </Grid>
                         <Grid item>
@@ -90,27 +85,17 @@ export default function InviteMemberModal({
                                 onChange={handleInputChange}
                             />
                         </Grid>
-                        <Grid container direction="column" spacing={2}>
-                            <Grid item>
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    // onClick={handleSubmit} // CHANGE TO CANCEL
-                                    className="w-full"
-                                >
-                                    Cancel
-                                </Button>
-                            </Grid>
-                            <Grid item>
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    onClick={handleSubmit}
-                                    className="w-full"
-                                >
-                                    INVITE
-                                </Button>
-                            </Grid>
+
+                        <Grid item>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleSubmit}
+                                className="w-full"
+                                sx={{ mr: 2 }}
+                            >
+                                INVITE
+                            </Button>
                         </Grid>
                     </Grid>
                 </Box>
