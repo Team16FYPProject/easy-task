@@ -26,12 +26,17 @@ SELECT ARRAY(SELECT id FROM auth.users) INTO user_ids;
 project_count := LEAST(5, GREATEST(1, array_length(user_ids, 1)));
 
 -- Dummy data for achievement table
-INSERT INTO achievement (achievement_name, achievement_desc) VALUES
-('Early Bird', 'Complete 5 tasks before 9 AM'),
-('Team Player', 'Collaborate on 10 different projects'),
-('Deadline Crusher', 'Complete 20 tasks before their deadlines'),
-('Project Master', 'Successfully complete 5 projects'),
-('Multitasker', 'Have 10 tasks in progress simultaneously');
+INSERT INTO achievement (achievement_id, achievement_name, achievement_desc, max_progress, icon) VALUES
+(gen_random_uuid(), 'Early Bird', 'Complete 5 tasks before 9 AM', 5, '🐦'),
+(gen_random_uuid(), 'Team Player', 'Collaborate on 10 different projects', 10, '🤝'),
+(gen_random_uuid(), 'Deadline Crusher', 'Complete 20 tasks before their deadlines', 20, '⏰'),
+(gen_random_uuid(), 'Project Master', 'Successfully complete 5 projects', 5, '🏆'),
+(gen_random_uuid(), 'Multitasker', 'Have 10 tasks in progress simultaneously', 10, '🔄'),
+(gen_random_uuid(), 'Task Master', 'Complete 50 tasks', 50, '✅'),
+(gen_random_uuid(), 'Time Wizard', 'Spend 100 hours on tasks', 100, '⌛'),
+(gen_random_uuid(), 'Meeting Maven', 'Attend 20 project meetings', 20, '💼'),
+(gen_random_uuid(), 'Productive Streak', 'Use the app for 30 consecutive days', 30, '🔥'),
+(gen_random_uuid(), 'Task Organizer', 'Create 25 tasks with all fields filled', 25, '📝');
 
 -- Dummy data for project table
 FOR i IN 1..project_count LOOP
@@ -89,10 +94,36 @@ SELECT task_id, task_deadline - (random() * INTERVAL '3 days')
 FROM task;
 
 -- Dummy data for user_achievement table
-INSERT INTO user_achievement (user_id, achievement_id)
-SELECT u.id, a.achievement_id
-FROM unnest(user_ids) AS u(id)
-CROSS JOIN achievement a
-WHERE random() < 0.7;  -- 70% chance of each user having each achievement
+INSERT INTO user_achievement (user_id, achievement_id, progress, completed, completed_at)
+SELECT 
+    u.id,
+        a.achievement_id,
+        floor(random() * (a.max_progress + 1))::INTEGER AS progress,
+        CASE 
+            WHEN floor(random() * (a.max_progress + 1))::INTEGER = a.max_progress THEN TRUE 
+            ELSE FALSE 
+        END AS completed,
+        CASE 
+            WHEN floor(random() * (a.max_progress + 1))::INTEGER = a.max_progress THEN NOW() - (random() * INTERVAL '30 days') 
+            ELSE NULL 
+        END AS completed_at
+FROM 
+    unnest(user_ids) AS u(id)
+CROSS JOIN 
+    achievement a;
+
+-- Update progress and completed status
+UPDATE user_achievement ua
+SET 
+    progress = LEAST(ua.progress + floor(random() * 10)::INTEGER, a.max_progress),
+    completed = ua.progress >= a.max_progress,
+    completed_at = CASE 
+        WHEN ua.progress >= a.max_progress THEN NOW() - (random() * INTERVAL '30 days') 
+        ELSE NULL 
+    END
+FROM 
+    achievement a
+WHERE 
+    ua.achievement_id = a.achievement_id;
 
 END $$;
