@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Box, Typography, Grid, Paper, Chip, Button } from "@mui/material";
 import { Task } from "@/utils/lib/types";
+import EditTaskModal from "@/components/EditTaskModal";
 
 interface ViewTaskModalProps {
     open: boolean;
@@ -25,6 +26,10 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
         borderBottom: "1px solid #e0e0e0",
         py: 2,
     };
+
+    const [taskOpen, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     return (
         <Modal open={open} onClose={handleCloseModal}>
@@ -116,9 +121,10 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                     <Button variant="contained" color="secondary">
                         ADD SUBTASK
                     </Button>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="contained" color="secondary" onClick={handleOpen}>
                         EDIT TASK
                     </Button>
+                    <EditTaskModal open={taskOpen} handleCloseModal={handleClose} task={task} />
                 </Box>
             </Box>
         </Modal>
