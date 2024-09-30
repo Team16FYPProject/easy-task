@@ -1,5 +1,5 @@
 import { Box, FormControl, MenuItem, Modal, Select, TextField } from "@mui/material";
-import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FormEvent, useState } from "react";
 import { ProjectTask } from "@/utils/types";
@@ -93,16 +93,18 @@ export default function AddTaskModal({
                             <label>
                                 Task Name <span className="text-red-600">*</span>
                             </label>
-                            <input
-                                className="rounded-md border-2 border-solid border-gray-600 p-2"
+                            <TextField
+                                id="outlined-basic"
+                                variant="outlined"
                                 value={taskName}
                                 onChange={(e) => {
                                     setTaskName(e.target.value);
                                 }}
                             />
                             <label>Task Description</label>
-                            <input
-                                className="rounded-md border-2 border-solid border-gray-600 p-2"
+                            <TextField
+                                id="outlined-basic"
+                                variant="outlined"
                                 value={taskDescription ?? ""}
                                 onChange={(e) => {
                                     setTaskDescription(e.target.value);
@@ -114,7 +116,7 @@ export default function AddTaskModal({
                                         Task Deadline<span className="text-red-600">*</span>
                                     </label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker
+                                        <DateTimePicker
                                             disablePast
                                             onChange={(newValue) =>
                                                 setTaskDeadline(
@@ -123,7 +125,7 @@ export default function AddTaskModal({
                                                         : null,
                                                 )
                                             }
-                                        ></DatePicker>
+                                        ></DateTimePicker>
                                     </LocalizationProvider>
                                 </div>
                                 <div className="flex w-full flex-col">
@@ -190,9 +192,9 @@ export default function AddTaskModal({
                                                 setTaskReminder(e.target.value);
                                             }}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                            <MenuItem value={"HOUR"}>One Hour Before</MenuItem>
+                                            <MenuItem value={"DAY"}>One Day Before</MenuItem>
+                                            <MenuItem value={"WEEK"}>One Week Before</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
