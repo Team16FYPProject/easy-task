@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Box, Typography, Grid, Paper, Chip, Button } from "@mui/material";
 import { Task } from "@/utils/lib/types";
 import EditTaskModal from "@/components/EditTaskModal";
+import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
 
 interface ViewTaskModalProps {
     open: boolean;
@@ -28,8 +29,12 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
     };
 
     const [taskOpen, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [taskEditOpen, setEditOpen] = React.useState(false);
+    const handleOpenEditModal = () => setEditOpen(true);
+    const handleEditClose = () => setEditOpen(false);
+    // const handleOpen = () => setOpen(true);
+    // const handleClose = () => setOpen(false);
+    const bgColor = determineBgColor(task.task_priority);
 
     return (
         <Modal open={open} onClose={handleCloseModal}>
@@ -57,13 +62,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                             Priority:{" "}
                             <Chip
                                 label={task.task_priority}
-                                color={
-                                    task.task_priority === "Low"
-                                        ? "success"
-                                        : task.task_priority === "Medium"
-                                          ? "warning"
-                                          : "error"
-                                }
+                                sx={{ backgroundColor: bgColor }}
                                 size="small"
                             />
                         </Typography>
@@ -121,10 +120,14 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                     <Button variant="contained" color="secondary">
                         ADD SUBTASK
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={handleOpen}>
+                    <Button variant="contained" color="secondary" onClick={handleOpenEditModal}>
                         EDIT TASK
                     </Button>
-                    <EditTaskModal open={taskOpen} handleCloseModal={handleClose} task={task} />
+                    <EditTaskModal
+                        open={taskEditOpen}
+                        handleCloseModal={handleEditClose}
+                        task={task}
+                    />
                 </Box>
             </Box>
         </Modal>

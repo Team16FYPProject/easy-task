@@ -42,7 +42,7 @@ type CardProp = {
     task_creator_id: string;
     task_deadline: string;
     task_desc: string;
-    task_id: string;
+    task_id: number;
     task_is_meeting: boolean;
     task_location: string;
     task_name: string;
@@ -481,7 +481,8 @@ const Card: React.FC<CardProp> = ({
             {viewTaskOpen && (
                 <ViewTaskModal
                     open={viewTaskOpen}
-                    onClose={handleCloseModal}
+                    handleCloseModal={handleCloseModal}
+                    // onClose={handleCloseModal}
                     task={{
                         project_id,
                         task_creator_id,

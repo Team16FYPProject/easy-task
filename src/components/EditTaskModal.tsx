@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import theme from "@/styles/theme";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 interface EditTaskModalProps {
     open: boolean;
@@ -130,7 +131,14 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
 
                         <Grid container spacing={2}>
                             <Grid item>
-                                <DatePicker id="task-deadline" required label="Task Deadline" />
+                                {/* <DatePicker
+                                    label="Task Deadline"
+                                    value={task.task_deadline ? dayjs(task.task_deadline) : null}
+                                    onChange={(newValue) => {
+                                        // handle the change
+                                    }}
+                                    renderInput={(params) => <TextField {...params} required />}
+                                /> */}
                             </Grid>
                             <Grid item>
                                 <TextField id="task-parent" select label="Task Parent"></TextField>
