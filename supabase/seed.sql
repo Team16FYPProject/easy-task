@@ -59,16 +59,22 @@ FROM project;
 INSERT INTO task (project_id, task_name, task_desc, task_deadline, task_time_spent, task_creator_id, task_status, task_priority, task_location, task_is_meeting)
 SELECT
     p.project_id,
-    'Task for ' || p.project_name,
-    'Description for task in ' || p.project_name,
-    NOW() + (random() * INTERVAL '30 days'),
-    (random() * 300)::int,
-    p.project_owner_id,
+    'Task ' || t.task_num || ' for ' || p.project_name,
+    'Description for Task ' || t.task_num || ' in ' || p.project_name,
+    NOW() + (random() * INTERVAL '60 days'),
+    (random() * 600)::int,
+    (SELECT id FROM auth.users ORDER BY random() LIMIT 1),
     (ARRAY['TODO', 'DOING', 'COMPLETE'])[floor(random() * 3 + 1)]::task_status_enum,
     (ARRAY['LOW', 'MEDIUM', 'HIGH'])[floor(random() * 3 + 1)]::task_priority_enum,
-    CASE WHEN random() > 0.5 THEN 'Remote' ELSE 'Office' END,
-    random() > 0.8
-FROM project p;
+    CASE 
+        WHEN random() < 0.6 THEN 'Remote'
+        WHEN random() < 0.9 THEN 'Office'
+        ELSE 'On-site'
+    END,
+    random() < 0.2  -- 20% chance of being a meeting
+FROM 
+    project p,
+    generate_series(1, 10) AS t(task_num);
 
 -- Dummy data for task_assignee table
 INSERT INTO task_assignee (task_id, user_id)
