@@ -120,18 +120,7 @@ export default function UpdateProfile() {
                                 <Grid item xs={12} padding={3}>
                                     <Typography variant="h4">Account</Typography>
                                 </Grid>
-                                {/* Profile Picture */}
-                                <Grid container spacing={2} padding={1}>
-                                    <Grid item>
-                                        <Button
-                                            variant="contained"
-                                            component="span"
-                                            onClick={handleUpdate}
-                                        >
-                                            Update
-                                        </Button>
-                                    </Grid>
-                                </Grid>
+
                                 {/* Profile Info */}
 
                                 <Grid container>
@@ -145,29 +134,48 @@ export default function UpdateProfile() {
                                     </Grid>
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
-                                            id="edit-email-address"
+                                            id="edit-last-name"
                                             label="Last Name"
                                             value={lastName}
                                             onChange={(e) => setLastName(e.target.value)}
                                         />
                                     </Grid>
                                 </Grid>
-                                <Grid container>
+                                <Grid container direction="column">
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
                                             id="edit-email-address"
                                             label="Email Address *" /* Note: the asteriks to become automatic */
                                             value={email}
+                                            fullWidth
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
                                     </Grid>
+
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
+                                            multiline
+                                            rows={4}
                                             id="edit-bio"
                                             label="Bio"
                                             value={bio}
+                                            fullWidth
                                             onChange={(e) => setBio(e.target.value)}
                                         />
+                                    </Grid>
+                                </Grid>
+
+                                {/* Update Button */}
+                                <Grid container spacing={2} padding={1}>
+                                    <Grid item>
+                                        <Button
+                                            variant="contained"
+                                            component="span"
+                                            color="secondary"
+                                            onClick={handleUpdate}
+                                        >
+                                            Update
+                                        </Button>
                                     </Grid>
                                 </Grid>
                             </Grid>
