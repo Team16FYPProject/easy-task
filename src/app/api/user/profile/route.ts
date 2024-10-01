@@ -1,4 +1,4 @@
-import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import {
     badRequestResponse,
     createdResponse,
