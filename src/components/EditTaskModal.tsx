@@ -19,7 +19,8 @@ import {
     SelectChangeEvent,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Assignee, Task } from "@/utils/lib/types";
+import { Task } from "@/utils/lib/types";
+import { Assignee } from "@/utils/lib/Assignee";
 import dayjs from "dayjs";
 
 interface EditTaskModalProps {

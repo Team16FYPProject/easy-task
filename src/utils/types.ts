@@ -69,3 +69,10 @@ export type ProjectTask = {
     task_time_spent: number;
     task_status: string;
 };
+
+// Interface for Assignee
+export interface Assignee {
+    id: string;
+    name: string;
+    email: string;
+}

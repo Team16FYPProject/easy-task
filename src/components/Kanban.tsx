@@ -42,7 +42,7 @@ type CardProp = {
     task_creator_id: string;
     task_deadline: string;
     task_desc: string;
-    task_id: number;
+    task_id: string;
     task_is_meeting: boolean;
     task_location: string;
     task_name: string;
@@ -404,7 +404,14 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
             >
                 {/*Renders the filtered cards */}
                 {filteredCards.map((c) => {
-                    return <Card key={c.task_id} {...c} handleDragStart={handleDragStart} />;
+                    return (
+                        <Card
+                            key={c.task_id}
+                            {...c}
+                            task_id={c.task_id}
+                            handleDragStart={handleDragStart}
+                        />
+                    );
                 })}
                 <DropIndicator beforeId={null} column={column} />
             </div>

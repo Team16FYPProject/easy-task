@@ -25,8 +25,12 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
 
     // Extract unique assignee IDs
     const assigneeIds = [
-        ...new Set(
-            taskData?.flatMap((task) => task.assignees.map((assignee) => assignee.user_id)) || [],
+        ...Array.from(
+            new Set(
+                taskData?.flatMap((task) =>
+                    task.assignees.map((assignee: { user_id: number }) => assignee.user_id),
+                ) || [],
+            ),
         ),
     ];
 
@@ -44,7 +48,7 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
     // Merge user information with tasks
     const tasksWithUserDetails = taskData?.map((task) => ({
         ...task,
-        assignees: task.assignees.map((assignee) => {
+        assignees: task.assignees.map((assignee: { user_id: number }) => {
             const user = userData?.find((u) => u.id === assignee.user_id);
             return {
                 ...assignee,
