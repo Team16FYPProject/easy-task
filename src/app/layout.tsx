@@ -1,10 +1,10 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import React from "react";
-import AppBar from "@/app/appbar/page";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "@/styles/theme"; // Adjust the import path as necessary
+import SiteAppBar from "@/components/AppBar";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -23,7 +23,7 @@ export default function RootLayout({
             <body>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
-                    <AppBar /> {/* This is the AppBar component */}
+                    <SiteAppBar /> {/* This is the AppBar component */}
                     <div>{children}</div>
                 </ThemeProvider>
             </body>

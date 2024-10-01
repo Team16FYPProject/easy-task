@@ -29,7 +29,7 @@ const NAVIGATION_LINKS: NavigationLink[][] = [
     ],
 ];
 
-export default function ButtonAppBar() {
+export default function SiteAppBar() {
     const [open, setOpen] = React.useState(false);
     const [shouldShowIconButton, setShouldShowIconButton] = React.useState(true);
 
@@ -46,8 +46,8 @@ export default function ButtonAppBar() {
         <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
             {NAVIGATION_LINKS.map((navigationGroup, idx) => {
                 return (
-                    <>
-                        <List key={`nav_group_${idx}`}>
+                    <React.Fragment key={`nav_group_${idx}`}>
+                        <List>
                             {navigationGroup.map((navLink) => (
                                 <ListItem key={navLink.name}>
                                     <Link href={navLink.link ?? `/${navLink.name.toLowerCase()}`}>
@@ -59,7 +59,7 @@ export default function ButtonAppBar() {
                             ))}
                         </List>
                         {idx !== NAVIGATION_LINKS.length - 1 && <Divider />}
-                    </>
+                    </React.Fragment>
                 );
             })}
         </Box>
