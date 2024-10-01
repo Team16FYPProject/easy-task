@@ -33,16 +33,25 @@ export type Database = {
                     achievement_desc: string;
                     achievement_id: string;
                     achievement_name: string;
+                    created_at: string | null;
+                    icon: string | null;
+                    max_progress: number;
                 };
                 Insert: {
                     achievement_desc: string;
                     achievement_id?: string;
                     achievement_name: string;
+                    created_at?: string | null;
+                    icon?: string | null;
+                    max_progress?: number;
                 };
                 Update: {
                     achievement_desc?: string;
                     achievement_id?: string;
                     achievement_name?: string;
+                    created_at?: string | null;
+                    icon?: string | null;
+                    max_progress?: number;
                 };
                 Relationships: [];
             };
@@ -114,6 +123,13 @@ export type Database = {
                         referencedRelation: "profile";
                         referencedColumns: ["user_id"];
                     },
+                    {
+                        foreignKeyName: "project_project_owner_id_fkey";
+                        columns: ["project_owner_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
+                        referencedColumns: ["user_id"];
+                    },
                 ];
             };
             project_invite_link: {
@@ -141,6 +157,13 @@ export type Database = {
                         columns: ["invite_creator_id"];
                         isOneToOne: false;
                         referencedRelation: "profile";
+                        referencedColumns: ["user_id"];
+                    },
+                    {
+                        foreignKeyName: "project_invite_link_invite_creator_id_fkey";
+                        columns: ["invite_creator_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
                         referencedColumns: ["user_id"];
                     },
                     {
@@ -178,6 +201,13 @@ export type Database = {
                         columns: ["user_id"];
                         isOneToOne: false;
                         referencedRelation: "profile";
+                        referencedColumns: ["user_id"];
+                    },
+                    {
+                        foreignKeyName: "project_member_user_id_fkey";
+                        columns: ["user_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
                         referencedColumns: ["user_id"];
                     },
                 ];
@@ -241,6 +271,13 @@ export type Database = {
                         referencedColumns: ["user_id"];
                     },
                     {
+                        foreignKeyName: "task_task_creator_id_fkey";
+                        columns: ["task_creator_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
+                        referencedColumns: ["user_id"];
+                    },
+                    {
                         foreignKeyName: "task_task_parent_id_fkey";
                         columns: ["task_parent_id"];
                         isOneToOne: false;
@@ -277,6 +314,13 @@ export type Database = {
                         referencedRelation: "profile";
                         referencedColumns: ["user_id"];
                     },
+                    {
+                        foreignKeyName: "task_assignee_user_id_fkey";
+                        columns: ["user_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
+                        referencedColumns: ["user_id"];
+                    },
                 ];
             };
             task_reminder: {
@@ -308,14 +352,23 @@ export type Database = {
             user_achievement: {
                 Row: {
                     achievement_id: string;
+                    completed: boolean;
+                    completed_at: string | null;
+                    progress: number;
                     user_id: string;
                 };
                 Insert: {
                     achievement_id: string;
+                    completed?: boolean;
+                    completed_at?: string | null;
+                    progress?: number;
                     user_id: string;
                 };
                 Update: {
                     achievement_id?: string;
+                    completed?: boolean;
+                    completed_at?: string | null;
+                    progress?: number;
                     user_id?: string;
                 };
                 Relationships: [
@@ -327,20 +380,62 @@ export type Database = {
                         referencedColumns: ["achievement_id"];
                     },
                     {
+                        foreignKeyName: "user_achievement_achievement_id_fkey";
+                        columns: ["achievement_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
+                        referencedColumns: ["achievement_id"];
+                    },
+                    {
                         foreignKeyName: "user_achievement_user_id_fkey";
                         columns: ["user_id"];
                         isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["user_id"];
                     },
+                    {
+                        foreignKeyName: "user_achievement_user_id_fkey";
+                        columns: ["user_id"];
+                        isOneToOne: false;
+                        referencedRelation: "user_achievement_progress";
+                        referencedColumns: ["user_id"];
+                    },
                 ];
             };
         };
         Views: {
-            [_ in never]: never;
+            user_achievement_progress: {
+                Row: {
+                    achievement_desc: string | null;
+                    achievement_id: string | null;
+                    achievement_name: string | null;
+                    completed: boolean | null;
+                    completed_at: string | null;
+                    email: string | null;
+                    max_progress: number | null;
+                    progress: number | null;
+                    user_id: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "profile_user_id_fkey";
+                        columns: ["user_id"];
+                        isOneToOne: true;
+                        referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    },
+                ];
+            };
         };
         Functions: {
-            [_ in never]: never;
+            update_user_achievement: {
+                Args: {
+                    p_user_id: string;
+                    p_achievement_name: string;
+                    p_progress: number;
+                };
+                Returns: undefined;
+            };
         };
         Enums: {
             task_priority_enum: "LOW" | "MEDIUM" | "HIGH";
