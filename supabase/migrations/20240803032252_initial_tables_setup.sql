@@ -11,7 +11,7 @@ ALTER TABLE achievement
 
 CREATE TABLE user_achievement
 (
-    user_id        uuid NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+    user_id        uuid NOT NULL REFERENCES profile ON DELETE CASCADE,
     achievement_id uuid NOT NULL REFERENCES achievement (achievement_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, achievement_id)
 );
@@ -25,7 +25,7 @@ CREATE TABLE project
 (
     project_id          uuid DEFAULT gen_random_uuid(),
     project_name        text NOT NULL,
-    project_owner_id    uuid NOT NULL REFERENCES auth.users ON DELETE RESTRICT,
+    project_owner_id    uuid NOT NULL REFERENCES profile ON DELETE RESTRICT,
     project_profile_pic text NULL,
     project_desc        text NULL,
     PRIMARY KEY (project_id)
@@ -43,7 +43,7 @@ CREATE POLICY "Users can modify the projects they own"
 CREATE TABLE project_member
 (
     project_id uuid NOT NULL REFERENCES project ON DELETE CASCADE,
-    user_id    uuid NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+    user_id    uuid NOT NULL REFERENCES profile ON DELETE CASCADE,
     PRIMARY KEY (project_id, user_id)
 );
 
@@ -55,7 +55,7 @@ CREATE TABLE project_invite_link
 (
     invite_id         uuid                 DEFAULT gen_random_uuid(),
     project_id        uuid        NOT NULL REFERENCES project,
-    invite_creator_id uuid        NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+    invite_creator_id uuid        NOT NULL REFERENCES profile ON DELETE CASCADE,
     invite_created_at timestamptz NOT NULL DEFAULT NOW(),
     PRIMARY KEY (invite_id)
 );
@@ -74,7 +74,7 @@ CREATE TABLE task
     task_desc       text               NULL,
     task_deadline   timestamptz        NULL,
     task_time_spent integer            NOT NULL DEFAULT 0,
-    task_creator_id uuid               REFERENCES auth.users ON DELETE SET NULL,
+    task_creator_id uuid               REFERENCES profile ON DELETE SET NULL,
     task_parent_id  uuid               REFERENCES task ON DELETE SET NULL,
     task_status     task_status_enum   NOT NULL DEFAULT 'TODO'::task_status_enum,
     task_priority   task_priority_enum NOT NULL DEFAULT 'MEDIUM'::task_priority_enum,
@@ -89,7 +89,7 @@ ALTER TABLE task
 CREATE TABLE task_assignee
 (
     task_id uuid NOT NULL REFERENCES task ON DELETE CASCADE,
-    user_id uuid NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES profile ON DELETE CASCADE,
     PRIMARY KEY (task_id, user_id)
 );
 
