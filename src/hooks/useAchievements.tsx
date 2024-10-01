@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getBrowserSupabase } from "@/utils/supabase/client";
 
-export function useAchievements(userId: number) {
+export function useAchievements(userId: string) {
     const [achievements, setAchievements] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

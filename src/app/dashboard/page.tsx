@@ -128,7 +128,7 @@ export default function Dashboard() {
 
                 // Fetch projects and their names
                 const projectIDsAndNames = result.projects.map(
-                    (project: { project_id: any; project_name: string }) => ({
+                    (project: { project_id: string; project_name: string }) => ({
                         project_id: project.project_id,
                         project_name: project.project_name,
                     }),
@@ -330,7 +330,7 @@ export default function Dashboard() {
     }
 
     // Handle card click for Team Cards
-    function handleCardClick(projectId: any): void {
+    function handleCardClick(projectId: string): void {
         router.push(`/team/${projectId}`);
     }
 

@@ -68,7 +68,7 @@ export default function ListView() {
 
                 // Fetch projects and their names
                 const projectIDsAndNames = result.projects.map(
-                    (project: { project_id: any; project_name: string }) => ({
+                    (project: { project_id: string; project_name: string }) => ({
                         project_id: project.project_id,
                         project_name: project.project_name,
                     }),

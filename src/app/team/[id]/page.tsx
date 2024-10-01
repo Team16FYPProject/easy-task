@@ -123,7 +123,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     }
 
     // Generate table row function
-    function generateRowFunction(users: any): React.ReactNode {
+    function generateRowFunction(users: Profile[]): React.ReactNode {
         if (!users) {
             return <></>;
         }
