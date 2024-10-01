@@ -4,7 +4,7 @@ import { okResponse, unauthorizedResponse } from "@/utils/server/server.response
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { createTask } from "./utils";
 
-export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
+export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     const { user } = await getSession();
     if (!user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
@@ -22,28 +22,6 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
         console.error("Unable to fetch tasks from the database", taskError);
         return okResponse({ success: true, tasks: [] });
     }
-
-    // // Extract unique assignee IDs
-    // const assigneeIds = [
-    //     ...Array.from(
-    //         new Set(
-    //             taskData?.flatMap((task) =>
-    //                 task.assignees.map((assignee: { user_id: number }) => assignee.user_id),
-    //             ) || [],
-    //         ),
-    //     ),
-    // ];
-
-    // // Fetch user details from auth.users table
-    // const { data: userData, error: userError } = await supabase
-    //     .from("auth.users")
-    //     .select("id, email, raw_user_meta_data")
-    //     .in("id", assigneeIds);
-    //
-    // if (userError) {
-    //     console.error("Unable to fetch user information", userError);
-    //     return okResponse({ success: true, tasks: taskData || [] });
-    // }
 
     // Merge user information with tasks
     const tasksWithUserDetails = taskData?.map((task) => ({
