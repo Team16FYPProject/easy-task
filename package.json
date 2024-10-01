@@ -14,7 +14,8 @@
         "format": "prettier --write .",
         "prepare": "husky install",
         "type-checks": "tsc --noEmit",
-        "sb:types": "npx supabase gen types --lang=typescript --local > src/utils/supabase/database.types.ts"
+        "sb:types": "npx supabase gen types --lang=typescript --local > src/utils/supabase/database.types.ts",
+        "db-reset": "supabase db reset && npm run sb:types"
     },
     "dependencies": {
         "@emotion/cache": "^11.13.1",

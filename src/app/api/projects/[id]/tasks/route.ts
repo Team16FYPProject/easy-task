@@ -14,7 +14,7 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
     // Query the database to find all tasks that match a project id
     const { data: taskData, error: taskError } = await supabase
         .from("task")
-        .select("*,assignees:task_assignee(user_id)")
+        .select("*,assignees:task_assignee(user_id, profile!inner(email, first_name, last_name))")
         .eq("project_id", id);
 
     // Handle query errors
@@ -23,41 +23,38 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
         return okResponse({ success: true, tasks: [] });
     }
 
-    // Extract unique assignee IDs
-    const assigneeIds = [
-        ...Array.from(
-            new Set(
-                taskData?.flatMap((task) =>
-                    task.assignees.map((assignee: { user_id: number }) => assignee.user_id),
-                ) || [],
-            ),
-        ),
-    ];
+    // // Extract unique assignee IDs
+    // const assigneeIds = [
+    //     ...Array.from(
+    //         new Set(
+    //             taskData?.flatMap((task) =>
+    //                 task.assignees.map((assignee: { user_id: number }) => assignee.user_id),
+    //             ) || [],
+    //         ),
+    //     ),
+    // ];
 
-    // Fetch user details from auth.users table
-    const { data: userData, error: userError } = await supabase
-        .from("auth.users")
-        .select("id, email, raw_user_meta_data")
-        .in("id", assigneeIds);
-
-    if (userError) {
-        console.error("Unable to fetch user information", userError);
-        return okResponse({ success: true, tasks: taskData || [] });
-    }
+    // // Fetch user details from auth.users table
+    // const { data: userData, error: userError } = await supabase
+    //     .from("auth.users")
+    //     .select("id, email, raw_user_meta_data")
+    //     .in("id", assigneeIds);
+    //
+    // if (userError) {
+    //     console.error("Unable to fetch user information", userError);
+    //     return okResponse({ success: true, tasks: taskData || [] });
+    // }
 
     // Merge user information with tasks
     const tasksWithUserDetails = taskData?.map((task) => ({
         ...task,
-        assignees: task.assignees.map((assignee: { user_id: number }) => {
-            const user = userData?.find((u) => u.id === assignee.user_id);
+        assignees: task.assignees.map((assignee) => {
             return {
                 ...assignee,
-                user: user
-                    ? {
-                          email: user.email,
-                          name: user.raw_user_meta_data?.name || "N/A",
-                      }
-                    : null,
+                user: {
+                    email: assignee.profile.email,
+                    name: assignee.profile.first_name + " " + assignee.profile.last_name,
+                },
             };
         }),
     }));

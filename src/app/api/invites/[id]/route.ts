@@ -15,7 +15,7 @@ export async function GET(_: Request, { params: { id } }: InviteIdParams) {
     const supabase = getServiceSupabase();
     const { data: inviteData, error: inviteError } = await supabase
         .from("project_invite_link")
-        .select("*, user!inner(first_name, last_name)")
+        .select("*, profile!inner(first_name, last_name)")
         .eq("invite_id", id)
         .single();
 
@@ -58,7 +58,7 @@ export async function GET(_: Request, { params: { id } }: InviteIdParams) {
                 image: projectData.project_profile_pic,
             },
             inviter: {
-                name: inviteData.user.first_name + " " + inviteData.user.last_name,
+                name: inviteData.profile.first_name + " " + inviteData.profile.last_name,
             },
         },
     });
