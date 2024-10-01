@@ -1,7 +1,18 @@
-import { Box, FormControl, MenuItem, Modal, Select, TextField } from "@mui/material";
-import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
+import {
+    Box,
+    Chip,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Modal,
+    OutlinedInput,
+    Select,
+    SelectChangeEvent,
+    TextField,
+} from "@mui/material";
+import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ProjectTask } from "@/utils/types";
 const style = {
     position: "absolute",
@@ -14,6 +25,16 @@ const style = {
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+};
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
 };
 export default function AddTaskModal({
     open,
@@ -38,9 +59,12 @@ export default function AddTaskModal({
     const [taskLocation, setTaskLocation] = useState<string>("");
     const [taskMeetingBool, setTaskMeetingBool] = useState<boolean>(false);
     const [taskDuration, setTaskDuration] = useState<string>("");
-    const [assignee, setTaskAssignees] = useState<string>("");
+    const [taskAssignee, setTaskAssignees] = useState<string[]>([]);
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
+    const [names, setNames] = useState<
+        { user_id: string; first_name: string; last_name: string }[]
+    >([]);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -60,6 +84,7 @@ export default function AddTaskModal({
                 taskMeetingBool,
                 taskLocation: taskLocation || null,
                 taskDuration: taskDuration || null,
+                taskAssignee: taskAssignee || null,
             }),
         });
         const data = await response.json();
@@ -74,6 +99,33 @@ export default function AddTaskModal({
             handleClose();
         }
     }
+    const handleChange = (event: SelectChangeEvent<typeof taskAssignee>) => {
+        const {
+            target: { value },
+        } = event;
+        setTaskAssignees(
+            // On autofill we get a stringified value.
+            typeof value === "string" ? value.split(",") : value,
+        );
+    };
+    useEffect(() => {
+        async function fetchTeamMembers() {
+            if (project_id && open) {
+                try {
+                    const route = `/api/projects/${project_id}/members`;
+                    const response = await fetch(route, {
+                        method: "GET",
+                        credentials: "include",
+                    });
+                    const result = await response.json();
+                    setNames(result.users);
+                } catch (e) {
+                    console.error(`Error fetching members for project ${project_id}`, e);
+                }
+            }
+        }
+        fetchTeamMembers();
+    }, [handleClose]);
 
     return (
         <div>
@@ -93,16 +145,18 @@ export default function AddTaskModal({
                             <label>
                                 Task Name <span className="text-red-600">*</span>
                             </label>
-                            <input
-                                className="rounded-md border-2 border-solid border-gray-600 p-2"
+                            <TextField
+                                id="outlined-basic"
+                                variant="outlined"
                                 value={taskName}
                                 onChange={(e) => {
                                     setTaskName(e.target.value);
                                 }}
                             />
                             <label>Task Description</label>
-                            <input
-                                className="rounded-md border-2 border-solid border-gray-600 p-2"
+                            <TextField
+                                id="outlined-basic"
+                                variant="outlined"
                                 value={taskDescription ?? ""}
                                 onChange={(e) => {
                                     setTaskDescription(e.target.value);
@@ -114,16 +168,14 @@ export default function AddTaskModal({
                                         Task Deadline<span className="text-red-600">*</span>
                                     </label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker
+                                        <DateTimePicker
                                             disablePast
                                             onChange={(newValue) =>
                                                 setTaskDeadline(
-                                                    newValue
-                                                        ? new Date(newValue.toISOString())
-                                                        : null,
+                                                    newValue ? new Date(newValue.toDate()) : null,
                                                 )
                                             }
-                                        ></DatePicker>
+                                        ></DateTimePicker>
                                     </LocalizationProvider>
                                 </div>
                                 <div className="flex w-full flex-col">
@@ -190,9 +242,9 @@ export default function AddTaskModal({
                                                 setTaskReminder(e.target.value);
                                             }}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                            <MenuItem value={"HOUR"}>One Hour Before</MenuItem>
+                                            <MenuItem value={"DAY"}>One Day Before</MenuItem>
+                                            <MenuItem value={"WEEK"}>One Week Before</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
@@ -243,15 +295,37 @@ export default function AddTaskModal({
                                 </div>
                             </div>
                             <FormControl fullWidth>
+                                <label>Task Assignee</label>
                                 <Select
-                                    value={assignee}
-                                    onChange={(e) => {
-                                        setTaskAssignees(e.target.value);
-                                    }}
+                                    fullWidth
+                                    multiple
+                                    value={taskAssignee}
+                                    onChange={handleChange}
+                                    input={<OutlinedInput label="Chip" />}
+                                    renderValue={(selected) => (
+                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                            {selected.map((value) => {
+                                                const user = names.find((u) => u.user_id === value);
+                                                return (
+                                                    <Chip
+                                                        key={value}
+                                                        label={
+                                                            user
+                                                                ? `${user.first_name} ${user.last_name}`
+                                                                : value
+                                                        }
+                                                    />
+                                                );
+                                            })}
+                                        </Box>
+                                    )}
+                                    MenuProps={MenuProps}
                                 >
-                                    <MenuItem value={10}>Ten</MenuItem>
-                                    <MenuItem value={20}>Twenty</MenuItem>
-                                    <MenuItem value={30}>Thirty</MenuItem>
+                                    {names.map((user) => (
+                                        <MenuItem key={user.user_id} value={user.user_id}>
+                                            {user.first_name + " " + user.last_name}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                             <div className="flex w-full justify-end">

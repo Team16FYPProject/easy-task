@@ -372,7 +372,7 @@ export default function CalendarView() {
                         endAccessor={(event: any) => new Date(event.end)}
                         style={{ height: "calc(100vh - 150px)", minHeight: 200 }}
                         view={view}
-                        onView={setView}
+                        onView={(view) => setView(view as "month" | "week" | "day")}
                         date={date}
                         onNavigate={setDate}
                         defaultView={Views.MONTH}
