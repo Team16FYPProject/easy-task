@@ -13,7 +13,7 @@ export async function GET() {
     }
     const { data, error } = await supabase
         .from("user_achievement")
-        .select("achievement_id, achievement(*)")
+        .select("achievement_id, achievement!inner(*)")
         .eq("user_id", user.id);
     if (error || !data) {
         return internalErrorResponse({ success: false, data: "Unable to load achievements" });
@@ -23,8 +23,8 @@ export async function GET() {
         success: true,
         data: data.map((achievement) => ({
             id: achievement.achievement_id,
-            name: achievement.achievement[0].achievement_name,
-            desc: achievement.achievement[0].achievement_desc,
+            name: achievement.achievement.achievement_name,
+            desc: achievement.achievement.achievement_desc,
         })),
     });
 }
