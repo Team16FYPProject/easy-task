@@ -147,7 +147,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     }
 
     return (
-        <Container sx={{ padding: 6 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid container direction="column" spacing={2}>
                 {/* Team Name */}
                 <Grid item xs={12}>

@@ -214,7 +214,7 @@ export default function ListView() {
     }
 
     return (
-        <Container sx={{ padding: 6 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid container direction="column" spacing={2}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>

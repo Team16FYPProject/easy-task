@@ -88,7 +88,7 @@ export default function UpdateProfile() {
     };
 
     return (
-        <Container sx={{ padding: 6 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid item xs={12} padding={1}>
                 <Typography variant="h3">Settings</Typography>
             </Grid>
