@@ -54,6 +54,7 @@ export interface Project {
  * @param task_priority: The priority of the task;
  * @param task_time_spent: How much time is spent on the task;
  * @param task_status: Current status of the task;
+ * @param assignees: The assignees of the task;
  */
 export type ProjectTask = {
     project_id: string;
@@ -68,6 +69,7 @@ export type ProjectTask = {
     task_priority: string;
     task_time_spent: number;
     task_status: string;
+    assignees: Assignee[];
 };
 
 // Interface for Assignee

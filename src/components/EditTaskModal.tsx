@@ -19,14 +19,13 @@ import {
     SelectChangeEvent,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Task } from "@/utils/lib/types";
-import { Assignee } from "@/utils/lib/Assignee";
+import { ProjectTask, Assignee } from "@/utils/types";
 import dayjs from "dayjs";
 
 interface EditTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
-    task: Task;
+    task: ProjectTask;
 }
 
 interface TeamMember {

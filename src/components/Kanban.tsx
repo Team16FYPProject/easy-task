@@ -2,10 +2,10 @@
 import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
-import { Project } from "../utils/lib/types";
+import { Project } from "../utils/types";
 import AddTaskModal from "./AddTaskModal";
 import { determineBgColor, determineTextColor } from "../utils/colourUtils";
-import { ProjectTask } from "@/utils/types";
+import { ProjectTask, Assignee } from "@/utils/types";
 import ViewTaskModal from "@/components/ViewTaskModal";
 // Types
 
@@ -34,6 +34,7 @@ type ColumnProps = {
  * @param task_parent_id: The parent of the task if any;
  * @param task_priority: The priority of the task;
  * @param task_time_spent: How much time is spent on the task;
+ * @param assignees: The assignees of the task;
  * @param task_status: Current status of the task;
  * @param handleDragStart: Function to start drag event
  */
@@ -49,6 +50,7 @@ type CardProp = {
     task_parent_id: string;
     task_priority: string;
     task_time_spent: number;
+    assignees: Assignee[];
     task_status: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => void;
 };
@@ -436,6 +438,7 @@ const Card: React.FC<CardProp> = ({
     task_priority,
     task_status,
     task_time_spent,
+    assignees,
     handleDragStart,
 }) => {
     const bgColor = determineBgColor(task_priority);
@@ -468,6 +471,7 @@ const Card: React.FC<CardProp> = ({
                         task_priority,
                         task_status,
                         task_time_spent,
+                        assignees,
                     })
                 }
                 style={{
@@ -512,6 +516,7 @@ const Card: React.FC<CardProp> = ({
                         task_priority,
                         task_status,
                         task_time_spent,
+                        assignees,
                     }}
                 />
             )}

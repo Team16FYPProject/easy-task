@@ -7,7 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { KanbanBoard } from "@/components/Kanban";
 import React from "react";
-import { Project } from "../../utils/lib/types";
+import { Project } from "../../utils/types";
 
 export default function Kanban() {
     const router = useRouter();

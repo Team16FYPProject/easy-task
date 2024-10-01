@@ -1,13 +1,13 @@
 import React from "react";
 import { Modal, Box, Typography, Grid, Paper, Chip, Button } from "@mui/material";
-import { Task } from "@/utils/lib/types";
+import { ProjectTask } from "@/utils/types";
 import EditTaskModal from "@/components/EditTaskModal";
-import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
+import { determineBgColor } from "@/utils/colourUtils";
 
 interface ViewTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
-    task: Task; // You'll need to pass the task data as a prop
+    task: ProjectTask; // You'll need to pass the task data as a prop
 }
 
 const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, task }) => {
@@ -40,7 +40,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
         <Modal open={open} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
                 <Typography variant="h5" component="h2" gutterBottom>
-                    {`${task.project_name}: ${task.task_name}`}
+                    {`${task.task_name}`}
                 </Typography>
 
                 <Box sx={sectionStyle}>
