@@ -106,7 +106,7 @@ export default function ProfilePage() {
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        Bio: {profile.profile_bio || ""}
+                        {profile.profile_bio || ""}
                     </Grid>
                 </Grid>
 
