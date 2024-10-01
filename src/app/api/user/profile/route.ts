@@ -1,4 +1,4 @@
-import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import {
     badRequestResponse,
     createdResponse,
@@ -51,9 +51,9 @@ export async function GET() {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
-        display_name: data.profile_display_name || "",
-        bio: data.profile_bio || "",
-        avatar: data.profile_avatar || "",
+        profile_display_name: data.profile_display_name || "",
+        profile_bio: data.profile_bio || "",
+        profile_avatar: data.profile_avatar || "",
         tasks: {
             todo: notStartTasks,
             doing: inProgressTasks,

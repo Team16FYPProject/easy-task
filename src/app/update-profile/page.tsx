@@ -71,7 +71,7 @@ export default function UpdateProfile() {
             setFirstName(profile.first_name);
             setLastName(profile.last_name);
             setEmail(profile.email);
-            setBio(profile.bio);
+            setBio(profile.profile_bio);
         }
     }, [loadingUser, user]);
     const [value, setValue] = React.useState(0);

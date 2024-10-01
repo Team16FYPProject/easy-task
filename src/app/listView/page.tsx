@@ -24,7 +24,7 @@ import {
 import AddTeamModal from "@/components/AddTeamModal";
 import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
-import { Task } from "./types";
+import { ProjectTask } from "@/utils/types";
 
 export default function ListView() {
     const router = useRouter();
@@ -32,7 +32,7 @@ export default function ListView() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [tasks, setTasks] = React.useState<Task[]>([]);
+    const [tasks, setTasks] = React.useState<ProjectTask[]>([]);
     const [loadingTasks, setLoadingTasks] = useState(true);
     const [pieChartProgressData, setPieChartProgressData] = useState<
         { id: number; value: number; color: string; label: string }[]
@@ -185,7 +185,7 @@ export default function ListView() {
     }
 
     // Generate rows for the table
-    function generateRowFunction(tasks: Task[]): React.ReactNode {
+    function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
         return tasks.map((task, index) => (
             <TableRow key={index}>
                 <TableCell>
@@ -197,7 +197,7 @@ export default function ListView() {
                         minute: "2-digit",
                     }).format(new Date(task.task_deadline))}
                 </TableCell>
-                <TableCell>{task.project_name + ": " + task.task_name}</TableCell>
+                <TableCell>{task.task_name}</TableCell>
                 <TableCell>
                     <Chip
                         style={{

@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { RowData, TeamViewData } from "./types";
-import { Project } from "@/utils/lib/types";
+import { Project } from "@/utils/types";
 import { ApiResponse, DashboardResponse, ProjectTask } from "@/utils/types";
 
 export default function Dashboard() {
