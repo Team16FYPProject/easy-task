@@ -8,7 +8,7 @@ import { DependencyList, useCallback, useEffect } from "react";
  */
 export const useEffectAsync = (effect: () => Promise<any>, deps?: DependencyList): void => {
     // Memoize the effect function using useCallback
-    const memoizedEffect = useCallback(effect, deps || []);
+    const memoizedEffect = useCallback(effect, [effect]);
 
     useEffect(() => {
         let isMounted = true;

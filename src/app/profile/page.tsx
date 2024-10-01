@@ -8,7 +8,7 @@ import Image from "next/image";
 import { PieChart } from "@mui/x-charts";
 import TeamCard from "@/components/TeamCard";
 import { useState } from "react";
-import type { ApiResponse, Profile, ProfileResponse } from "@/utils/types";
+import type { ApiResponse, ProfileResponse } from "@/utils/types";
 
 export default function ProfilePage() {
     const router = useRouter();

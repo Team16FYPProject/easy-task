@@ -157,7 +157,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             // set the cards to be a new array
             setCards(tasksDict.get(teamId).tasks);
         }
-    }, [teamId]);
+    }, [tasksDict, teamId]);
 
     const handleChange = (event: SelectChangeEvent) => {
         const newTeamId = event.target.value;

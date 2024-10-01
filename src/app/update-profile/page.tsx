@@ -1,16 +1,5 @@
 "use client";
-import {
-    Box,
-    Tab,
-    Container,
-    Grid,
-    Tabs,
-    Typography,
-    TextField,
-    Avatar,
-    Skeleton,
-    Button,
-} from "@mui/material";
+import { Box, Tab, Container, Grid, Tabs, Typography, TextField, Button } from "@mui/material";
 
 import { useUser } from "@/hooks/useUser";
 import React, { useState } from "react";

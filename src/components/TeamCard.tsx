@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
+import { Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
 
 interface TeamCardProps {
     title: string;

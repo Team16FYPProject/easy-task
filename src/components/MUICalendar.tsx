@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, CalendarProps } from "react-big-calendar";
-import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
+import { ThemeProvider, styled } from "@mui/material/styles";
 import { Paper, Theme, useTheme } from "@mui/material";
 import { MUIStyledCommonProps } from "@mui/system";
 

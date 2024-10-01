@@ -4,7 +4,7 @@ import { getBrowserSupabase } from "@/utils/supabase/client";
 export function useAchievements(userId: unknown) {
     const [achievements, setAchievements] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const supabase = getBrowserSupabase();
 
     useEffect(() => {
@@ -19,7 +19,11 @@ export function useAchievements(userId: unknown) {
                 if (error) throw error;
                 setAchievements(data);
             } catch (err) {
-                setError(err.message);
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError(String(err));
+                }
             } finally {
                 setLoading(false);
             }
@@ -28,7 +32,7 @@ export function useAchievements(userId: unknown) {
         if (userId) {
             fetchAchievements();
         }
-    }, [userId]);
+    }, [supabase, userId]);
 
     return { achievements, loading, error };
 }

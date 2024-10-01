@@ -2,7 +2,6 @@ import {
     Box,
     Chip,
     FormControl,
-    InputLabel,
     MenuItem,
     Modal,
     OutlinedInput,
@@ -125,7 +124,7 @@ export default function AddTaskModal({
             }
         }
         fetchTeamMembers();
-    }, [handleClose]);
+    }, [handleClose, open, project_id]);
 
     return (
         <div>
