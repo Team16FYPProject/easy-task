@@ -1,4 +1,4 @@
-import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import { badRequestResponse, okResponse } from "@/utils/server/server.responses.utils";
 import { getSession } from "@/utils/server/auth.server.utils";
 import { DashboardResponse, Project, ProjectTask } from "@/utils/types";

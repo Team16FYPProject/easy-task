@@ -23,7 +23,6 @@ export async function createTask(
         taskStatus,
         taskMeetingBool,
         taskLocation,
-        taskDuration,
         taskAssignee,
     } = data;
     if (!taskName) {

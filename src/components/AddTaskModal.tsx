@@ -1,8 +1,8 @@
 import {
     Box,
+    Button,
     Chip,
     FormControl,
-    InputLabel,
     MenuItem,
     Modal,
     OutlinedInput,
@@ -329,20 +329,18 @@ export default function AddTaskModal({
                                 </Select>
                             </FormControl>
                             <div className="flex w-full justify-end">
-                                <button
-                                    type="submit"
-                                    className="my-3 rounded-md p-2 text-xl text-purple-500"
-                                    onClick={handleClose}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="my-3 rounded-md p-2 text-xl text-purple-500"
-                                    onClick={handleSubmit}
-                                >
-                                    Submit
-                                </button>
+                                <Box sx={{ display: "flex", gap: 2 }}>
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        onClick={handleClose}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" color="primary" type="submit">
+                                        Submit
+                                    </Button>
+                                </Box>
                             </div>
                         </div>
                     </form>

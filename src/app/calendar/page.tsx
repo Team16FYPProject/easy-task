@@ -125,28 +125,6 @@ export default function CalendarView() {
         handleOpen(); // This will open your AddTaskModal
     };
 
-    // const EventComponent = ({ event }: { event: any }) => {
-    //     const bgColor = determineBgColor(event.task_priority);
-    //     const textColor = determineTextColor(event.task_priority);
-    //     console.log(bgColor);
-    //     return (
-    //         <div
-    //             style={{
-    //                 backgroundColor: bgColor,
-    //                 color: textColor,
-    //                 padding: "2px 2px",
-    //                 borderRadius: "2px",
-    //                 fontSize: "0.6em",
-    //                 outline: "none",
-    //                 boxShadow: "none",
-    //             }}
-    //         >
-    //             <strong>{event.title}</strong>
-    //             <div>{event.start.toLocaleDateString()}</div> {/* Display the due date */}
-    //         </div>
-    //     );
-    // };
-
     const EventComponent = ({ event }: { event: any }) => {
         const bgColor = determineBgColor(event.task_priority);
         const textColor = determineTextColor(event.task_priority);
@@ -179,11 +157,12 @@ export default function CalendarView() {
         isSelected: any,
     ) => {
         const bgColor = determineBgColor(event.task_priority || "");
+        const textColor = determineTextColor(event.task_priority || "");
         const style = {
             backgroundColor: bgColor || "#3174ad",
             borderRadius: "3px",
             opacity: 0.8,
-            color: "white",
+            color: textColor || "#ffffff",
             border: "none",
             display: "block",
         };

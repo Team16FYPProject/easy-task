@@ -68,7 +68,7 @@ export default function ListView() {
 
                 // Fetch projects and their names
                 const projectIDsAndNames = result.projects.map(
-                    (project: { project_id: any; project_name: string }) => ({
+                    (project: { project_id: string; project_name: string }) => ({
                         project_id: project.project_id,
                         project_name: project.project_name,
                     }),
@@ -214,7 +214,7 @@ export default function ListView() {
     }
 
     return (
-        <Container sx={{ padding: 6 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid container direction="column" spacing={2}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>

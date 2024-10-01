@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { List, ListItem, ListItemButton, ListItemText, Divider, Drawer } from "@mui/material";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type NavigationLink = {
     name: string;
@@ -17,7 +17,11 @@ type NavigationLink = {
 };
 
 const NAVIGATION_LINKS: NavigationLink[][] = [
-    [{ name: "Dashboard" }, { name: "Profile" }, { name: "Achievements" }],
+    [
+        { name: "Dashboard", link: "/dashboard" },
+        { name: "Profile", link: "/profile" },
+        { name: "Achievements", link: "/achievement" },
+    ],
     [
         { name: "Calendar View", link: "/calendar" },
         { name: "List View", link: "/listView" },
@@ -45,12 +49,9 @@ export default function SiteAppBar() {
                     <React.Fragment key={`nav_group_${idx}`}>
                         <List>
                             {navigationGroup.map((navLink) => (
-                                <ListItem key={navLink.name} className="w-full">
-                                    <Link
-                                        href={navLink.link ?? `/${navLink.name.toLowerCase()}`}
-                                        className="w-full"
-                                    >
-                                        <ListItemButton className="w-full rounded-lg">
+                                <ListItem key={navLink.name}>
+                                    <Link href={navLink.link ?? `/${navLink.name.toLowerCase()}`}>
+                                        <ListItemButton>
                                             <ListItemText primary={navLink.name} />
                                         </ListItemButton>
                                     </Link>

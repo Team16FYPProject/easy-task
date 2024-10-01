@@ -3,7 +3,7 @@ import {
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { getServerSupabase, getServiceSupabase } from "@/utils/supabase/server";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
 import { getSession } from "@/utils/server/auth.server.utils";
 

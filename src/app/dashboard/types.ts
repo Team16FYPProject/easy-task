@@ -9,3 +9,8 @@ export interface RowData {
     teamView2: TeamViewData;
     teamView3: TeamViewData;
 }
+
+// Interface for Assignee
+export interface Assignee {
+    user_id: string;
+}

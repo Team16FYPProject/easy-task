@@ -25,27 +25,27 @@ export default function TeamSettings({
     handleClose: () => void;
 }) {
     const [teamName, setTeamName] = React.useState("");
-    const [image, setImage] = React.useState<File | null>(null);
+    // const [image, setImage] = React.useState<File | null>(null);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamName(event.target.value);
     };
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            setImage(event.target.files[0]);
-        }
-    };
+    // const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (event.target.files && event.target.files[0]) {
+    //         setImage(event.target.files[0]);
+    //     }
+    // };
 
     const handleSubmit = async () => {
         const formData = new FormData();
         formData.append("name", teamName);
         formData.append("description", teamName);
         // If you do image
-        if (image) {
-            formData.append("image", image);
-            console.log("Image added");
-        }
+        // if (image) {
+        //     formData.append("image", image);
+        //     console.log("Image added");
+        // }
 
         try {
             const response = await fetch("/api/projects", {

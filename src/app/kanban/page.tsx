@@ -1,8 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { KanbanBoard } from "@/components/Kanban";

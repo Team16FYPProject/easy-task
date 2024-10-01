@@ -1,16 +1,5 @@
 "use client";
-import {
-    Box,
-    Tab,
-    Container,
-    Grid,
-    Tabs,
-    Typography,
-    TextField,
-    Avatar,
-    Skeleton,
-    Button,
-} from "@mui/material";
+import { Box, Tab, Container, Grid, Tabs, Typography, TextField, Button } from "@mui/material";
 
 import { useUser } from "@/hooks/useUser";
 import React, { useState } from "react";
@@ -99,7 +88,7 @@ export default function UpdateProfile() {
     };
 
     return (
-        <Container sx={{ padding: 6 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid item xs={12} padding={1}>
                 <Typography variant="h3">Settings</Typography>
             </Grid>
