@@ -134,7 +134,7 @@ export default function UpdateProfile() {
                                     </Grid>
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
-                                            id="edit-email-address"
+                                            id="edit-last-name"
                                             label="Last Name"
                                             value={lastName}
                                             onChange={(e) => setLastName(e.target.value)}
@@ -147,6 +147,7 @@ export default function UpdateProfile() {
                                             id="edit-email-address"
                                             label="Email Address *" /* Note: the asteriks to become automatic */
                                             value={email}
+                                            fullWidth
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
                                     </Grid>
@@ -154,10 +155,11 @@ export default function UpdateProfile() {
                                     <Grid item spacing={2} padding={1}>
                                         <TextField
                                             multiline
-                                            maxRows={4}
+                                            rows={4}
                                             id="edit-bio"
                                             label="Bio"
                                             value={bio}
+                                            fullWidth
                                             onChange={(e) => setBio(e.target.value)}
                                         />
                                     </Grid>
