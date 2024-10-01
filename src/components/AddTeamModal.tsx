@@ -4,17 +4,23 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Grid, TextField } from "@mui/material";
+import { ApiResponse } from "@/utils/types";
+import { useRouter } from "next/navigation";
 
 const style = {
-    position: "absolute" as "absolute",
+    position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
+    width: "justifyContent",
+    height: "justifyContent",
+    minHeight: "25%",
+    minWidth: "25%",
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+    overflow: "auto",
 };
 
 export default function AddTeamModal({
@@ -24,6 +30,8 @@ export default function AddTeamModal({
     open: boolean;
     handleClose: () => void;
 }) {
+    const router = useRouter();
+
     const [teamName, setTeamName] = React.useState("");
     const [image, setImage] = React.useState<File | null>(null);
 
@@ -53,15 +61,17 @@ export default function AddTeamModal({
                 body: formData,
             });
 
-            if (response.ok) {
+            const data: ApiResponse<{ id: string }> = await response.json();
+            if (response.ok && data.success) {
+                const projectId = data.data.id;
                 // Handle successful response
                 console.log("Team created successfully");
                 handleClose(); // Close the modal
+                router.push(`/team/${projectId}`);
             } else {
                 // Handle error response
                 console.error(`Failed to create team. Status: ${response.status}`);
-                const errorText = await response.text();
-                console.error(`Error details: ${errorText}`);
+                console.error(`Error details: ${data}`);
             }
         } catch (error) {
             console.error("Error:", error);

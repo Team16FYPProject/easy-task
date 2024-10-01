@@ -10,9 +10,7 @@ export const InviteMemberEmailTemplate: React.FC<Readonly<EmailTemplateProps>> =
     <div>
         <h1>Hello, you have been invited to join {props.teamName}!</h1>
         <a href={props.link}>
-            <Button variant="contained" color="primary">
-                Join Now
-            </Button>
+            <button>Join Now</button>
         </a>
     </div>
 );

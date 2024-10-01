@@ -32,7 +32,8 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const [loadingMembers, setLoadingMembers] = React.useState(true);
     const [members, setMembers] = React.useState<Profile[]>([]);
     const [displayedMembers, setDisplayedMembers] = React.useState<Profile[]>([]);
-    const [open, setOpen] = React.useState(false);
+    const [showMemberModal, setShowMemberModal] = React.useState(false);
+    const [showSettingsModal, setShowSettingsModal] = React.useState(false);
 
     const [search, setSearch] = useState<string>("");
 
@@ -43,8 +44,11 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         }
     }, [loadingUser, user]);
 
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const openInviteMemberModal = () => setShowMemberModal(true);
+    const closeInviteMemberModal = () => setShowMemberModal(false);
+
+    const openSettingsModal = () => setShowSettingsModal(true);
+    const closeSettingsModal = () => setShowSettingsModal(false);
 
     // Fetch member profiles
     useEffect(() => {
@@ -181,7 +185,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 variant="contained"
                                 color="secondary"
                                 sx={{ mr: 2 }}
-                                onClick={handleOpen}
+                                onClick={openInviteMemberModal}
                             >
                                 INVITE MEMBER
                             </Button>
@@ -189,13 +193,19 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 color="default"
                                 size="medium"
                                 sx={{ mr: 2 }}
-                                onClick={handleOpen}
-                            ></IconButton>
-                            <InviteMemberModal open={open} handleClose={handleClose} />
-                            <IconButton color="default" size="medium" sx={{ mr: 2 }}>
+                                onClick={openSettingsModal}
+                            >
                                 <SettingsFilled />
                             </IconButton>
-                            <TeamSettingsModal open={open} handleClose={handleClose} />
+                            <InviteMemberModal
+                                open={showMemberModal}
+                                handleClose={closeInviteMemberModal}
+                                projectId={id}
+                            />
+                            <TeamSettingsModal
+                                open={showSettingsModal}
+                                handleClose={closeSettingsModal}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>

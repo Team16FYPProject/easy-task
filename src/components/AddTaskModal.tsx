@@ -19,12 +19,13 @@ const style = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 1200,
-    height: 800,
+    width: "75%",
+    height: "75%",
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+    overflow: "auto",
 };
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
