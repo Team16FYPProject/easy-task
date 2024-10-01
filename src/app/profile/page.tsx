@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import { Avatar, Button, Container, Grid, Typography } from "@mui/material";
+import { Avatar, Box, Button, Container, Grid, Typography } from "@mui/material";
 import Image from "next/image";
 import TeamCard from "@/components/TeamCard";
 import { useState } from "react";
@@ -113,38 +113,52 @@ export default function ProfilePage() {
                 {/* Achievements */}
                 <Grid item container spacing={2} justifyContent="space-between">
                     <Grid item xs={12} sm={6}>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <PieChart>
-                                <Pie
-                                    data={pieData}
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                    label={({ name, value }) => `${name} (${value})`}
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={COLORS[index % COLORS.length]}
-                                        />
-                                    ))}
-                                </Pie>
-                            </PieChart>
-                        </ResponsiveContainer>
+                        <Box
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            height="100%"
+                        >
+                            <ResponsiveContainer width="100%" height={200}>
+                                <PieChart>
+                                    <Pie
+                                        data={pieData}
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        label={({ name, value }) => `${name} (${value})`}
+                                    >
+                                        {pieData.map((entry, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={COLORS[index % COLORS.length]}
+                                            />
+                                        ))}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </Box>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <AchievementTree
-                            filledCount={achievements.reduce(
-                                (sum, achievement) =>
-                                    sum +
-                                    Math.floor(
-                                        (achievement.progress / achievement.max_progress) * 3,
-                                    ),
-                                0,
-                            )}
-                        />
+                        <Box
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            height="100%"
+                        >
+                            <AchievementTree
+                                filledCount={achievements.reduce(
+                                    (sum, achievement) =>
+                                        sum +
+                                        Math.floor(
+                                            (achievement.progress / achievement.max_progress) * 3,
+                                        ),
+                                    0,
+                                )}
+                            />
+                        </Box>
                     </Grid>
                 </Grid>
                 {/* Profile Information */}
