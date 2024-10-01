@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import AddTeamModal from "@/components/AddTeamModal";
 import TeamCard from "@/components/TeamCard";
 import {
+    bottomNavigationActionClasses,
     Button,
     ButtonBase,
     Chip,
@@ -27,6 +28,7 @@ import React, { useEffect, useState } from "react";
 import { RowData, TeamViewData } from "./types";
 import { Project } from "@/utils/lib/types";
 import { ApiResponse, DashboardResponse, ProjectTask } from "@/utils/types";
+import { vi } from "vitest";
 
 export default function Dashboard() {
     const router = useRouter();
@@ -109,6 +111,63 @@ export default function Dashboard() {
         setRows(newRows);
     }, [projects]);
 
+    // Fetch tasks
+    useEffect(() => {
+        async function fetchTasks() {
+            try {
+                setLoadingTasks(true);
+                const response = await fetch("/api/projects", {
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.data || "Failed to fetch projects");
+                }
+
+                // Fetch projects and their names
+                const projectIDsAndNames = result.projects.map(
+                    (project: { project_id: any; project_name: string }) => ({
+                        project_id: project.project_id,
+                        project_name: project.project_name,
+                    }),
+                );
+
+                // Fetch tasks for each project
+                const fetchPromises = projectIDsAndNames.map(
+                    ({ project_id, project_name }: { project_id: string; project_name: string }) =>
+                        fetch(`/api/projects/${project_id}/tasks`, {
+                            method: "GET",
+                            credentials: "include",
+                        }).then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json().then((data) => ({
+                                tasks: data.tasks,
+                                project_name,
+                            }));
+                        }),
+                );
+
+                const results = await Promise.all(fetchPromises);
+                // Flatten the results and include project names with tasks
+                const allTasks = results.flatMap(({ tasks, project_name }) =>
+                    tasks.map((task: any) => ({ ...task, project_name })),
+                );
+                setTasks(allTasks);
+            } catch (e) {
+                console.error("Error:", e);
+            } finally {
+                setLoadingTasks(false);
+            }
+        }
+
+        fetchTasks();
+    }, []);
+
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
@@ -168,22 +227,53 @@ export default function Dashboard() {
         const footerHeight = 53; // Approximate height of the footer
         const availableHeight = dataTableHeight - footerHeight;
         return (
-            <Paper sx={{ height: dataTableHeight, width: "100%" }}>
+            <Paper
+                sx={{
+                    height: dataTableHeight,
+                    width: "100%",
+                    border: "none",
+                    boxShadow: "none",
+                    "& .MuiDataGrid-root": {
+                        border: "none",
+                    },
+                    "& .MuiDataGrid-window": {
+                        border: "none",
+                    },
+                }}
+            >
                 <DataGrid
                     rows={rows}
                     columns={columns}
                     initialState={{ pagination: { paginationModel } }}
                     pageSizeOptions={[1]}
-                    // sx={{ border: 0 }}
                     disableColumnMenu
                     columnHeaderHeight={0}
                     getRowHeight={() => availableHeight}
                     sx={{
-                        border: 0,
+                        border: "none",
                         "& .MuiDataGrid-cell": {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                            overflow: "hidden",
+                        },
+                        "& .MuiDataGrid-columnHeader": {
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
+                            borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-columnHeaders .MuiDataGrid-columnSeparator": {
+                            visibility: "hidden",
                         },
                     }}
                 />
@@ -242,11 +332,11 @@ export default function Dashboard() {
 
     const onButtonClick = (link: String) => router.push(`/${link}`);
     return (
-        <Container sx={{ padding: 6 }}>
+        <Container sx={{ padding: 2 }}>
             <Grid container direction="column" spacing={2}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+                    <Grid container spacing={1} alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Typography variant="h4">Teams</Typography>
                         </Grid>
