@@ -68,10 +68,10 @@ export async function setProjectSettings(
     const { data: projectData, error: projectError } = await supabase
         .from("project")
         .upsert({
-            project_id: projectId!,
-            project_name: name,
+            project_id: projectId,
+            project_name: name as unknown as string,
+            project_desc: description as unknown as string,
             project_owner_id: user.id,
-            project_desc: description,
             project_profile_pic: imageUrl,
         })
         .select("project_id")
