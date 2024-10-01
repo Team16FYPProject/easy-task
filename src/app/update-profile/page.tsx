@@ -85,6 +85,7 @@ export default function UpdateProfile() {
             return;
         }
         alert("Profile details updated.");
+        router.push("/profile");
     };
 
     return (

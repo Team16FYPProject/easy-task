@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Grid, TextField } from "@mui/material";
+import { ApiResponse } from "@/utils/types";
 
 const style = {
     position: "absolute" as "absolute",
@@ -20,42 +21,37 @@ const style = {
 export default function InviteMemberModal({
     open,
     handleClose,
+    projectId,
 }: {
     open: boolean;
     handleClose: () => void;
+    projectId: string;
 }) {
-    const [teamName, setTeamName] = React.useState("");
+    const [email, setEmail] = React.useState("");
     const [image, setImage] = React.useState<File | null>(null);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTeamName(event.target.value);
+        setEmail(event.target.value);
     };
 
     const handleSubmit = async () => {
-        const formData = new FormData();
-        formData.append("name", teamName);
-        formData.append("description", teamName);
-        // If you do image
-        if (image) {
-            formData.append("image", image);
-            console.log("Image added");
+        if (!email.trim()) {
+            return alert("Please enter a valid email.");
         }
-
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch(`/api/projects/${projectId}/members/invite`, {
                 method: "POST",
-                body: formData,
+                body: JSON.stringify({ email }),
             });
 
-            if (response.ok) {
-                // Handle successful response
-                console.log("Team created successfully");
+            const data: ApiResponse<void> = await response.json();
+
+            if (response.ok && data.success) {
                 handleClose(); // Close the modal
             } else {
                 // Handle error response
                 console.error(`Failed to create team. Status: ${response.status}`);
-                const errorText = await response.text();
-                console.error(`Error details: ${errorText}`);
+                console.error(`Error details: ${data}`);
             }
         } catch (error) {
             console.error("Error:", error);
