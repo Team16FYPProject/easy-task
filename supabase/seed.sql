@@ -64,7 +64,7 @@ FROM project;
 INSERT INTO task (project_id, task_name, task_desc, task_deadline, task_time_spent, task_creator_id, task_status, task_priority, task_location, task_is_meeting)
 SELECT
     p.project_id,
-    'Task ' || t.task_num || ' for ' || p.project_name,
+    'Task ' || t.task_num,
     'Description for Task ' || t.task_num || ' in ' || p.project_name,
     NOW() + (random() * INTERVAL '60 days'),
     (random() * 600)::int,

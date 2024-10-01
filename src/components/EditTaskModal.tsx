@@ -131,8 +131,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                             defaultValue={task.task_status}
                             margin="normal"
                         >
-                            <MenuItem value="TO DO">TO DO</MenuItem>
-                            <MenuItem value="IN PROGRESS">IN PROGRESS</MenuItem>
+                            <MenuItem value="TODO">TO DO</MenuItem>
+                            <MenuItem value="DOING">IN PROGRESS</MenuItem>
                             <MenuItem value="DONE">DONE</MenuItem>
                         </TextField>
                     </Grid>
@@ -153,19 +153,21 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
-                        {" "}
-                        TODO
-                        {/* Add backend
-                         <DatePicker
+                        <DatePicker
                             label="Deadline"
-                            value={task.task_deadline ? dayjs(task.task_deadline) : null}
-                            onChange={(newValue) => {
-                                // Handle the change
-                            }}
-                        /> */}
+                            value={dayjs(task.task_deadline)}
+                            onChange={() => {}}
+                            slotProps={{ textField: { fullWidth: true } }}
+                        />
                     </Grid>
                     <Grid item xs={6}>
-                        <TextField fullWidth label="Location" variant="outlined" margin="normal" />
+                        <TextField
+                            fullWidth
+                            label="Location"
+                            variant="outlined"
+                            margin="normal"
+                            defaultValue={task.task_location}
+                        />
                     </Grid>
                 </Grid>
 

@@ -74,7 +74,12 @@ export type ProjectTask = {
 
 // Interface for Assignee
 export interface Assignee {
-    id: string;
-    name: string;
+    user_id: string;
+    profile: Profile;
+    user: User;
+}
+
+export interface User {
     email: string;
+    name: string;
 }

@@ -36,6 +36,8 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
     // const handleClose = () => setOpen(false);
     const bgColor = determineBgColor(task.task_priority);
 
+    console.log(task);
+
     return (
         <Modal open={open} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
@@ -45,7 +47,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
 
                 <Box sx={sectionStyle}>
                     <Typography variant="body2" color="text.secondary">
-                        {"TODO"}
+                        {"Parent Task: " + (task.task_parent_id || "No parent task")}
                     </Typography>
                 </Box>
 
@@ -71,17 +73,26 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
-                        <Typography variant="body2">Deadline: {task.task_deadline}</Typography>
+                        <Typography variant="body2">
+                            Deadline:{" "}
+                            {new Date(task.task_deadline).toLocaleString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                            })}
+                        </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="body2">Location: {"TODO"}</Typography>
+                        <Typography variant="body2">Location: {task.task_location}</Typography>
                     </Grid>
                 </Grid>
 
                 <Grid container spacing={2} sx={sectionStyle}>
-                    <Grid item xs={6}>
-                        <Typography variant="body2">Reminder: {"TODO"}</Typography>
-                    </Grid>
+                    {/* <Grid item xs={6}>
+                        <Typography variant="body2">Reminder: {}</Typography>
+                    </Grid> */}
                     <Grid item xs={6}>
                         <Typography variant="body2">
                             Hours Logged: {task.task_time_spent}
@@ -93,20 +104,22 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                     <Typography variant="h6" gutterBottom>
                         Assignees
                     </Typography>
-                    <Paper variant="outlined">
-                        {task.assignees && Array.isArray(task.assignees) ? (
-                            task.assignees.map((assignee, index) => (
-                                <Box
-                                    key={index}
-                                    sx={
-                                        {
-                                            /* styles here */
-                                        }
-                                    }
-                                >
-                                    {/* render assignee data here */}
-                                </Box>
-                            ))
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        {task.assignees &&
+                        Array.isArray(task.assignees) &&
+                        task.assignees.length > 0 ? (
+                            <ul>
+                                {task.assignees.map((assignee, index) => (
+                                    <li key={index}>
+                                        <Typography variant="body2">
+                                            {"Name: " +
+                                                assignee.user.name +
+                                                " | Email: " +
+                                                assignee.user.email}
+                                        </Typography>
+                                    </li>
+                                ))}
+                            </ul>
                         ) : (
                             <Typography>No assignees</Typography>
                         )}
@@ -116,9 +129,6 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
                     <Button variant="contained" color="secondary">
                         LOG 1 HOUR
-                    </Button>
-                    <Button variant="contained" color="secondary">
-                        ADD SUBTASK
                     </Button>
                     <Button variant="contained" color="secondary" onClick={handleOpenEditModal}>
                         EDIT TASK
