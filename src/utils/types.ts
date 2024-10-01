@@ -15,9 +15,9 @@ export interface Profile {
     first_name: string;
     last_name: string;
     email: string;
-    bio: string;
-    display_name: string;
-    avatar: string;
+    profile_bio: string;
+    profile_display_name: string;
+    profile_avatar: string;
 }
 
 export interface ProfileResponse extends Profile {
@@ -54,6 +54,7 @@ export interface Project {
  * @param task_priority: The priority of the task;
  * @param task_time_spent: How much time is spent on the task;
  * @param task_status: Current status of the task;
+ * @param assignees: The assignees of the task;
  */
 export type ProjectTask = {
     project_id: string;
@@ -68,4 +69,12 @@ export type ProjectTask = {
     task_priority: string;
     task_time_spent: number;
     task_status: string;
+    assignees: Assignee[];
 };
+
+// Interface for Assignee
+export interface Assignee {
+    id: string;
+    name: string;
+    email: string;
+}

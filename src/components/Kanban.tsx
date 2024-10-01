@@ -2,10 +2,11 @@
 import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
-import { Project } from "../utils/lib/types";
+import { Project } from "../utils/types";
 import AddTaskModal from "./AddTaskModal";
 import { determineBgColor, determineTextColor } from "../utils/colourUtils";
-import { ProjectTask } from "@/utils/types";
+import { ProjectTask, Assignee } from "@/utils/types";
+import ViewTaskModal from "@/components/ViewTaskModal";
 // Types
 
 /**
@@ -33,6 +34,7 @@ type ColumnProps = {
  * @param task_parent_id: The parent of the task if any;
  * @param task_priority: The priority of the task;
  * @param task_time_spent: How much time is spent on the task;
+ * @param assignees: The assignees of the task;
  * @param task_status: Current status of the task;
  * @param handleDragStart: Function to start drag event
  */
@@ -48,6 +50,7 @@ type CardProp = {
     task_parent_id: string;
     task_priority: string;
     task_time_spent: number;
+    assignees: Assignee[];
     task_status: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => void;
 };
@@ -83,6 +86,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projects }) => {
 export const Board = ({ projects }: { projects: Project[] }) => {
     const [cards, setCards] = useState<ProjectTask[]>([]); // state for the cards
     const [open, setOpen] = React.useState(false); // state for modal task add
+
     const handleOpen = () => setOpen(true); // opens modal
     const handleClose = () => setOpen(false); // closes modal
     const [loading, setLoading] = useState(true); // loading state for fetching tasks
@@ -142,6 +146,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             await Promise.all(fetchPromises);
 
             setTasksDict(tasksDict);
+            console.log(tasksDict);
             if (tasksDict.size > 0) {
                 setLoading(false);
                 setTeamId(projects[0].project_id);
@@ -401,7 +406,14 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
             >
                 {/*Renders the filtered cards */}
                 {filteredCards.map((c) => {
-                    return <Card key={c.task_id} {...c} handleDragStart={handleDragStart} />;
+                    return (
+                        <Card
+                            key={c.task_id}
+                            {...c}
+                            task_id={c.task_id}
+                            handleDragStart={handleDragStart}
+                        />
+                    );
                 })}
                 <DropIndicator beforeId={null} column={column} />
             </div>
@@ -426,10 +438,20 @@ const Card: React.FC<CardProp> = ({
     task_priority,
     task_status,
     task_time_spent,
+    assignees,
     handleDragStart,
 }) => {
     const bgColor = determineBgColor(task_priority);
     const textColor = determineTextColor(task_priority);
+    const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
+    const handleCardClick = () => {
+        setViewTaskOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setViewTaskOpen(false);
+    };
+
     return (
         <>
             <DropIndicator beforeId={task_id} column={task_status} />
@@ -449,6 +471,7 @@ const Card: React.FC<CardProp> = ({
                         task_priority,
                         task_status,
                         task_time_spent,
+                        assignees,
                     })
                 }
                 style={{
@@ -457,6 +480,7 @@ const Card: React.FC<CardProp> = ({
                     marginLeft: "6px",
                     marginRight: "6px",
                 }}
+                onClick={handleCardClick}
                 className={`0 active:cursor-grabbing} cursor-grab rounded p-3`}
             >
                 <div className="flex-col text-sm" style={{ color: textColor }}>
@@ -474,6 +498,28 @@ const Card: React.FC<CardProp> = ({
                     <p>{task_priority}</p>
                 </div>
             </div>
+            {viewTaskOpen && (
+                <ViewTaskModal
+                    open={viewTaskOpen}
+                    handleCloseModal={handleCloseModal}
+                    // onClose={handleCloseModal}
+                    task={{
+                        project_id,
+                        task_creator_id,
+                        task_deadline,
+                        task_desc,
+                        task_id,
+                        task_is_meeting,
+                        task_location,
+                        task_name,
+                        task_parent_id,
+                        task_priority,
+                        task_status,
+                        task_time_spent,
+                        assignees,
+                    }}
+                />
+            )}
         </>
     );
 };

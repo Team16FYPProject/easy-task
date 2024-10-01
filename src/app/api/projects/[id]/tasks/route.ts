@@ -11,18 +11,58 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
     }
     const supabase = getServiceSupabase();
 
-    // query the database to find all tasks that match a project id
+    // Query the database to find all tasks that match a project id
     const { data: taskData, error: taskError } = await supabase
         .from("task")
         .select("*,assignees:task_assignee(user_id)")
         .eq("project_id", id);
 
-    // handle query errors
+    // Handle query errors
     if (taskError) {
         console.error("Unable to fetch tasks from the database", taskError);
         return okResponse({ success: true, tasks: [] });
     }
-    return okResponse({ success: true, tasks: taskData });
+
+    // Extract unique assignee IDs
+    const assigneeIds = [
+        ...Array.from(
+            new Set(
+                taskData?.flatMap((task) =>
+                    task.assignees.map((assignee: { user_id: number }) => assignee.user_id),
+                ) || [],
+            ),
+        ),
+    ];
+
+    // Fetch user details from auth.users table
+    const { data: userData, error: userError } = await supabase
+        .from("auth.users")
+        .select("id, email, raw_user_meta_data")
+        .in("id", assigneeIds);
+
+    if (userError) {
+        console.error("Unable to fetch user information", userError);
+        return okResponse({ success: true, tasks: taskData || [] });
+    }
+
+    // Merge user information with tasks
+    const tasksWithUserDetails = taskData?.map((task) => ({
+        ...task,
+        assignees: task.assignees.map((assignee: { user_id: number }) => {
+            const user = userData?.find((u) => u.id === assignee.user_id);
+            return {
+                ...assignee,
+                user: user
+                    ? {
+                          email: user.email,
+                          name: user.raw_user_meta_data?.name || "N/A",
+                      }
+                    : null,
+            };
+        }),
+    }));
+
+    return okResponse({ success: true, tasks: tasksWithUserDetails || [] });
 }
 
 export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
