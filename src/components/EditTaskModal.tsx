@@ -154,7 +154,7 @@ export default function EditTaskModal({
 
                     <Grid container spacing={2}>
                         <Grid item>
-                            <DatePicker id="task-deadline" required label="Task Deadline" />
+                            {/* <DatePicker id="task-deadline" required label="Task Deadline" /> */}
                         </Grid>
                         <Grid item>
                             <TextField id="task-parent" select label="Task Parent"></TextField>
