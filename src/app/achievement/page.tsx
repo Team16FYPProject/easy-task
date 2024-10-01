@@ -69,7 +69,7 @@ const ProgressIcons = ({ progress, maxProgress }: { progress: number; maxProgres
 export default function Achievements() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
-    const { achievements, loading: loadingAchievements } = useAchievements(user?.id);
+    const { achievements, loading: loadingAchievements } = useAchievements(user?.id ?? "");
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {

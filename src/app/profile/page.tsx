@@ -44,7 +44,7 @@ const AchievementTree = ({ filledCount }: { filledCount: number }) => {
 export default function ProfilePage() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
-    const { achievements, loading: loadingAchievements } = useAchievements(user?.id);
+    const { achievements, loading: loadingAchievements } = useAchievements(user?.id || "");
     const [profile, setProfile] = useState<ProfileResponse | null>(null);
 
     useEffectAsync(async () => {
