@@ -23,6 +23,8 @@ export async function createTask(
         taskStatus,
         taskMeetingBool,
         taskLocation,
+        taskDuration,
+        taskAssignee,
     } = data;
     if (!taskName) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });
@@ -76,6 +78,17 @@ export async function createTask(
         })
         .select("*")
         .single();
+
+    if (taskAssignee && taskAssignee.length > 0) {
+        const { error: assigneeError } = await supabase
+            .from("task_assignee")
+            .upsert(taskAssignee.map((userId: string) => ({ task_id: taskId, user_id: userId })));
+
+        if (assigneeError) {
+            console.error("Unable to assign users to task", assigneeError);
+        }
+    }
+
     if (taskError || !data) {
         console.error("Unable to insert task to database", taskError);
         return internalErrorResponse({
