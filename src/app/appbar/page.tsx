@@ -49,12 +49,9 @@ export default function ButtonAppBar() {
                     <>
                         <List key={`nav_group_${idx}`}>
                             {navigationGroup.map((navLink) => (
-                                <ListItem key={navLink.name} className="w-full">
-                                    <Link
-                                        href={navLink.link ?? `/${navLink.name.toLowerCase()}`}
-                                        className="w-full"
-                                    >
-                                        <ListItemButton className="w-full rounded-lg">
+                                <ListItem key={navLink.name}>
+                                    <Link href={navLink.link ?? `/${navLink.name.toLowerCase()}`}>
+                                        <ListItemButton>
                                             <ListItemText primary={navLink.name} />
                                         </ListItemButton>
                                     </Link>
