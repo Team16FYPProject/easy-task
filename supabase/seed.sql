@@ -97,20 +97,23 @@ FROM task;
 INSERT INTO user_achievement (user_id, achievement_id, progress, completed, completed_at)
 SELECT 
     u.id,
-        a.achievement_id,
-        floor(random() * (a.max_progress + 1))::INTEGER AS progress,
-        CASE 
-            WHEN floor(random() * (a.max_progress + 1))::INTEGER = a.max_progress THEN TRUE 
-            ELSE FALSE 
-        END AS completed,
-        CASE 
-            WHEN floor(random() * (a.max_progress + 1))::INTEGER = a.max_progress THEN NOW() - (random() * INTERVAL '30 days') 
-            ELSE NULL 
-        END AS completed_at
+    a.achievement_id,
+    progress,
+    CASE 
+        WHEN progress = a.max_progress THEN TRUE 
+        ELSE FALSE 
+    END AS completed,
+    CASE 
+        WHEN progress = a.max_progress THEN NOW() - (random() * INTERVAL '30 days') 
+        ELSE NULL 
+    END AS completed_at
 FROM 
     unnest(user_ids) AS u(id)
 CROSS JOIN 
-    achievement a;
+    achievement a,
+    LATERAL (
+        SELECT floor(random() * (a.max_progress + 1))::INTEGER AS progress
+    ) AS subquery;
 
 -- Update progress and completed status
 UPDATE user_achievement ua

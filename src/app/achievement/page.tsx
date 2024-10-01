@@ -22,30 +22,27 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#0088FE", "#00C49F"];
 
-const AchievementTree = ({
-    completedCount,
-    totalCount,
-}: {
-    completedCount: number;
-    totalCount: number;
-}) => {
-    const treeHeight = 200 + (completedCount / totalCount) * 100;
+const AchievementTree = ({ filledCount }: { filledCount: number }) => {
+    const treeHeight = 300; // Fixed tree height
+    const treeWidth = 200; // Fixed tree width
+    const maxCircles = 20; // Maximum number of circles to display
+
     return (
-        <svg width="200" height={treeHeight} viewBox={`0 0 200 ${treeHeight}`}>
+        <svg width={treeWidth} height={treeHeight} viewBox={`0 0 ${treeWidth} ${treeHeight}`}>
             <image
                 href="/emptytree.jpg"
                 x="0"
                 y="0"
-                width="200"
+                width={treeWidth}
                 height={treeHeight}
                 preserveAspectRatio="xMidYMid slice"
             />
-            {[...Array(completedCount)].map((_, index) => (
+            {[...Array(Math.min(filledCount, maxCircles))].map((_, index) => (
                 <circle
                     key={index}
-                    cx={100 + Math.cos(index * 0.5) * 40}
-                    cy={treeHeight - 100 + Math.sin(index * 0.5) * 40}
-                    r="5"
+                    cx={100 + Math.cos(index * 0.5 + Math.PI) * 70} // Rotate by 180 degrees
+                    cy={treeHeight - 200 + Math.sin(index * 0.5 + Math.PI) * 70} // Rotate by 180 degrees
+                    r="7" // Increased radius of circle
                     fill="pink"
                 />
             ))}
@@ -54,8 +51,7 @@ const AchievementTree = ({
 };
 
 const ProgressIcons = ({ progress, maxProgress }: { progress: number; maxProgress: number }) => {
-    console.log(progress, maxProgress);
-    const filledCount = Math.floor((progress / maxProgress) * 5);
+    const filledCount = Math.floor((progress / maxProgress) * 3);
     return (
         <Box>
             {[...Array(filledCount)].map((_, index) => (
@@ -63,7 +59,7 @@ const ProgressIcons = ({ progress, maxProgress }: { progress: number; maxProgres
                     🌸
                 </span>
             ))}
-            {[...Array(5 - filledCount)].map((_, index) => (
+            {[...Array(3 - filledCount)].map((_, index) => (
                 <span key={index + filledCount} style={{ color: "lightgrey" }}></span>
             ))}
         </Box>
@@ -118,9 +114,7 @@ export default function Achievements() {
                                     outerRadius={80}
                                     fill="#8884d8"
                                     dataKey="value"
-                                    label={({ name, percent }) =>
-                                        `${name} ${(percent * 100).toFixed(0)}%`
-                                    }
+                                    label={({ name, value }) => `${name} (${value})`}
                                 >
                                     {pieData.map((entry, index) => (
                                         <Cell
@@ -134,8 +128,14 @@ export default function Achievements() {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <AchievementTree
-                            completedCount={completedAchievements}
-                            totalCount={achievements.length}
+                            filledCount={achievements.reduce(
+                                (sum, achievement) =>
+                                    sum +
+                                    Math.floor(
+                                        (achievement.progress / achievement.max_progress) * 3,
+                                    ),
+                                0,
+                            )}
                         />
                     </Grid>
                 </Grid>

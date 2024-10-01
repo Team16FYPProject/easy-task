@@ -297,7 +297,12 @@ export default function Dashboard() {
 
     // Generate rows for the table
     function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
-        return tasks.map((task, index) => (
+        // Sort tasks by deadline
+        const sortedTasks = tasks.sort(
+            (a, b) => new Date(a.task_deadline).getTime() - new Date(b.task_deadline).getTime(),
+        );
+
+        return sortedTasks.map((task, index) => (
             <TableRow key={index}>
                 <TableCell>
                     {new Intl.DateTimeFormat("en-AU", {
