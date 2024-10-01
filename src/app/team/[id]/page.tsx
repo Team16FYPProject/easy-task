@@ -75,7 +75,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         }
 
         fetchMembers();
-    }, [id, members]);
+    }, []);
 
     // Set displayed members
     useEffect(() => {

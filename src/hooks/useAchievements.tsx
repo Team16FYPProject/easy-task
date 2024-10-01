@@ -32,7 +32,7 @@ export function useAchievements(userId: unknown) {
         if (userId) {
             fetchAchievements();
         }
-    }, [supabase, userId]);
+    }, [userId]);
 
     return { achievements, loading, error };
 }
