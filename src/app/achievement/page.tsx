@@ -15,7 +15,6 @@ import {
     TableHead,
     TableRow,
     Typography,
-    LinearProgress,
     Box,
 } from "@mui/material";
 // import { PieChart } from "@mui/x-charts";
@@ -23,7 +22,13 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#0088FE", "#00C49F"];
 
-const AchievementTree = ({ completedCount, totalCount }) => {
+const AchievementTree = ({
+    completedCount,
+    totalCount,
+}: {
+    completedCount: number;
+    totalCount: number;
+}) => {
     const treeHeight = 200 + (completedCount / totalCount) * 100;
     return (
         <svg width="200" height={treeHeight} viewBox={`0 0 200 ${treeHeight}`}>
@@ -89,7 +94,6 @@ export default function Achievements() {
     const inProgressAchievements = achievements.filter(
         (a) => a.progress > 0 && !a.completed,
     ).length;
-    const notStartedAchievements = achievements.filter((a) => a.progress === 0).length;
 
     const pieData = [
         { name: "Completed", value: completedAchievements },

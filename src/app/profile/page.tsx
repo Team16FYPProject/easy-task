@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { Avatar, Button, Container, Grid, Typography } from "@mui/material";
+import Image from "next/image";
 import { PieChart } from "@mui/x-charts";
 import TeamCard from "@/components/TeamCard";
 import { useState } from "react";
@@ -121,7 +122,7 @@ export default function ProfilePage() {
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
                             {/* tree */}
-                            <img src="emptytree.jpg"></img>
+                            <Image src="/emptytree.jpg" alt="Empty Tree" width={400} height={300} />
                         </Grid>
                     </Grid>
                 </Grid>
