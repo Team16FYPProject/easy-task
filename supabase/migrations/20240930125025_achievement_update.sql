@@ -85,46 +85,6 @@ END;
 
 $function$ LANGUAGE plpgsql;
 
--- Achievement Triggers
--- Trigger for task completion
-CREATE
-OR REPLACE FUNCTION update_task_completion_achievement() RETURNS TRIGGER AS $function$ BEGIN IF NEW.task_status = 'COMPLETE'
-AND OLD.task_status != 'COMPLETE' THEN PERFORM update_user_achievement(NEW.task_creator_id, 'Complete tasks', 1);
-
-END IF;
-
-RETURN NEW;
-
-END;
-
-$function$ LANGUAGE plpgsql;
-
-CREATE TRIGGER task_completion_achievement_trigger
-AFTER
-UPDATE
-    ON task FOR EACH ROW EXECUTE FUNCTION update_task_completion_achievement();
-
--- Trigger for time spent on tasks
-CREATE
-OR REPLACE FUNCTION update_time_spent_achievement() RETURNS TRIGGER AS $function$ BEGIN IF NEW.task_time_spent > OLD.task_time_spent THEN PERFORM update_user_achievement(
-    NEW.task_creator_id,
-    'Time spent on tasks',
-    NEW.task_time_spent - OLD.task_time_spent
-);
-
-END IF;
-
-RETURN NEW;
-
-END;
-
-$function$ LANGUAGE plpgsql;
-
-CREATE TRIGGER time_spent_achievement_trigger
-AFTER
-UPDATE
-    ON task FOR EACH ROW EXECUTE FUNCTION update_time_spent_achievement();
-
 -- Achievement Progress View
 CREATE
 OR REPLACE VIEW user_achievement_progress AS

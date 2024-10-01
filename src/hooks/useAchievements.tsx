@@ -9,24 +9,19 @@ export function useAchievements(userId: string) {
 
     useEffect(() => {
         async function fetchAchievements() {
-            try {
-                setLoading(true);
-                const { data, error } = await supabase
-                    .from("user_achievement_progress")
-                    .select("*")
-                    .eq("user_id", userId);
+            setLoading(true);
+            const { data, error } = await supabase
+                .from("user_achievement_progress")
+                .select("*")
+                .eq("user_id", userId);
 
-                if (error) throw error;
+            if (error) {
+                console.error("Error fetching achievements:", error);
+                setError(error.message);
+            } else {
                 setAchievements(data);
-            } catch (err) {
-                if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError(String(err));
-                }
-            } finally {
-                setLoading(false);
             }
+            setLoading(false);
         }
 
         if (userId) {
