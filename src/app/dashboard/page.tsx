@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import AddTeamModal from "@/components/AddTeamModal";
 import TeamCard from "@/components/TeamCard";
 import {
-    bottomNavigationActionClasses,
     Button,
     ButtonBase,
     Chip,

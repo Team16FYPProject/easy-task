@@ -22,9 +22,6 @@ ADD
 ADD
     COLUMN completed_at TIMESTAMP WITH TIME ZONE;
 
--- Create an index to improve query performance
-CREATE INDEX idx_user_achievement_user_id ON user_achievement(user_id);
-
 CREATE
 OR REPLACE FUNCTION update_user_achievement(
     p_user_id UUID,

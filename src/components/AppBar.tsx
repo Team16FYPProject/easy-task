@@ -18,7 +18,7 @@ type NavigationLink = {
 
 const NAVIGATION_LINKS: NavigationLink[][] = [
     [
-        { name: "Dashboard", link: "/calendar" },
+        { name: "Dashboard", link: "/dashboard" },
         { name: "Profile", link: "/profile" },
         { name: "Achievements", link: "/achievement" },
     ],
