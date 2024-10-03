@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { ProjectTask } from "@/utils/types";
 const style = {
     position: "absolute",
@@ -41,13 +41,13 @@ export default function AddTaskModal({
     open,
     handleClose,
     project_id,
-    setNewTask,
+    setUpdatedTask,
     projectTasks,
 }: {
     open: boolean;
     handleClose: () => void;
     project_id: string;
-    setNewTask: (newTask: string) => void;
+    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
     projectTasks: ProjectTask[];
 }) {
     const [taskName, setTaskName] = useState<string>("");
@@ -96,7 +96,7 @@ export default function AddTaskModal({
                 setIsError(false);
             }, 5000);
         } else {
-            setNewTask(data.data.taskData);
+            setUpdatedTask(data.data.taskData);
             handleClose();
         }
     }
@@ -173,7 +173,9 @@ export default function AddTaskModal({
                                             disablePast
                                             onChange={(newValue) =>
                                                 setTaskDeadline(
-                                                    newValue ? new Date(newValue.toDate()) : null,
+                                                    newValue
+                                                        ? new Date(newValue.toISOString())
+                                                        : null,
                                                 )
                                             }
                                         ></DateTimePicker>

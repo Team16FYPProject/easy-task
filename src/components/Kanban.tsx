@@ -21,6 +21,7 @@ type ColumnProps = {
     cards: ProjectTask[];
     setCards: React.Dispatch<React.SetStateAction<ProjectTask[]>>;
     setTasksDict: React.Dispatch<React.SetStateAction<Map<string, { tasks: ProjectTask[] }>>>;
+    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
 };
 /**
  * @param project_id: The id of the project
@@ -53,6 +54,7 @@ type CardProp = {
     assignees: Assignee[];
     task_status: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => void;
+    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
 };
 /**
  * @param beforeId: The id of the column it is being dragged from
@@ -92,21 +94,28 @@ export const Board = ({ projects }: { projects: Project[] }) => {
     const [loading, setLoading] = useState(true); // loading state for fetching tasks
     const [teamId, setTeamId] = React.useState(""); // state for selected team id
     const [tasksDict, setTasksDict] = useState(new Map());
-    const [newTask, setNewTask] = useState("");
+    const [updatedTask, setUpdatedTask] = useState<ProjectTask | null>(null);
     useEffect(() => {
         async function handleUpdate() {
-            if (teamId && newTask && tasksDict) {
+            // we only run this once a task has been updated
+            // this could be a task creation or modification
+            if (teamId && updatedTask && tasksDict) {
                 // get the tasks array for the current team
                 const updatedTasks = [...(tasksDict.get(teamId)?.tasks || [])];
 
+                // get all tasks except for our possibily updated task
+                const filteredTasks = updatedTasks.filter(
+                    (task) => task.task_id != updatedTask.task_id,
+                );
+
                 // add the new task to the copied tasks array
-                updatedTasks.push(newTask);
+                filteredTasks.push(updatedTask);
 
                 // update the tasks array in the dictionary
-                tasksDict.set(teamId, { ...tasksDict.get(teamId), tasks: updatedTasks });
+                tasksDict.set(teamId, { ...tasksDict.get(teamId), tasks: filteredTasks });
 
                 // update the state with the new array of tasks
-                setCards(updatedTasks);
+                setCards(filteredTasks);
 
                 // update taskDict state
                 setTasksDict(tasksDict);
@@ -114,7 +123,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
         }
 
         handleUpdate();
-    }, [newTask, tasksDict, teamId]);
+    }, [updatedTask]);
     // fetch all tasks from the database
     useEffect(() => {
         async function fetchTasks() {
@@ -146,7 +155,6 @@ export const Board = ({ projects }: { projects: Project[] }) => {
             await Promise.all(fetchPromises);
 
             setTasksDict(tasksDict);
-            console.log(tasksDict);
             if (tasksDict.size > 0) {
                 setLoading(false);
                 setTeamId(projects[0].project_id);
@@ -207,7 +215,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                         open={open}
                         handleClose={handleClose}
                         project_id={`${teamId}`}
-                        setNewTask={setNewTask}
+                        setUpdatedTask={setUpdatedTask}
                         projectTasks={cards}
                     />
                 </div>
@@ -220,6 +228,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     cards={cards}
                     setCards={setCards}
                     setTasksDict={setTasksDict}
+                    setUpdatedTask={setUpdatedTask}
                 />
                 <Column
                     title="IN PROGRESS"
@@ -227,6 +236,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     cards={cards}
                     setCards={setCards}
                     setTasksDict={setTasksDict}
+                    setUpdatedTask={setUpdatedTask}
                 />
                 <Column
                     title="COMPLETE"
@@ -234,6 +244,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     cards={cards}
                     setCards={setCards}
                     setTasksDict={setTasksDict}
+                    setUpdatedTask={setUpdatedTask}
                 />
             </div>
         </div>
@@ -244,14 +255,21 @@ export const Board = ({ projects }: { projects: Project[] }) => {
  * @param {ColumnProps}
  * @returns react component with columns of the Kanban Board
  */
-export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, setTasksDict }) => {
+export const Column: React.FC<ColumnProps> = ({
+    title,
+    column,
+    cards,
+    setCards,
+    setTasksDict,
+    setUpdatedTask,
+}) => {
     async function handleTaskStatus(cardToBeTransferred: ProjectTask) {
         if (!cardToBeTransferred) {
             console.error("No card to transfer");
             return;
         }
         try {
-            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
+            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}/task_status`;
             await fetch(route, {
                 method: "PATCH",
                 headers: {
@@ -412,6 +430,7 @@ export const Column: React.FC<ColumnProps> = ({ title, column, cards, setCards, 
                             {...c}
                             task_id={c.task_id}
                             handleDragStart={handleDragStart}
+                            setUpdatedTask={setUpdatedTask}
                         />
                     );
                 })}
@@ -440,6 +459,7 @@ const Card: React.FC<CardProp> = ({
     task_time_spent,
     assignees,
     handleDragStart,
+    setUpdatedTask,
 }) => {
     const bgColor = determineBgColor(task_priority);
     const textColor = determineTextColor(task_priority);
@@ -518,6 +538,7 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                         assignees,
                     }}
+                    setUpdatedTask={setUpdatedTask}
                 />
             )}
         </>
