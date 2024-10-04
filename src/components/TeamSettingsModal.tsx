@@ -60,11 +60,11 @@ export default function TeamSettings({
 
             if (response.ok) {
                 // Handle successful response
-                console.log("Team created successfully");
+                console.log("Team modified successfully");
                 handleClose(); // Close the modal
             } else {
                 // Handle error response
-                console.error(`Failed to create team. Status: ${response.status}`);
+                console.error(`Failed to modify team. Status: ${response.status}`);
                 const errorText = await response.text();
                 console.error(`Error details: ${errorText}`);
             }
