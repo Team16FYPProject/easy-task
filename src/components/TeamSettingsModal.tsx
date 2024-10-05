@@ -4,6 +4,8 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Grid, TextField } from "@mui/material";
+import { useState } from "react";
+import { ApiResponse } from "@/utils/types";
 
 const style = {
     position: "absolute" as "absolute",
@@ -20,49 +22,43 @@ const style = {
 export default function TeamSettings({
     open,
     handleClose,
+    projectId,
+    projectName,
+    updateProjectName,
 }: {
     open: boolean;
     handleClose: () => void;
+    projectId: string;
+    projectName: string;
+    updateProjectName: (name: string) => void;
 }) {
-    const [teamName, setTeamName] = React.useState("");
-    // const [image, setImage] = React.useState<File | null>(null);
+    const [teamName, setTeamName] = React.useState(projectName);
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamName(event.target.value);
     };
 
-    // const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     if (event.target.files && event.target.files[0]) {
-    //         setImage(event.target.files[0]);
-    //     }
-    // };
-
     const handleSubmit = async () => {
-        const formData = new FormData();
-        formData.append("name", teamName);
-        formData.append("description", teamName);
-        // If you do image
-        // if (image) {
-        //     formData.append("image", image);
-        //     console.log("Image added");
-        // }
-
+        if (!teamName) {
+            setErrorMsg("Please enter a team name.");
+            return;
+        }
         try {
-            const response = await fetch("/api/projects", {
-                method: "POST",
-                body: formData,
+            const response = await fetch(`/api/projects/${projectId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    name: teamName,
+                }),
             });
 
-            if (response.ok) {
-                // Handle successful response
-                console.log("Team created successfully");
-                handleClose(); // Close the modal
-            } else {
-                // Handle error response
-                console.error(`Failed to create team. Status: ${response.status}`);
-                const errorText = await response.text();
-                console.error(`Error details: ${errorText}`);
+            const data: ApiResponse<void> = await response.json();
+            if (!data.success) {
+                setErrorMsg(data.data);
+                return;
             }
+            updateProjectName(teamName);
+            handleClose(); // Close the modal
         } catch (error) {
             console.error("Error:", error);
         }
@@ -81,6 +77,16 @@ export default function TeamSettings({
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 Team Settings
                             </Typography>
+                            {errorMsg && (
+                                <Typography
+                                    id="modal-modal-error"
+                                    variant="subtitle2"
+                                    component="p"
+                                    className="text-red-500"
+                                >
+                                    {errorMsg}
+                                </Typography>
+                            )}
                         </Grid>
                         <Grid item>
                             <TextField
