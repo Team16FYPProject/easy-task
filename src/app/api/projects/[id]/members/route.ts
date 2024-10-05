@@ -1,11 +1,13 @@
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
 import {
+    badRequestResponse,
     internalErrorResponse,
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
+import { isValidEmail } from "@/utils/check.utils";
 
 export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
@@ -36,6 +38,60 @@ export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
         return okResponse({ success: false, users: [] });
     }
     return okResponse({ success: true, users: userData });
+}
+
+export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
+    const session = await getSession();
+    if (!session) {
+        return unauthorizedResponse({ success: false, data: "Unauthorized" });
+    }
+    const { email } = await request.json();
+    if (!email) return badRequestResponse({ success: false, data: "Email is a required field." });
+
+    if (!isValidEmail(email))
+        return badRequestResponse({ success: false, data: "Please enter a valid email." });
+
+    const serviceSupabase = getServiceSupabase();
+
+    const { data: userData, error: userError } = await serviceSupabase
+        .from("profile")
+        .select("*")
+        .ilike("email", email)
+        .single();
+    if (userError) {
+        return badRequestResponse({
+            success: false,
+            data: "This member does not have an account. Please ask them to sign up first.",
+        });
+    }
+
+    const { data: memberData, error: memberError } = await serviceSupabase
+        .from("project_member")
+        .select("user_id")
+        .eq("user_id", userData.user_id)
+        .eq("project_id", id)
+        .maybeSingle();
+    if (memberError) {
+        console.error(memberError);
+        return internalErrorResponse({ success: false, data: "Unable to add that member" });
+    }
+    if (memberData) {
+        return badRequestResponse({
+            success: false,
+            data: "That member is already part of this project.",
+        });
+    }
+
+    const { error: insertError } = await getServiceSupabase().from("project_member").insert({
+        user_id: userData.user_id,
+        project_id: id,
+    });
+
+    if (insertError) {
+        console.error(insertError);
+        return internalErrorResponse({ success: false, data: "Unable to remove that member" });
+    }
+    return okResponse({ success: true, data: userData });
 }
 
 export async function DELETE(request: Request, { params: { id } }: ProjectIdParams) {

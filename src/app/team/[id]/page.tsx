@@ -50,6 +50,10 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const openSettingsModal = () => setShowSettingsModal(true);
     const closeSettingsModal = () => setShowSettingsModal(false);
 
+    function addMember(newMember: Profile) {
+        setMembers((_members) => [..._members, newMember]);
+    }
+
     // Fetch member profiles
     useEffect(() => {
         async function fetchMembers() {
@@ -113,11 +117,8 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
 
     async function handleRemoveMember(userId: string) {
         if (!confirm("Are you sure you want to remove that member?")) return;
-        const response = await fetch(`/api/projects/${id}/members/remove`, {
-            method: "POST",
-            body: JSON.stringify({
-                userId: userId,
-            }),
+        const response = await fetch(`/api/projects/${id}/members/${userId}`, {
+            method: "DELETE",
         });
         const data: ApiResponse<void> = await response.json();
         if (!data.success) {
@@ -200,6 +201,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             <InviteMemberModal
                                 open={showMemberModal}
                                 handleClose={closeInviteMemberModal}
+                                addMember={addMember}
                                 projectId={id}
                             />
                             <TeamSettingsModal
