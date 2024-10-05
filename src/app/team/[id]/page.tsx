@@ -105,7 +105,9 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
 
     async function handleLeaveTeam() {
         if (!confirm("Are you sure you want to leave this team?")) return;
-        const response = await fetch(`/api/projects/${id}/members`, { method: "DELETE" });
+        const response = await fetch(`/api/projects/${id}/members/${user?.id}`, {
+            method: "DELETE",
+        });
         const data: ApiResponse<void> = await response.json();
         if (!data.success) {
             return alert("Unable to leave team. Please try again.");
@@ -113,16 +115,19 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         router.push("/dashboard");
     }
 
-    async function handleInviteMember() {}
-
     async function handleRemoveMember(userId: string) {
+        if (user?.id === userId) {
+            return alert(
+                "You cannot remove yourself. If you'd like to leave the team, use the Leave button instead.",
+            );
+        }
         if (!confirm("Are you sure you want to remove that member?")) return;
         const response = await fetch(`/api/projects/${id}/members/${userId}`, {
             method: "DELETE",
         });
         const data: ApiResponse<void> = await response.json();
         if (!data.success) {
-            return alert("Unable to remove that member. Please try again.");
+            return alert(data.data);
         }
         setMembers((_members) => _members.filter((member) => member.user_id !== userId));
     }
@@ -253,6 +258,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         </Container>
     );
 }
+
 function setOpen(arg0: boolean) {
     throw new Error("Function not implemented.");
 }
