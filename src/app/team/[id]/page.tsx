@@ -23,13 +23,14 @@ import SettingsFilled from "@mui/icons-material/Settings";
 import { TeamIdParams } from "@/app/team/[id]/types";
 import { useEffect, useState } from "react";
 import React from "react";
-import { ApiResponse, Profile } from "@/utils/types";
+import { ApiResponse, Profile, Project } from "@/utils/types";
 import InviteMemberModal from "@/components/InviteMemberModal";
 
 export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const router = useRouter();
     const { loadingUser, user } = useUser();
     const [loadingMembers, setLoadingMembers] = React.useState(true);
+    const [project, setProject] = React.useState<Project | null>(null);
     const [members, setMembers] = React.useState<Profile[]>([]);
     const [displayedMembers, setDisplayedMembers] = React.useState<Profile[]>([]);
     const [showMemberModal, setShowMemberModal] = React.useState(false);
@@ -39,7 +40,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
 
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
-            await router.push("/login");
+            router.push("/login");
             return;
         }
     }, [loadingUser, user]);
@@ -50,35 +51,42 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const openSettingsModal = () => setShowSettingsModal(true);
     const closeSettingsModal = () => setShowSettingsModal(false);
 
+    function updateProjectName(newName: string) {
+        setProject((_project) => {
+            if (!_project) return null;
+            return { ..._project, project_name: newName };
+        });
+    }
+
+    function addMember(newMember: Profile) {
+        setMembers((_members) => [..._members, newMember]);
+    }
+
     // Fetch member profiles
     useEffect(() => {
-        async function fetchMembers() {
+        async function fetchProjectData() {
             setLoadingMembers(true);
             try {
-                const response = await fetch(`/api/projects/${id}/members`, {
+                const response = await fetch(`/api/projects/${id}`, {
                     method: "GET",
-                    credentials: "include",
                 });
 
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.data || "Failed to fetch members");
+                const result: ApiResponse<{ project: Project; members: Profile[] }> =
+                    await response.json();
+                if (!result.success) {
+                    return alert(
+                        (result.data as string) ?? "Unable to fetch project info. Please refresh",
+                    );
                 }
-
-                if (result.success) {
-                    setMembers(result.users);
-                } else {
-                    throw new Error("Failed to fetch members");
-                }
-                console.log("Members:", members);
+                setProject(result.data.project);
+                setMembers(result.data.members);
             } catch (e) {
                 console.error("Error:", e);
             }
             setLoadingMembers(false);
         }
 
-        fetchMembers();
+        void fetchProjectData();
     }, []);
 
     // Set displayed members
@@ -101,7 +109,9 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
 
     async function handleLeaveTeam() {
         if (!confirm("Are you sure you want to leave this team?")) return;
-        const response = await fetch(`/api/projects/${id}/members`, { method: "DELETE" });
+        const response = await fetch(`/api/projects/${id}/members/${user?.id}`, {
+            method: "DELETE",
+        });
         const data: ApiResponse<void> = await response.json();
         if (!data.success) {
             return alert("Unable to leave team. Please try again.");
@@ -109,19 +119,19 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         router.push("/dashboard");
     }
 
-    async function handleInviteMember() {}
-
     async function handleRemoveMember(userId: string) {
+        if (user?.id === userId) {
+            return alert(
+                "You cannot remove yourself. If you'd like to leave the team, use the Leave button instead.",
+            );
+        }
         if (!confirm("Are you sure you want to remove that member?")) return;
-        const response = await fetch(`/api/projects/${id}/members/remove`, {
-            method: "POST",
-            body: JSON.stringify({
-                userId: userId,
-            }),
+        const response = await fetch(`/api/projects/${id}/members/${userId}`, {
+            method: "DELETE",
         });
         const data: ApiResponse<void> = await response.json();
         if (!data.success) {
-            return alert("Unable to remove that member. Please try again.");
+            return alert(data.data);
         }
         setMembers((_members) => _members.filter((member) => member.user_id !== userId));
     }
@@ -155,7 +165,9 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
             <Grid container direction="column" spacing={2}>
                 {/* Team Name */}
                 <Grid item xs={12}>
-                    <Typography variant="h3">Team Members</Typography>
+                    <Typography variant="h3">
+                        {project?.project_name ? project.project_name + "'s" : ""} Team Members
+                    </Typography>
                 </Grid>
 
                 {/* Team Features */}
@@ -200,12 +212,15 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             <InviteMemberModal
                                 open={showMemberModal}
                                 handleClose={closeInviteMemberModal}
+                                addMember={addMember}
                                 projectId={id}
                             />
                             <TeamSettingsModal
                                 open={showSettingsModal}
                                 handleClose={closeSettingsModal}
-                                teamId={id}
+                                projectId={id}
+                                projectName={project?.project_name ?? ""}
+                                updateProjectName={updateProjectName}
                             />
                         </Grid>
                     </Grid>
@@ -252,6 +267,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
         </Container>
     );
 }
+
 function setOpen(arg0: boolean) {
     throw new Error("Function not implemented.");
 }

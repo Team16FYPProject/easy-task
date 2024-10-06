@@ -65,7 +65,7 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
 
     if (error) {
         // Error is expected here since we don't own the easy-task.com domain.
-        console.error(error);
+        // console.error(error);
         // return internalErrorResponse({ success: false, data: error });
     }
     return okResponse({ success: true, data: "The invite email has been sent." });

@@ -6,6 +6,7 @@ import Modal from "@mui/material/Modal";
 import { Grid, TextField } from "@mui/material";
 import { ApiResponse } from "@/utils/types";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const style = {
     position: "absolute",
@@ -34,18 +35,22 @@ export default function AddTeamModal({
 
     const [teamName, setTeamName] = React.useState("");
     const [image, setImage] = React.useState<File | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string>("");
+
+    // Clear the error message when the modal is re-opened.
+    useEffect(() => {
+        setErrorMsg("");
+    }, [open]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamName(event.target.value);
     };
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            setImage(event.target.files[0]);
-        }
-    };
-
     const handleSubmit = async () => {
+        if (!teamName) {
+            setErrorMsg("Please enter a team name.");
+            return;
+        }
         const formData = new FormData();
         formData.append("name", teamName);
         formData.append("description", teamName);
@@ -69,6 +74,7 @@ export default function AddTeamModal({
                 handleClose(); // Close the modal
                 router.push(`/team/${projectId}`);
             } else {
+                setErrorMsg((data.data as string) ?? "Unable to create team.");
                 // Handle error response
                 console.error(`Failed to create team. Status: ${response.status}`);
                 console.error(`Error details: ${data}`);
@@ -91,6 +97,16 @@ export default function AddTeamModal({
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 Create Team
                             </Typography>
+                            {errorMsg && (
+                                <Typography
+                                    id="modal-modal-error"
+                                    variant="subtitle2"
+                                    component="p"
+                                    className="text-red-500"
+                                >
+                                    {errorMsg}
+                                </Typography>
+                            )}
                         </Grid>
                         <Grid item>
                             <TextField
