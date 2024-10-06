@@ -81,7 +81,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                 } else {
                     throw new Error("Failed to fetch members");
                 }
-                console.log("Members:", members);
             } catch (e) {
                 console.error("Error:", e);
             }

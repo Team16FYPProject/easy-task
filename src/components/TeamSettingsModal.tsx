@@ -4,8 +4,11 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Grid, TextField } from "@mui/material";
+
 import { useState } from "react";
 import { ApiResponse } from "@/utils/types";
+import { Description } from "@mui/icons-material";
+
 
 const style = {
     position: "absolute" as "absolute",
@@ -31,6 +34,7 @@ export default function TeamSettings({
     projectId: string;
     projectName: string;
     updateProjectName: (name: string) => void;
+
 }) {
     const [teamName, setTeamName] = React.useState(projectName);
     const [errorMsg, setErrorMsg] = useState<string>("");
