@@ -335,12 +335,12 @@ export default function AddTaskModal({
                                 <Box sx={{ display: "flex", gap: 2 }}>
                                     <Button
                                         variant="outlined"
-                                        color="secondary"
+                                        color="primary"
                                         onClick={handleClose}
                                     >
                                         Cancel
                                     </Button>
-                                    <Button variant="contained" color="primary" type="submit">
+                                    <Button variant="contained" color="secondary" type="submit">
                                         Submit
                                     </Button>
                                 </Box>

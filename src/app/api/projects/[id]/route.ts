@@ -72,5 +72,3 @@ export async function PUT(request: Request, { params: { id } }: ProjectIdParams)
     const data = await request.formData();
     return setProjectSettings(id, data, session, false);
 }
-
-

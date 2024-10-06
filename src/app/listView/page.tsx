@@ -21,7 +21,7 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import AddTeamModal from "@/components/AddTeamModal";
+import AddTaskModal from "@/components/AddTaskModal";
 import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
 import { ProjectTask } from "@/utils/types";
@@ -224,9 +224,19 @@ export default function ListView() {
                         </Grid>
                         <Grid item>
                             <Button variant="contained" color="secondary" onClick={handleOpen}>
-                                ADD TASK
+                                CREATE TASK
                             </Button>
-                            <AddTeamModal open={open} handleClose={handleClose} />
+                            <AddTaskModal
+                                open={open}
+                                handleClose={handleClose}
+                                project_id={""}
+                                setUpdatedTask={function (
+                                    value: React.SetStateAction<ProjectTask | null>,
+                                ): void {
+                                    throw new Error("Function not implemented.");
+                                }}
+                                projectTasks={[]}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -304,7 +314,7 @@ export default function ListView() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Due Date</TableCell>
-                                    <TableCell>Team/Task</TableCell>
+                                    <TableCell>Project/Task</TableCell>
                                     <TableCell>Priority</TableCell>
                                     <TableCell>Meeting</TableCell>
                                     <TableCell>Status</TableCell>
