@@ -289,8 +289,12 @@ export default function ProfilePage() {
                         <Grid container spacing={2}>
                             <Grid item>
                                 <Avatar>
-                                    {profile.first_name[0]}
-                                    {profile.last_name[0]}
+                                    {profile.first_name &&
+                                    profile.first_name.trim() !== "" &&
+                                    profile.last_name &&
+                                    profile.last_name.trim() !== ""
+                                        ? `${profile.first_name[0]}${profile.last_name[0]}`
+                                        : ""}
                                 </Avatar>
                             </Grid>
                             <Grid item>
