@@ -163,14 +163,19 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
     return (
         <Container sx={{ padding: 2 }}>
             <Grid container direction="column" spacing={2}>
-                {/* Team Name */}
+                {/* Project Name */}
                 <Grid item xs={12}>
                     <Typography variant="h3">
-                        {project?.project_name ? project.project_name + "'s" : ""} Team Members
+                        Project {project?.project_name ? project.project_name : ""} Members
                     </Typography>
                 </Grid>
 
-                {/* Team Features */}
+                {/* Project Desc */}
+                <Grid item xs={12}>
+                    <Typography>{project?.project_desc ? project.project_desc : ""}</Typography>
+                </Grid>
+
+                {/* Project Features */}
                 <Grid item xs={12}>
                     {/* Search bar */}
                     <Grid container spacing={2} alignItems="center" justifyContent="space-between">
@@ -183,7 +188,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </Grid>
-                        {/* Leave Team, Invite Member, Settings */}
+                        {/* Leave Project, Invite Member, Settings */}
                         <Grid item>
                             <Button
                                 variant="contained"
@@ -191,7 +196,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 sx={{ mr: 2 }}
                                 onClick={handleLeaveTeam}
                             >
-                                LEAVE TEAM
+                                LEAVE PROJECT
                             </Button>
                             <Button
                                 variant="contained"
@@ -220,6 +225,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 handleClose={closeSettingsModal}
                                 projectId={id}
                                 projectName={project?.project_name ?? ""}
+                                projectDesc={project?.project_desc ?? ""}
                                 updateProjectName={updateProjectName}
                             />
                         </Grid>

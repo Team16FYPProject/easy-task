@@ -34,6 +34,7 @@ export default function AddTeamModal({
     const router = useRouter();
 
     const [teamName, setTeamName] = React.useState("");
+    const [teamDesc, setTeamDesc] = React.useState("");
     const [image, setImage] = React.useState<File | null>(null);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -46,6 +47,10 @@ export default function AddTeamModal({
         setTeamName(event.target.value);
     };
 
+    const handleInputChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTeamDesc(event.target.value);
+    };
+
     const handleSubmit = async () => {
         if (!teamName) {
             setErrorMsg("Please enter a team name.");
@@ -53,7 +58,7 @@ export default function AddTeamModal({
         }
         const formData = new FormData();
         formData.append("name", teamName);
-        formData.append("description", teamName);
+        formData.append("description", teamDesc);
         // If you do image
         if (image) {
             formData.append("image", image);
@@ -70,13 +75,13 @@ export default function AddTeamModal({
             if (response.ok && data.success) {
                 const projectId = data.data.id;
                 // Handle successful response
-                console.log("Team created successfully");
+                console.log("Project created successfully");
                 handleClose(); // Close the modal
                 router.push(`/team/${projectId}`);
             } else {
-                setErrorMsg((data.data as string) ?? "Unable to create team.");
+                setErrorMsg((data.data as string) ?? "Unable to create project.");
                 // Handle error response
-                console.error(`Failed to create team. Status: ${response.status}`);
+                console.error(`Failed to create project. Status: ${response.status}`);
                 console.error(`Error details: ${data}`);
             }
         } catch (error) {
@@ -95,7 +100,7 @@ export default function AddTeamModal({
                     <Grid container direction="column" spacing={2}>
                         <Grid item>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Create Team
+                                Create Project
                             </Typography>
                             {errorMsg && (
                                 <Typography
@@ -111,11 +116,24 @@ export default function AddTeamModal({
                         <Grid item>
                             <TextField
                                 id="outlined-basic"
-                                label="Team Name"
+                                label="Project Name"
                                 variant="outlined"
                                 className="w-full"
+                                required
                                 value={teamName}
                                 onChange={handleInputChange}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                id="outlined-basic"
+                                label="Project Description"
+                                variant="outlined"
+                                className="w-full"
+                                value={teamDesc}
+                                multiline
+                                rows={4}
+                                onChange={handleInputChange2}
                             />
                         </Grid>
                         <Grid item>

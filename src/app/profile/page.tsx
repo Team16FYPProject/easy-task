@@ -288,7 +288,10 @@ export default function ProfilePage() {
                     <Paper sx={{ p: 2 }}>
                         <Grid container spacing={2}>
                             <Grid item>
-                                <Avatar></Avatar>
+                                <Avatar>
+                                    {profile.first_name[0]}
+                                    {profile.last_name[0]}
+                                </Avatar>
                             </Grid>
                             <Grid item>
                                 <Typography variant="h5">
@@ -364,7 +367,7 @@ export default function ProfilePage() {
 
                 <Grid item xs={12}>
                     <Paper sx={{ p: 2 }}>
-                        <Typography variant="h5">Teams</Typography>
+                        <Typography variant="h5">Projects</Typography>
 
                         {/* Team Cards */}
                         {loadingProjects ? (
