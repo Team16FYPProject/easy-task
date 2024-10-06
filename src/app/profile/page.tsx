@@ -287,7 +287,10 @@ export default function ProfilePage() {
                 <Grid item xs={12}>
                     <Grid container spacing={2}>
                         <Grid item>
-                            <Avatar></Avatar>
+                            <Avatar>
+                                {profile.first_name[0]}
+                                {profile.last_name[0]}
+                            </Avatar>
                         </Grid>
                         <Grid item>
                             <Typography variant="h5">
