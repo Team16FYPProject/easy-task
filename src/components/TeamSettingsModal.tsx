@@ -40,11 +40,11 @@ export default function TeamSettings({
     const [teamDesc, setTeamDesc] = React.useState(projectDesc);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamName(event.target.value);
     };
 
-    const handleInputChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDescChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamDesc(event.target.value);
     };
 
@@ -105,7 +105,7 @@ export default function TeamSettings({
                                 className="w-full"
                                 required
                                 value={teamName}
-                                onChange={handleInputChange}
+                                onChange={handleNameChange}
                             />
                         </Grid>
                         <Grid item>
@@ -117,7 +117,7 @@ export default function TeamSettings({
                                 value={teamDesc}
                                 multiline
                                 rows={4}
-                                onChange={handleInputChange2}
+                                onChange={handleDescChange}
                             />
                         </Grid>
                         <Grid item>
