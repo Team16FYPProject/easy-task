@@ -304,7 +304,7 @@ export default function ListView() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Due Date</TableCell>
-                                    <TableCell>Team/Task</TableCell>
+                                    <TableCell>Project/Task</TableCell>
                                     <TableCell>Priority</TableCell>
                                     <TableCell>Meeting</TableCell>
                                     <TableCell>Status</TableCell>

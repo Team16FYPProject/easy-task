@@ -70,7 +70,7 @@ export default function AddTeamModal({
             if (response.ok && data.success) {
                 const projectId = data.data.id;
                 // Handle successful response
-                console.log("Team created successfully");
+                console.log("Project created successfully");
                 handleClose(); // Close the modal
                 router.push(`/team/${projectId}`);
             } else {
@@ -95,7 +95,7 @@ export default function AddTeamModal({
                     <Grid container direction="column" spacing={2}>
                         <Grid item>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Create Team
+                                Create Project
                             </Typography>
                             {errorMsg && (
                                 <Typography
@@ -111,7 +111,7 @@ export default function AddTeamModal({
                         <Grid item>
                             <TextField
                                 id="outlined-basic"
-                                label="Team Name"
+                                label="Project Name"
                                 variant="outlined"
                                 className="w-full"
                                 value={teamName}

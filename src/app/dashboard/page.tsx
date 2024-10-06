@@ -342,11 +342,11 @@ export default function Dashboard() {
                 <Grid item xs={12}>
                     <Grid container spacing={1} alignItems="center" justifyContent="space-between">
                         <Grid item>
-                            <Typography variant="h4">Teams</Typography>
+                            <Typography variant="h4">Projects</Typography>
                         </Grid>
                         <Grid item>
                             <Button variant="contained" color="secondary" onClick={handleOpen}>
-                                CREATE TEAM
+                                CREATE PROJECT
                             </Button>
                             <AddTeamModal open={open} handleClose={handleClose} />
                         </Grid>
@@ -410,7 +410,7 @@ export default function Dashboard() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Date and Time</TableCell>
-                                    <TableCell>Team/Task</TableCell>
+                                    <TableCell>Project/Task</TableCell>
                                     <TableCell>Priority</TableCell>
                                     <TableCell>Meeting</TableCell>
                                     <TableCell>Status</TableCell>

@@ -356,7 +356,7 @@ export default function ProfilePage() {
                 </Grid>
                 {/* Profile Information */}
                 <Grid item xs={12}>
-                    <Typography variant="h5">Teams</Typography>
+                    <Typography variant="h5">Projects</Typography>
                 </Grid>
 
                 {/* Team Cards */}

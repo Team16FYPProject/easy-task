@@ -184,7 +184,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                 <div className="flex items-center gap-3">
                     <h3 className="text-3xl">Kanban View</h3>
                     <FormControl sx={{ minWidth: 120 }} size="small" disabled={loading}>
-                        <InputLabel id="select-team-label">Team</InputLabel>
+                        <InputLabel id="select-team-label">Project</InputLabel>
                         <Select
                             labelId="select-team-label"
                             id="simple-team-select"

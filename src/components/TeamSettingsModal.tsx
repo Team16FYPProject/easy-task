@@ -9,7 +9,6 @@ import { useState } from "react";
 import { ApiResponse } from "@/utils/types";
 import { Description } from "@mui/icons-material";
 
-
 const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -34,7 +33,6 @@ export default function TeamSettings({
     projectId: string;
     projectName: string;
     updateProjectName: (name: string) => void;
-
 }) {
     const [teamName, setTeamName] = React.useState(projectName);
     const [errorMsg, setErrorMsg] = useState<string>("");
@@ -79,7 +77,7 @@ export default function TeamSettings({
                     <Grid container direction="column" spacing={2}>
                         <Grid item>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Team Settings
+                                Project Settings
                             </Typography>
                             {errorMsg && (
                                 <Typography
@@ -95,7 +93,7 @@ export default function TeamSettings({
                         <Grid item>
                             <TextField
                                 id="outlined-basic"
-                                label="Edit Team Name"
+                                label="Edit Project Name"
                                 variant="outlined"
                                 className="w-full"
                                 value={teamName}
