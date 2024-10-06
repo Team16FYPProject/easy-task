@@ -269,7 +269,7 @@ export default function ProfilePage() {
 
     return (
         <Container sx={{ padding: 2 }}>
-            <Grid container direction="column" spacing={2}>
+            <Grid container direction="column" spacing={3}>
                 <Grid item xs={12}>
                     <Grid container spacing={2} alignItems="center" justifyContent="space-between">
                         <Grid item>
@@ -285,84 +285,94 @@ export default function ProfilePage() {
 
                 {/* Profile Information */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                        <Grid item>
-                            <Avatar></Avatar>
+                    <Paper sx={{ p: 2 }}>
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                <Avatar></Avatar>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h5">
+                                    {profile.first_name} {profile.last_name}
+                                </Typography>
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <Typography variant="h5">
-                                {profile.first_name} {profile.last_name}
-                            </Typography>
+                        <Grid item xs={12} mt={2}>
+                            {profile.profile_bio || ""}
                         </Grid>
-                    </Grid>
-                    <Grid item xs={12}>
-                        {profile.profile_bio || ""}
-                    </Grid>
+                    </Paper>
                 </Grid>
 
                 {/* Achievements */}
-                <Grid item container spacing={2} justifyContent="space-between">
-                    <Grid item xs={12} sm={6}>
-                        <Box
-                            display="flex"
-                            justifyContent="center"
-                            alignItems="center"
-                            height="100%"
-                        >
-                            <ResponsiveContainer width="100%" height={200}>
-                                <PieChart>
-                                    <Pie
-                                        data={pieData}
-                                        cx="50%"
-                                        cy="50%"
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        label={({ name, value }) => `${name} (${value})`}
-                                    >
-                                        {pieData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={COLORS[index % COLORS.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Box
-                            display="flex"
-                            justifyContent="center"
-                            alignItems="center"
-                            height="100%"
-                        >
-                            <AchievementTree
-                                filledCount={achievements.reduce(
-                                    (sum, achievement) =>
-                                        sum +
-                                        Math.floor(
-                                            (achievement.progress / achievement.max_progress) * 3,
-                                        ),
-                                    0,
-                                )}
-                            />
-                        </Box>
-                    </Grid>
-                </Grid>
-                {/* Profile Information */}
                 <Grid item xs={12}>
-                    <Typography variant="h5">Teams</Typography>
+                    <Paper sx={{ p: 2 }}>
+                        <Grid item container spacing={2} justifyContent="space-between">
+                            <Grid item xs={12} sm={6}>
+                                <Box
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    height="100%"
+                                >
+                                    <ResponsiveContainer width="100%" height={200}>
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData}
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius={80}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                label={({ name, value }) => `${name} (${value})`}
+                                            >
+                                                {pieData.map((entry, index) => (
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={COLORS[index % COLORS.length]}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Box
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    height="100%"
+                                >
+                                    <AchievementTree
+                                        filledCount={achievements.reduce(
+                                            (sum, achievement) =>
+                                                sum +
+                                                Math.floor(
+                                                    (achievement.progress /
+                                                        achievement.max_progress) *
+                                                        3,
+                                                ),
+                                            0,
+                                        )}
+                                    />
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </Paper>
                 </Grid>
 
-                {/* Team Cards */}
+                {/* Profile Information */}
+
                 <Grid item xs={12}>
-                    {loadingProjects ? (
-                        <Skeleton variant="rounded" width={"100%"} height={dataTableHeight} />
-                    ) : (
-                        <DataTable />
-                    )}
+                    <Paper sx={{ p: 2 }}>
+                        <Typography variant="h5">Teams</Typography>
+
+                        {/* Team Cards */}
+                        {loadingProjects ? (
+                            <Skeleton variant="rounded" width={"100%"} height={dataTableHeight} />
+                        ) : (
+                            <DataTable />
+                        )}
+                    </Paper>
                 </Grid>
             </Grid>
         </Container>
