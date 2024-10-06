@@ -26,19 +26,26 @@ export default function TeamSettings({
     handleClose,
     projectId,
     projectName,
+    projectDesc,
     updateProjectName,
 }: {
     open: boolean;
     handleClose: () => void;
     projectId: string;
     projectName: string;
+    projectDesc: string;
     updateProjectName: (name: string) => void;
 }) {
     const [teamName, setTeamName] = React.useState(projectName);
+    const [teamDesc, setTeamDesc] = React.useState(projectDesc);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTeamName(event.target.value);
+    };
+
+    const handleInputChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTeamDesc(event.target.value);
     };
 
     const handleSubmit = async () => {
@@ -96,8 +103,21 @@ export default function TeamSettings({
                                 label="Edit Project Name"
                                 variant="outlined"
                                 className="w-full"
+                                required
                                 value={teamName}
                                 onChange={handleInputChange}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                id="outlined-basic"
+                                label="Edit Project Description"
+                                variant="outlined"
+                                className="w-full"
+                                value={teamDesc}
+                                multiline
+                                rows={4}
+                                onChange={handleInputChange2}
                             />
                         </Grid>
                         <Grid item>

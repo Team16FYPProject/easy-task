@@ -225,6 +225,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                                 handleClose={closeSettingsModal}
                                 projectId={id}
                                 projectName={project?.project_name ?? ""}
+                                projectDesc={project?.project_desc ?? ""}
                                 updateProjectName={updateProjectName}
                             />
                         </Grid>
