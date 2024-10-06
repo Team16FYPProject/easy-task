@@ -27,6 +27,7 @@ const NAVIGATION_LINKS: NavigationLink[][] = [
         { name: "List View", link: "/listView" },
         { name: "Kanban View", link: "/kanban" },
     ],
+    [{ name: "Logout", link: "/logout" }],
 ];
 
 export default function SiteAppBar() {
