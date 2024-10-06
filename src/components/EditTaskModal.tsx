@@ -39,6 +39,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
     const [personName, setPersonName] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<Assignee[]>(task.assignees || []);
     const [newAssignee, setNewAssignee] = useState<string>("");
+    const [taskReminder, setTaskReminder] = useState<string>("");
 
     const modalStyle = {
         position: "absolute" as "absolute",
@@ -191,35 +192,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
-                        <TextField
-                            fullWidth
-                            select
-                            label="Status"
-                            defaultValue={task.task_status}
-                            margin="normal"
-                        >
-                            <MenuItem value="TODO">TO DO</MenuItem>
-                            <MenuItem value="DOING">IN PROGRESS</MenuItem>
-                            <MenuItem value="COMPLETE">DONE</MenuItem>
-                        </TextField>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            fullWidth
-                            select
-                            label="Priority"
-                            defaultValue={task.task_priority}
-                            margin="normal"
-                        >
-                            <MenuItem value="LOW">LOW</MenuItem>
-                            <MenuItem value="MEDIUM">MEDIUM</MenuItem>
-                            <MenuItem value="HIGH">HIGH</MenuItem>
-                        </TextField>
-                    </Grid>
-                </Grid>
-
-                <Grid container spacing={2} sx={sectionStyle}>
-                    <Grid item xs={6}>
                         {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DatePicker
                                 label="Deadline"
@@ -230,7 +202,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                         </LocalizationProvider> */}
                         <TextField
                             fullWidth
-                            label="Date"
+                            label="Task Deadline"
                             variant="outlined"
                             margin="normal"
                             defaultValue={task.task_deadline}
@@ -248,22 +220,48 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                 </Grid>
 
                 <Grid container spacing={2} sx={sectionStyle}>
-                    {/* <Grid item xs={6}>
-                        <TextField fullWidth select label="Reminder" margin="normal">
-                            <MenuItem value="1 day before">1 day before</MenuItem>
-                            <MenuItem value="2 days before">2 days before</MenuItem>
-                            <MenuItem value="1 week before">1 week before</MenuItem>
-                        </TextField>
-                    </Grid> */}
-                    {/* <Grid item xs={6}>
+                    <Grid item xs={6}>
                         <TextField
                             fullWidth
-                            type="number"
-                            label="Hours Logged"
-                            defaultValue={task.task_time_spent}
+                            select
+                            label="Task Status"
+                            defaultValue={task.task_status}
                             margin="normal"
-                        />
-                    </Grid> */}
+                        >
+                            <MenuItem value="TODO">TO DO</MenuItem>
+                            <MenuItem value="DOING">IN PROGRESS</MenuItem>
+                            <MenuItem value="COMPLETE">DONE</MenuItem>
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            select
+                            label="Task Priority"
+                            defaultValue={task.task_priority}
+                            margin="normal"
+                        >
+                            <MenuItem value="LOW">LOW</MenuItem>
+                            <MenuItem value="MEDIUM">MEDIUM</MenuItem>
+                            <MenuItem value="HIGH">HIGH</MenuItem>
+                        </TextField>
+                    </Grid>
+                </Grid>
+
+                <Grid container spacing={2} sx={sectionStyle}>
+                    <Grid item xs={6}>
+                        <TextField
+                            select
+                            fullWidth
+                            label="Task Reminder"
+                            defaultValue={taskReminder}
+                            margin="normal"
+                        >
+                            <MenuItem value={"HOUR"}>One Hour Before</MenuItem>
+                            <MenuItem value={"DAY"}>One Day Before</MenuItem>
+                            <MenuItem value={"WEEK"}>One Week Before</MenuItem>
+                        </TextField>
+                    </Grid>
                 </Grid>
 
                 {/* Assignees - Need to fix backend */}

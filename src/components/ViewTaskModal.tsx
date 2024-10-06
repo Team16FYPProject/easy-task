@@ -151,9 +151,9 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
-                        {/* <Grid item xs={6}>
-                        <Typography variant="body2">Reminder: {}</Typography>
-                    </Grid> */}
+                        <Grid item xs={6}>
+                            <Typography variant="body2">Reminder: Backend</Typography>
+                        </Grid>
                     </Grid>
                 </Grid>
 
