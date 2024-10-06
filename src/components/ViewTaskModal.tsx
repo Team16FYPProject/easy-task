@@ -8,9 +8,15 @@ interface ViewTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
     task: ProjectTask; // You'll need to pass the task data as a prop
+    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
 }
 
-const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, task }) => {
+const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
+    open,
+    handleCloseModal,
+    task,
+    setUpdatedTask,
+}) => {
     const modalStyle = {
         position: "absolute" as "absolute",
         top: "50%",
@@ -35,35 +41,57 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
     const bgColor = determineBgColor(task.task_priority);
+    const [currentTask, setCurrentTask] = React.useState(task);
 
-    console.log(task);
+    const handleLogClick = async () => {
+        try {
+            const route = `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/logged_hours`;
+            await fetch(route, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    task_logged_hours: currentTask.task_time_spent + 1,
+                }),
+            });
+            const updatedTask = {
+                ...currentTask,
+                task_time_spent: currentTask.task_time_spent + 1,
+            };
+            setCurrentTask(updatedTask);
+            setUpdatedTask(updatedTask);
+        } catch (e) {
+            console.error(`Error updating logged hours for project ${currentTask.project_id}:`, e);
+        }
+    };
 
     return (
         <Modal open={open} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
                 <Typography variant="h5" component="h2" gutterBottom>
-                    {`${task.task_name}`}
+                    {`${currentTask.task_name}`}
                 </Typography>
 
                 <Box sx={sectionStyle}>
                     <Typography variant="body2" color="text.secondary">
-                        {"Parent Task: " + (task.task_parent_id || "No parent task")}
+                        {"Parent Task: " + (currentTask.task_parent_id || "No parent task")}
                     </Typography>
                 </Box>
 
                 <Box sx={sectionStyle}>
-                    <Typography variant="body1">{task.task_desc}</Typography>
+                    <Typography variant="body1">{currentTask.task_desc}</Typography>
                 </Box>
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
-                        <Typography variant="body2">Status: {task.task_status}</Typography>
+                        <Typography variant="body2">Status: {currentTask.task_status}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="body2">
                             Priority:{" "}
                             <Chip
-                                label={task.task_priority}
+                                label={currentTask.task_priority}
                                 sx={{ backgroundColor: bgColor }}
                                 size="small"
                             />
@@ -85,7 +113,9 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                         </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="body2">Location: {task.task_location}</Typography>
+                        <Typography variant="body2">
+                            Location: {currentTask.task_location}
+                        </Typography>
                     </Grid>
                 </Grid>
 
@@ -95,7 +125,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                     </Grid> */}
                     <Grid item xs={6}>
                         <Typography variant="body2">
-                            Hours Logged: {task.task_time_spent}
+                            Hours Logged: {currentTask.task_time_spent}
                         </Typography>
                     </Grid>
                 </Grid>
@@ -105,9 +135,9 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                         Assignees
                     </Typography>
                     <Paper variant="outlined" sx={{ p: 2 }}>
-                        {task.assignees &&
-                        Array.isArray(task.assignees) &&
-                        task.assignees.length > 0 ? (
+                        {currentTask.assignees &&
+                        Array.isArray(currentTask.assignees) &&
+                        currentTask.assignees.length > 0 ? (
                             <ul>
                                 {task.assignees.map((assignee, index) => (
                                     <li key={index}>
@@ -127,7 +157,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                 </Box>
 
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="contained" color="secondary" onClick={handleLogClick}>
                         LOG 1 HOUR
                     </Button>
                     <Button variant="contained" color="secondary" onClick={handleOpenEditModal}>
@@ -136,7 +166,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({ open, handleCloseModal, t
                     <EditTaskModal
                         open={taskEditOpen}
                         handleCloseModal={handleEditClose}
-                        task={task}
+                        task={currentTask}
                     />
                 </Box>
             </Box>
