@@ -224,7 +224,7 @@ export default function ListView() {
                         </Grid>
                         <Grid item>
                             <Button variant="contained" color="secondary" onClick={handleOpen}>
-                                ADD TASK
+                                CREATE TASK
                             </Button>
                             <AddTaskModal
                                 open={open}
