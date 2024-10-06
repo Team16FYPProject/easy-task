@@ -1,5 +1,5 @@
-import React from "react";
-import { Modal, Box, Typography, Grid, Paper, Chip, Button } from "@mui/material";
+import React, { useState } from "react";
+import { Modal, Box, Typography, Grid, Paper, Chip, Button, TextField } from "@mui/material";
 import { ProjectTask } from "@/utils/types";
 import EditTaskModal from "@/components/EditTaskModal";
 import { determineBgColor } from "@/utils/colourUtils";
@@ -7,7 +7,7 @@ import { determineBgColor } from "@/utils/colourUtils";
 interface ViewTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
-    task: ProjectTask; // You'll need to pass the task data as a prop
+    task: ProjectTask;
     setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
 }
 
@@ -38,10 +38,12 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     const [taskEditOpen, setEditOpen] = React.useState(false);
     const handleOpenEditModal = () => setEditOpen(true);
     const handleEditClose = () => setEditOpen(false);
+
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
     const bgColor = determineBgColor(task.task_priority);
     const [currentTask, setCurrentTask] = React.useState(task);
+    const [hoursToLog, setHoursToLog] = useState(1);
 
     const handleLogClick = async () => {
         try {
@@ -52,12 +54,12 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    task_logged_hours: currentTask.task_time_spent + 1,
+                    task_logged_hours: currentTask.task_time_spent + hoursToLog,
                 }),
             });
             const updatedTask = {
                 ...currentTask,
-                task_time_spent: currentTask.task_time_spent + 1,
+                task_time_spent: currentTask.task_time_spent + hoursToLog,
             };
             setCurrentTask(updatedTask);
             setUpdatedTask(updatedTask);
@@ -119,14 +121,39 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
+                {/* Logging Hours */}
                 <Grid container spacing={2} sx={sectionStyle}>
-                    {/* <Grid item xs={6}>
-                        <Typography variant="body2">Reminder: {}</Typography>
-                    </Grid> */}
                     <Grid item xs={6}>
                         <Typography variant="body2">
                             Hours Logged: {currentTask.task_time_spent}
                         </Typography>
+                    </Grid>
+                    <Grid item xs={6} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <TextField
+                            type="number"
+                            label="Add Hours"
+                            value={hoursToLog}
+                            onChange={(e) => setHoursToLog(Math.max(0, Number(e.target.value)))}
+                            inputProps={{ min: 0, step: 0.5 }}
+                            sx={{ width: 100 }}
+                            size="small"
+                        />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleLogClick}
+                            size="small"
+                        >
+                            LOG HOURS
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <Grid container spacing={2} sx={sectionStyle}>
+                    <Grid item xs={6}>
+                        {/* <Grid item xs={6}>
+                        <Typography variant="body2">Reminder: {}</Typography>
+                    </Grid> */}
                     </Grid>
                 </Grid>
 
@@ -156,10 +183,15 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Paper>
                 </Box>
 
-                <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
-                    <Button variant="contained" color="secondary" onClick={handleLogClick}>
-                        LOG 1 HOUR
-                    </Button>
+                <Box
+                    sx={{
+                        mt: 2,
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: 1,
+                        alignItems: "center",
+                    }}
+                >
                     <Button variant="contained" color="secondary" onClick={handleOpenEditModal}>
                         EDIT TASK
                     </Button>

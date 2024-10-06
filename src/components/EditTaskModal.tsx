@@ -329,10 +329,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                 </Box>
 
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
-                    <Button variant="contained" color="secondary" onClick={handleCloseModal}>
+                    <Button variant="outlined" color="primary" onClick={handleCloseModal}>
                         CANCEL
                     </Button>
-                    <Button variant="contained" color="primary">
+                    <Button variant="contained" color="secondary">
                         SAVE CHANGES
                     </Button>
                 </Box>
