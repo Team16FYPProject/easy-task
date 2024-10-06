@@ -205,6 +205,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                             <TeamSettingsModal
                                 open={showSettingsModal}
                                 handleClose={closeSettingsModal}
+                                teamId={id}
                             />
                         </Grid>
                     </Grid>

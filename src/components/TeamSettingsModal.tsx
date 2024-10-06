@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Grid, TextField } from "@mui/material";
+import { Description } from "@mui/icons-material";
 
 const style = {
     position: "absolute" as "absolute",
@@ -20,9 +21,11 @@ const style = {
 export default function TeamSettings({
     open,
     handleClose,
+    teamId,
 }: {
     open: boolean;
     handleClose: () => void;
+    teamId: string;
 }) {
     const [teamName, setTeamName] = React.useState("");
     // const [image, setImage] = React.useState<File | null>(null);
@@ -41,6 +44,7 @@ export default function TeamSettings({
         const formData = new FormData();
         formData.append("name", teamName);
         formData.append("description", teamName);
+        console.log(teamName);
         // If you do image
         // if (image) {
         //     formData.append("image", image);
@@ -48,18 +52,19 @@ export default function TeamSettings({
         // }
 
         try {
-            const response = await fetch("/api/projects", {
-                method: "POST",
+            const route = `/api/projects/${teamId}`;
+            const response = await fetch(route, {
+                method: "PATCH",
                 body: formData,
             });
 
             if (response.ok) {
                 // Handle successful response
-                console.log("Team created successfully");
+                console.log("Team modified successfully");
                 handleClose(); // Close the modal
             } else {
                 // Handle error response
-                console.error(`Failed to create team. Status: ${response.status}`);
+                console.error(`Failed to modify team. Status: ${response.status}`);
                 const errorText = await response.text();
                 console.error(`Error details: ${errorText}`);
             }
