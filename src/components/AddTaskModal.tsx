@@ -67,6 +67,21 @@ export default function AddTaskModal({
         { user_id: string; first_name: string; last_name: string }[]
     >([]);
 
+    const handleModalClose = () => {
+        // reset all form values
+        setTaskName("");
+        setTaskDescription("");
+        setTaskParent("");
+        setTaskDeadline(null);
+        setTaskStatus("");
+        setTaskPriority("");
+        setTaskReminder("");
+        setTaskLocation("");
+        setTaskMeetingBool(false);
+        setTaskDuration("");
+        setTaskAssignees([]);
+        handleClose();
+    };
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
         const route = `/api/projects/${project_id}/tasks`;
@@ -132,7 +147,7 @@ export default function AddTaskModal({
         <div>
             <Modal
                 open={open}
-                onClose={handleClose}
+                onClose={handleModalClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
@@ -149,7 +164,7 @@ export default function AddTaskModal({
                             <TextField
                                 id="outlined-basic"
                                 variant="outlined"
-                                value={taskName}
+                                defaultValue={""}
                                 onChange={(e) => {
                                     setTaskName(e.target.value);
                                 }}
@@ -158,7 +173,7 @@ export default function AddTaskModal({
                             <TextField
                                 id="outlined-basic"
                                 variant="outlined"
-                                value={taskDescription ?? ""}
+                                defaultValue={""}
                                 onChange={(e) => {
                                     setTaskDescription(e.target.value);
                                 }}
@@ -185,7 +200,7 @@ export default function AddTaskModal({
                                     <label>Task Parent</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={taskParent}
+                                            defaultValue={""}
                                             onChange={(e) => {
                                                 setTaskParent(e.target.value);
                                             }}
@@ -206,7 +221,7 @@ export default function AddTaskModal({
                                     </label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={taskStatus}
+                                            defaultValue={""}
                                             onChange={(e) => {
                                                 setTaskStatus(e.target.value);
                                             }}
@@ -223,7 +238,7 @@ export default function AddTaskModal({
                                     </label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={taskPriority}
+                                            defaultValue={""}
                                             onChange={(e) => {
                                                 setTaskPriority(e.target.value);
                                             }}
@@ -240,7 +255,7 @@ export default function AddTaskModal({
                                     <label>Reminder</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={taskReminder}
+                                            defaultValue={""}
                                             onChange={(e) => {
                                                 setTaskReminder(e.target.value);
                                             }}
@@ -269,7 +284,7 @@ export default function AddTaskModal({
                                     <label>Designate Meeting</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            value={taskMeetingBool}
+                                            defaultValue={false}
                                             onChange={(e) => {
                                                 setTaskMeetingBool(
                                                     e.target.value === "true" ? true : false,
