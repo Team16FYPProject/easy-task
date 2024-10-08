@@ -83,3 +83,10 @@ export interface User {
     email: string;
     name: string;
 }
+
+export interface Reminders {
+    reminder_id: string;
+    task: ProjectTask;
+    profile: Profile;
+    reminder_datetime: string;
+}
