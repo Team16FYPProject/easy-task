@@ -13,8 +13,12 @@ import {
     OutlinedInput,
     Chip,
     FormControl,
+    CircularProgress,
 } from "@mui/material";
 import { ProjectTask, Assignee, Profile, ApiResponse } from "@/utils/types";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker, DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 interface EditTaskModalProps {
     open: boolean;
@@ -38,8 +42,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     const [taskAssignees, setTaskAssignees] = useState<string[]>(
         task.assignees.map((assignee) => assignee.user_id),
     );
-    const [personName, setPersonName] = useState<string[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const modalStyle = {
         position: "absolute" as "absolute",
@@ -70,12 +74,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     };
 
     // Get team members from the backend
-    const [loadingMembers, setLoadingMembers] = React.useState(true);
     const [members, setMembers] = React.useState<Profile[]>([]);
     // Fetch member profiles
     useEffect(() => {
         async function fetchMembers() {
-            setLoadingMembers(true);
             try {
                 const response = await fetch(`/api/projects/${task.project_id}/members`, {
                     method: "GET",
@@ -96,19 +98,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             } catch (e) {
                 console.error("Error:", e);
             }
-            setLoadingMembers(false);
         }
 
-        fetchMembers();
+        void fetchMembers();
     }, []);
-
-    // const handleAssigneeToggle = (memberId: string) => {
-    //     setAssignees(prev =>
-    //         prev.some(assignee => assignee.id === memberId)
-    //             ? prev.filter(assignee => assignee.id !== memberId)
-    //             : [...prev, teamMembers.find(member => member.id === memberId)!]
-    //     );
-    // };
 
     function updateTaskProperty(key: keyof typeof originalTask, value: any) {
         setTask((_task) => {
@@ -120,6 +113,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
     async function handleSaveChanges() {
         try {
+            setIsSaving(true);
             const taskResponse = await fetch(
                 `/api/projects/${task.project_id}/tasks/${task.task_id}`,
                 {
@@ -129,26 +123,42 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                         desc: task.task_desc,
                         deadline: task.task_deadline,
                         time_spent: task.task_time_spent,
-                        task_status: task.task_status,
+                        status: task.task_status,
                         priority: task.task_priority,
-                        task_location: task.task_location,
-                        task_is_meeting: task.task_is_meeting,
+                        location: task.task_location,
+                        is_meeting: task.task_is_meeting,
                     }),
                 },
             );
-            const data: ApiResponse<ProjectTask> = await taskResponse.json();
-            if (!data.success) {
-                setErrorMsg(data.data);
-                return;
+            const taskData: ApiResponse<ProjectTask> = await taskResponse.json();
+            if (!taskData.success) {
+                throw new Error(taskData.data);
             }
-            const updatedTask = data.data;
-            // TODO Fix assignees endpoint.
-            // const assigneesResponse = await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/task_assignees`)
-            updateTask(updatedTask);
+            const updatedTask = taskData.data;
+
+            const assigneesResponse = await fetch(
+                `/api/projects/${task.project_id}/tasks/${task.task_id}/task_assignees`,
+                {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        ids: taskAssignees,
+                    }),
+                },
+            );
+            const assigneesData: ApiResponse<Assignee[]> = await assigneesResponse.json();
+            if (!assigneesData.success) {
+                throw new Error(assigneesData.data);
+            }
+            updateTask({
+                ...updatedTask,
+                assignees: assigneesData.data,
+            });
             handleCloseModal();
         } catch (error) {
             console.error(error);
-            setErrorMsg("Unable to update task. Please try again.");
+            setErrorMsg((error as Error).message ?? "Unable to update task. Please try again.");
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -158,6 +168,16 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 <Typography variant="h5" component="h2" gutterBottom>
                     Edit Task
                 </Typography>
+                {errorMsg && (
+                    <Typography
+                        id="modal-modal-error"
+                        variant="subtitle2"
+                        component="p"
+                        className="text-red-500"
+                    >
+                        {errorMsg}
+                    </Typography>
+                )}
 
                 <Box sx={sectionStyle}>
                     <TextField
@@ -188,22 +208,19 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
-                        {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <DatePicker
-                                label="Deadline"
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DateTimePicker
+                                label="Team Deadline"
+                                disablePast
                                 value={dayjs(task.task_deadline)}
-                                onChange={() => {}}
-                                slotProps={{ textField: { fullWidth: true } }}
-                            />
-                        </LocalizationProvider> */}
-                        <TextField
-                            fullWidth
-                            label="Task Deadline"
-                            variant="outlined"
-                            margin="normal"
-                            value={task.task_deadline}
-                            onChange={(e) => updateTaskProperty("task_deadline", e.target.value)}
-                        />
+                                onChange={(newValue) =>
+                                    updateTaskProperty(
+                                        "task_deadline",
+                                        newValue ? new Date(newValue.toISOString()) : null,
+                                    )
+                                }
+                            ></DateTimePicker>
+                        </LocalizationProvider>
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
@@ -315,8 +332,17 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     <Button variant="outlined" color="primary" onClick={handleCloseModal}>
                         CANCEL
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={handleSaveChanges}>
-                        SAVE CHANGES
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleSaveChanges}
+                        disabled={isSaving}
+                    >
+                        {isSaving ? (
+                            <CircularProgress color="secondary" size="20px" />
+                        ) : (
+                            "SAVE CHANGES"
+                        )}
                     </Button>
                 </Box>
             </Box>

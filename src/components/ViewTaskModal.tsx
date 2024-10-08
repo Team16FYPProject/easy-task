@@ -17,6 +17,8 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     task,
     updateTask,
 }) => {
+    const [currentTask, setCurrentTask] = React.useState(task);
+
     const modalStyle = {
         position: "absolute" as "absolute",
         top: "50%",
@@ -41,8 +43,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
 
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
-    const bgColor = determineBgColor(task.task_priority);
-    const [currentTask, setCurrentTask] = React.useState(task);
+    const bgColor = determineBgColor(currentTask.task_priority);
     const [hoursToLog, setHoursToLog] = useState(1);
 
     const handleLogClick = async () => {
@@ -105,7 +106,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     <Grid item xs={6}>
                         <Typography variant="body2">
                             Deadline:{" "}
-                            {new Date(task.task_deadline).toLocaleString([], {
+                            {new Date(currentTask.task_deadline).toLocaleString([], {
                                 hour: "2-digit",
                                 minute: "2-digit",
                                 year: "numeric",
@@ -166,7 +167,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         Array.isArray(currentTask.assignees) &&
                         currentTask.assignees.length > 0 ? (
                             <ul>
-                                {task.assignees.map((assignee, index) => (
+                                {currentTask.assignees.map((assignee, index) => (
                                     <li key={index}>
                                         <Typography variant="body2">
                                             {"Name: " +
@@ -199,7 +200,10 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         open={taskEditOpen}
                         handleCloseModal={handleEditClose}
                         task={currentTask}
-                        updateTask={updateTask}
+                        updateTask={(updatedTask) => {
+                            setCurrentTask(updatedTask);
+                            updateTask(updatedTask);
+                        }}
                     />
                 </Box>
             </Box>

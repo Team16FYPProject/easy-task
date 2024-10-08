@@ -6,7 +6,6 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { setProjectSettings } from "@/app/api/projects/utils";
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
-import { changeProjectSettings } from "./utils";
 
 import { getServiceSupabase } from "@/utils/supabase/server";
 
