@@ -85,8 +85,6 @@ export default function CalendarView() {
                 );
                 setTasks(allTasks);
                 console.log(allTasks);
-                const events = transformTasksToEvents(allTasks);
-                setTaskEventsList(events);
             } catch (e) {
                 console.error("Error:", e);
             } finally {
@@ -117,9 +115,10 @@ export default function CalendarView() {
         );
     };
 
-    const handleSelectEvent = (event: any) => {
-        setOpenedTask(event.task);
-    };
+    useEffect(() => {
+        const events = transformTasksToEvents(tasks);
+        setTaskEventsList(events);
+    }, [tasks]);
 
     const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
         console.log("Selected slot:", start, end);
@@ -131,7 +130,10 @@ export default function CalendarView() {
         setTasks((_tasks) =>
             _tasks.map((_task) => {
                 if (_task.task_id !== task.task_id) return _task;
-                return task;
+                return {
+                    ..._task,
+                    ...task,
+                };
             }),
         );
     }
@@ -375,7 +377,7 @@ export default function CalendarView() {
                         onNavigate={setDate}
                         defaultView={Views.MONTH}
                         views={["month", "week", "day"]}
-                        onSelectEvent={handleSelectEvent}
+                        onSelectEvent={(event) => setOpenedTask(event.task)}
                         onSelectSlot={handleSelectSlot}
                         selectable
                         popup
