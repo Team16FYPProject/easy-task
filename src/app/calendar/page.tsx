@@ -377,7 +377,7 @@ export default function CalendarView() {
                         onNavigate={setDate}
                         defaultView={Views.MONTH}
                         views={["month", "week", "day"]}
-                        onSelectEvent={(event) => setOpenedTask(event.task)}
+                        onSelectEvent={(event: any) => setOpenedTask(event.task)}
                         onSelectSlot={handleSelectSlot}
                         selectable
                         popup
