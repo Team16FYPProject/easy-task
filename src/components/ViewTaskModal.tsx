@@ -126,7 +126,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
                         <Typography variant="body2">
-                            Hours Logged: {currentTask.task_time_spent}
+                            Hours Logged: {currentTask.task_time_spent.toFixed(2)}
                         </Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
