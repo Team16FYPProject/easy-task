@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 
 type NavigationLink = {
     name: string;
-    link?: string;
+    link: string;
 };
 
 const NAVIGATION_LINKS: NavigationLink[][] = [
@@ -51,7 +51,7 @@ export default function SiteAppBar() {
                         <List>
                             {navigationGroup.map((navLink) => (
                                 <ListItem key={navLink.name}>
-                                    <Link href={navLink.link ?? `/${navLink.name.toLowerCase()}`}>
+                                    <Link href={navLink.link}>
                                         <ListItemButton>
                                             <ListItemText primary={navLink.name} />
                                         </ListItemButton>

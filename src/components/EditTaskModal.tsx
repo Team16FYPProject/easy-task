@@ -8,26 +8,19 @@ import {
     Button,
     Select,
     MenuItem,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     Paper,
-    Checkbox,
     SelectChangeEvent,
+    OutlinedInput,
+    Chip,
+    FormControl,
 } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { ProjectTask, Assignee, Profile } from "@/utils/types";
-import dayjs from "dayjs";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { useUser } from "@/hooks/useUser";
+import { ProjectTask, Assignee, Profile, ApiResponse } from "@/utils/types";
 
 interface EditTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
     task: ProjectTask;
+    updateTask: (updatedTask: ProjectTask) => void;
 }
 
 interface TeamMember {
@@ -35,11 +28,18 @@ interface TeamMember {
     name: string;
 }
 
-const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, task }) => {
+const EditTaskModal: React.FC<EditTaskModalProps> = ({
+    open,
+    handleCloseModal,
+    task: originalTask,
+    updateTask,
+}) => {
+    const [task, setTask] = useState<ProjectTask>(originalTask);
+    const [taskAssignees, setTaskAssignees] = useState<string[]>(
+        task.assignees.map((assignee) => assignee.user_id),
+    );
     const [personName, setPersonName] = useState<string[]>([]);
-    const [assignees, setAssignees] = useState<Assignee[]>(task.assignees || []);
-    const [newAssignee, setNewAssignee] = useState<string>("");
-    const [taskReminder, setTaskReminder] = useState<string>("");
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
     const modalStyle = {
         position: "absolute" as "absolute",
@@ -51,6 +51,17 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
         boxShadow: 24,
         p: 4,
         borderRadius: 2,
+    };
+
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: 250,
+            },
+        },
     };
 
     const sectionStyle = {
@@ -91,13 +102,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
         fetchMembers();
     }, []);
 
-    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-        const {
-            target: { value },
-        } = event;
-        setPersonName(typeof value === "string" ? value.split(",") : value);
-    };
-
     // const handleAssigneeToggle = (memberId: string) => {
     //     setAssignees(prev =>
     //         prev.some(assignee => assignee.id === memberId)
@@ -106,57 +110,47 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
     //     );
     // };
 
-    // const handleNewAssigneeChange = (event: SelectChangeEvent<string>) => {
-    //     setNewAssignee(event.target.value as string);
-    // };
+    function updateTaskProperty(key: keyof typeof originalTask, value: any) {
+        setTask((_task) => {
+            const newTask: Record<string, any> = { ..._task };
+            newTask[key] = value;
+            return newTask as ProjectTask;
+        });
+    }
 
-    const handleAddNewAssignee = async () => {
-        if (newAssignee && !assignees.some((assignee) => assignee.user_id === newAssignee)) {
-            const newTeamMember = members.find((member) => member.user_id === newAssignee);
-            console.log("New team member:", newTeamMember);
-            if (newTeamMember) {
-                try {
-                    const response = await fetch(
-                        `/api/projects/${task.project_id}/tasks/${task.task_id}/task_assignees`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                assignee: newTeamMember.user_id,
-                            }),
-                        },
-                    );
-
-                    const result = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(result.data || "Failed to add assignee");
-                    }
-
-                    if (result.success) {
-                        setAssignees((prev) => [
-                            ...prev,
-                            {
-                                user_id: newTeamMember.user_id,
-                                user: {
-                                    email: newTeamMember.email,
-                                    name: `${newTeamMember.first_name} ${newTeamMember.last_name}`,
-                                },
-                                profile: newTeamMember,
-                            },
-                        ]);
-                        setNewAssignee("");
-                    } else {
-                        throw new Error("Failed to add assignee");
-                    }
-                } catch (e) {
-                    console.error("Error:", e);
-                }
+    async function handleSaveChanges() {
+        try {
+            const taskResponse = await fetch(
+                `/api/projects/${task.project_id}/tasks/${task.task_id}`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        name: task.task_name,
+                        desc: task.task_desc,
+                        deadline: task.task_deadline,
+                        time_spent: task.task_time_spent,
+                        task_status: task.task_status,
+                        priority: task.task_priority,
+                        task_location: task.task_location,
+                        task_is_meeting: task.task_is_meeting,
+                    }),
+                },
+            );
+            const data: ApiResponse<ProjectTask> = await taskResponse.json();
+            if (!data.success) {
+                setErrorMsg(data.data);
+                return;
             }
+            const updatedTask = data.data;
+            // TODO Fix assignees endpoint.
+            // const assigneesResponse = await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/task_assignees`)
+            updateTask(updatedTask);
+            handleCloseModal();
+        } catch (error) {
+            console.error(error);
+            setErrorMsg("Unable to update task. Please try again.");
         }
-    };
+    }
 
     return (
         <Modal open={open} onClose={handleCloseModal}>
@@ -172,7 +166,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                         id="task-name"
                         label="Task Name"
                         variant="outlined"
-                        defaultValue={task.task_name}
+                        value={task.task_name}
+                        onChange={(e) => updateTaskProperty("task_name", e.target.value)}
                         margin="normal"
                     />
                 </Box>
@@ -185,7 +180,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                         variant="outlined"
                         multiline
                         rows={3}
-                        defaultValue={task.task_desc}
+                        value={task.task_desc}
+                        onChange={(e) => updateTaskProperty("task_desc", e.target.value)}
                         margin="normal"
                     />
                 </Box>
@@ -205,7 +201,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                             label="Task Deadline"
                             variant="outlined"
                             margin="normal"
-                            defaultValue={task.task_deadline}
+                            value={task.task_deadline}
+                            onChange={(e) => updateTaskProperty("task_deadline", e.target.value)}
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -214,7 +211,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                             label="Location"
                             variant="outlined"
                             margin="normal"
-                            defaultValue={task.task_location}
+                            value={task.task_location}
+                            onChange={(e) => updateTaskProperty("task_location", e.target.value)}
                         />
                     </Grid>
                 </Grid>
@@ -225,7 +223,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                             fullWidth
                             select
                             label="Task Status"
-                            defaultValue={task.task_status}
+                            value={task.task_status}
+                            onChange={(e) => updateTaskProperty("task_status", e.target.value)}
                             margin="normal"
                         >
                             <MenuItem value="TODO">TO DO</MenuItem>
@@ -238,7 +237,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                             fullWidth
                             select
                             label="Task Priority"
-                            defaultValue={task.task_priority}
+                            value={task.task_priority}
+                            onChange={(e) => updateTaskProperty("task_priority", e.target.value)}
                             margin="normal"
                         >
                             <MenuItem value="LOW">LOW</MenuItem>
@@ -248,89 +248,74 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ open, handleCloseModal, t
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={2} sx={sectionStyle}>
-                    <Grid item xs={6}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Task Reminder"
-                            defaultValue={taskReminder}
-                            margin="normal"
-                        >
-                            <MenuItem value={"HOUR"}>One Hour Before</MenuItem>
-                            <MenuItem value={"DAY"}>One Day Before</MenuItem>
-                            <MenuItem value={"WEEK"}>One Week Before</MenuItem>
-                        </TextField>
-                    </Grid>
-                </Grid>
+                {/* TODO Decide if we're still doing task reminder.*/}
+                {/*<Grid container spacing={2} sx={sectionStyle}>*/}
+                {/*    <Grid item xs={6}>*/}
+                {/*        <TextField*/}
+                {/*            select*/}
+                {/*            fullWidth*/}
+                {/*            label="Task Reminder"*/}
+                {/*            value={task.task_reminder}*/}
+                {/*            onChange={(e) => updateTaskProperty('task_reminder', e.target.value)}*/}
+                {/*            margin="normal"*/}
+                {/*        >*/}
+                {/*            <MenuItem value={"HOUR"}>One Hour Before</MenuItem>*/}
+                {/*            <MenuItem value={"DAY"}>One Day Before</MenuItem>*/}
+                {/*            <MenuItem value={"WEEK"}>One Week Before</MenuItem>*/}
+                {/*        </TextField>*/}
+                {/*    </Grid>*/}
+                {/*</Grid>*/}
 
                 {/* Assignees - Need to fix backend */}
 
-                <Box sx={{ ...sectionStyle, borderBottom: "none" }}>
-                    <Box sx={{ pt: 2 }}>
-                        <Typography variant="h6" gutterBottom>
-                            Assignees
-                        </Typography>
-                    </Box>
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                        {task.assignees &&
-                        Array.isArray(task.assignees) &&
-                        task.assignees.length > 0 ? (
-                            <ul>
-                                {task.assignees.map((assignee, index) => (
-                                    <li key={index}>
-                                        <Typography variant="body2">
-                                            {"Name: " +
-                                                assignee.user.name +
-                                                " | Email: " +
-                                                assignee.user.email}
-                                        </Typography>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <Typography>No assignees</Typography>
+                <FormControl fullWidth>
+                    <label>Task Assignees</label>
+                    <Select
+                        fullWidth
+                        multiple
+                        value={taskAssignees}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setTaskAssignees(typeof value === "string" ? value.split(",") : value);
+                        }}
+                        input={<OutlinedInput label="Chip" />}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                {selected.map((value) => {
+                                    const user = members.find((u) => u.user_id === value);
+                                    return (
+                                        <Chip
+                                            key={value}
+                                            label={
+                                                user
+                                                    ? `${user.first_name} ${user.last_name}`
+                                                    : value
+                                            }
+                                        />
+                                    );
+                                })}
+                            </Box>
                         )}
-                    </Paper>
-                    <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
-                        <Select
-                            value={newAssignee}
-                            // onChange={handleNewAssigneeChange}
-                            displayEmpty
-                            sx={{ minWidth: 200, mr: 1 }}
-                            onChange={(e) => setNewAssignee(e.target.value)}
-                        >
-                            <MenuItem value="" disabled>
-                                Select new assignee
-                            </MenuItem>
-                            {members
-                                .filter(
-                                    (member) =>
-                                        !assignees.some(
-                                            (assignee) => assignee.user_id === member.user_id,
-                                        ),
-                                )
-                                .map((member) => (
-                                    <MenuItem key={member.user_id} value={member.user_id}>
-                                        {member.first_name} {member.last_name}
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                        <Button
-                            variant="contained"
-                            onClick={handleAddNewAssignee}
-                            disabled={!newAssignee}
-                        >
-                            Add Assignee
-                        </Button>
-                    </Box>
-                </Box>
+                        MenuProps={MenuProps}
+                    >
+                        {members
+                            .filter(
+                                (member) =>
+                                    !taskAssignees.some((userId) => userId === member.user_id),
+                            )
+                            .map((member) => (
+                                <MenuItem key={member.user_id} value={member.user_id}>
+                                    {member.first_name} {member.last_name}
+                                </MenuItem>
+                            ))}
+                    </Select>
+                </FormControl>
 
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
                     <Button variant="outlined" color="primary" onClick={handleCloseModal}>
                         CANCEL
                     </Button>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="contained" color="secondary" onClick={handleSaveChanges}>
                         SAVE CHANGES
                     </Button>
                 </Box>

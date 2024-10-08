@@ -21,7 +21,7 @@ export async function POST(request: Request, { params: { id, taskId } }: TaskIdP
         .insert({ task_id: taskId, user_id: assignee });
 
     if (insertError) {
-        console.error(`Error adding user ${user.id} to task ${taskId}:`, insertError);
+        console.error(`Error adding assignees to task ${taskId}:`, insertError);
         return internalErrorResponse({
             success: false,
             data: `Unable to add user to task assignees. Error: ${insertError.message}`,

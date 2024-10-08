@@ -8,14 +8,14 @@ interface ViewTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
     task: ProjectTask;
-    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    updateTask: (updatedTask: ProjectTask) => void;
 }
 
 const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     open,
     handleCloseModal,
     task,
-    setUpdatedTask,
+    updateTask,
 }) => {
     const modalStyle = {
         position: "absolute" as "absolute",
@@ -62,7 +62,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 task_time_spent: currentTask.task_time_spent + hoursToLog,
             };
             setCurrentTask(updatedTask);
-            setUpdatedTask(updatedTask);
+            updateTask(updatedTask);
         } catch (e) {
             console.error(`Error updating logged hours for project ${currentTask.project_id}:`, e);
         }
@@ -199,6 +199,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         open={taskEditOpen}
                         handleCloseModal={handleEditClose}
                         task={currentTask}
+                        updateTask={updateTask}
                     />
                 </Box>
             </Box>
