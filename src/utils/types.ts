@@ -15,9 +15,9 @@ export interface Profile {
     first_name: string;
     last_name: string;
     email: string;
-    profile_bio: string;
-    profile_display_name: string;
-    profile_avatar: string;
+    profile_bio: string | null;
+    profile_display_name: string | null;
+    profile_avatar: string | null;
 }
 
 export interface ProfileResponse extends Profile {

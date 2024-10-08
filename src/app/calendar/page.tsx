@@ -8,10 +8,11 @@ import { Button, Container, Grid, Paper, Typography } from "@mui/material";
 // import AddTaskModal from "@/components/AddTaskModal";
 import React, { useEffect, useState } from "react";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Task } from "@/app/calendar/types";
 import moment from "moment";
 import { momentLocalizer, Views } from "react-big-calendar";
 import MUICalendar from "@/components/MUICalendar";
+import ViewTaskModal from "@/components/ViewTaskModal";
+import { ProjectTask } from "@/utils/types";
 
 export default function CalendarView() {
     const router = useRouter();
@@ -19,7 +20,7 @@ export default function CalendarView() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
-    const [tasks, setTasks] = React.useState<Task[]>([]);
+    const [tasks, setTasks] = React.useState<ProjectTask[]>([]);
     const [taskEventsList, setTaskEventsList] = React.useState<any[]>([]);
     const [loadingTasks, setLoadingTasks] = useState(true);
     const localizer = momentLocalizer(moment);
@@ -27,6 +28,7 @@ export default function CalendarView() {
     const [view, setView] = useState<"month" | "week" | "day">(Views.MONTH);
     const [date, setDate] = useState(new Date());
 
+    const [openedTask, setOpenedTask] = useState<ProjectTask | null>(null);
     // Redirect to login if user is not logged in
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -83,8 +85,6 @@ export default function CalendarView() {
                 );
                 setTasks(allTasks);
                 console.log(allTasks);
-                const events = transformTasksToEvents(allTasks);
-                setTaskEventsList(events);
             } catch (e) {
                 console.error("Error:", e);
             } finally {
@@ -110,20 +110,33 @@ export default function CalendarView() {
                 end: new Date(task.task_deadline),
                 resource: task.project_name, // Optional, can be used for grouping or coloring
                 task_priority: task.task_priority,
+                task: task,
             }),
         );
     };
 
-    const handleSelectEvent = (event: any) => {
-        console.log("Selected event:", event);
-        // You can add logic here to show event details or edit the event
-    };
+    useEffect(() => {
+        const events = transformTasksToEvents(tasks);
+        setTaskEventsList(events);
+    }, [tasks]);
 
     const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
         console.log("Selected slot:", start, end);
         // You can add logic here to create a new event
         handleOpen(); // This will open your AddTaskModal
     };
+
+    async function updateTask(task: ProjectTask) {
+        setTasks((_tasks) =>
+            _tasks.map((_task) => {
+                if (_task.task_id !== task.task_id) return _task;
+                return {
+                    ..._task,
+                    ...task,
+                };
+            }),
+        );
+    }
 
     const EventComponent = ({ event }: { event: any }) => {
         const bgColor = determineBgColor(event.task_priority);
@@ -322,6 +335,14 @@ export default function CalendarView() {
 
     return (
         <Container sx={{ padding: 2 }}>
+            {openedTask && (
+                <ViewTaskModal
+                    open={true}
+                    task={openedTask}
+                    handleCloseModal={() => setOpenedTask(null)}
+                    updateTask={updateTask}
+                />
+            )}
             <Grid container direction="column" spacing={2}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>
@@ -356,7 +377,7 @@ export default function CalendarView() {
                         onNavigate={setDate}
                         defaultView={Views.MONTH}
                         views={["month", "week", "day"]}
-                        onSelectEvent={handleSelectEvent}
+                        onSelectEvent={(event: any) => setOpenedTask(event.task)}
                         onSelectSlot={handleSelectSlot}
                         selectable
                         popup

@@ -538,7 +538,7 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                         assignees,
                     }}
-                    setUpdatedTask={setUpdatedTask}
+                    updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
                 />
             )}
         </>

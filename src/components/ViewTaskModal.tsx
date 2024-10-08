@@ -8,15 +8,17 @@ interface ViewTaskModalProps {
     open: boolean;
     handleCloseModal: () => void;
     task: ProjectTask;
-    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    updateTask: (updatedTask: ProjectTask) => void;
 }
 
 const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     open,
     handleCloseModal,
     task,
-    setUpdatedTask,
+    updateTask,
 }) => {
+    const [currentTask, setCurrentTask] = React.useState(task);
+
     const modalStyle = {
         position: "absolute" as "absolute",
         top: "50%",
@@ -41,8 +43,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
 
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
-    const bgColor = determineBgColor(task.task_priority);
-    const [currentTask, setCurrentTask] = React.useState(task);
+    const bgColor = determineBgColor(currentTask.task_priority);
     const [hoursToLog, setHoursToLog] = useState(1);
 
     const handleLogClick = async () => {
@@ -62,7 +63,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 task_time_spent: currentTask.task_time_spent + hoursToLog,
             };
             setCurrentTask(updatedTask);
-            setUpdatedTask(updatedTask);
+            updateTask(updatedTask);
         } catch (e) {
             console.error(`Error updating logged hours for project ${currentTask.project_id}:`, e);
         }
@@ -105,7 +106,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     <Grid item xs={6}>
                         <Typography variant="body2">
                             Deadline:{" "}
-                            {new Date(task.task_deadline).toLocaleString([], {
+                            {new Date(currentTask.task_deadline).toLocaleString([], {
                                 hour: "2-digit",
                                 minute: "2-digit",
                                 year: "numeric",
@@ -125,7 +126,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
                         <Typography variant="body2">
-                            Hours Logged: {currentTask.task_time_spent}
+                            Hours Logged: {currentTask.task_time_spent.toFixed(2)}
                         </Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -166,7 +167,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         Array.isArray(currentTask.assignees) &&
                         currentTask.assignees.length > 0 ? (
                             <ul>
-                                {task.assignees.map((assignee, index) => (
+                                {currentTask.assignees.map((assignee, index) => (
                                     <li key={index}>
                                         <Typography variant="body2">
                                             {"Name: " +
@@ -199,6 +200,10 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         open={taskEditOpen}
                         handleCloseModal={handleEditClose}
                         task={currentTask}
+                        updateTask={(updatedTask) => {
+                            setCurrentTask(updatedTask);
+                            updateTask(updatedTask);
+                        }}
                     />
                 </Box>
             </Box>
