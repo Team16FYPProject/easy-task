@@ -111,7 +111,7 @@ export default function AddTaskModal({
                 setIsError(false);
             }, 5000);
         } else {
-            setUpdatedTask(data.data.taskData);
+            setUpdatedTask(data.data);
             handleClose();
         }
     }
