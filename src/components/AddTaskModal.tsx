@@ -66,6 +66,7 @@ export default function AddTaskModal({
     const [names, setNames] = useState<
         { user_id: string; first_name: string; last_name: string }[]
     >([]);
+    const [selectedReminder, setSelectedReminder] = useState<string>("");
 
     const handleModalClose = () => {
         // reset all form values
@@ -84,6 +85,25 @@ export default function AddTaskModal({
     };
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
+        // Calculate the reminder date based on the selected taskDeadline and taskReminder
+        let reminderDate = null;
+        if (taskDeadline) {
+            const reminderMapping = {
+                HOUR: 1,
+                DAY: 24,
+                WEEK: 168, // hours in a week
+            };
+
+            const taskDeadlineDate = new Date(taskDeadline);
+            const hoursToSubtract = reminderMapping[taskReminder as keyof typeof reminderMapping];
+            if (hoursToSubtract) {
+                taskDeadlineDate.setHours(taskDeadlineDate.getHours() - hoursToSubtract);
+                // Store the reminder as a Date object
+                reminderDate = taskDeadlineDate; // This is a valid Date object
+            }
+        }
+
+        // prepare to send data
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {
             method: "POST",
@@ -101,6 +121,7 @@ export default function AddTaskModal({
                 taskLocation: taskLocation || null,
                 taskDuration: taskDuration || null,
                 taskAssignee: taskAssignee || null,
+                reminder_datetime: reminderDate,
             }),
         });
         const data = await response.json();
@@ -257,7 +278,9 @@ export default function AddTaskModal({
                                         <Select
                                             defaultValue={""}
                                             onChange={(e) => {
-                                                setTaskReminder(e.target.value);
+                                                const value = e.target.value;
+                                                setTaskReminder(value);
+                                                setSelectedReminder(value); // Update the selected reminder state
                                             }}
                                         >
                                             <MenuItem value={"HOUR"}>One Hour Before</MenuItem>

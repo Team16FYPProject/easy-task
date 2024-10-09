@@ -102,6 +102,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
+                {/* Reminders */}
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
                         <Typography variant="body2">
@@ -150,13 +151,27 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={2} sx={sectionStyle}>
-                    <Grid item xs={6}>
-                        <Grid item xs={6}>
-                            <Typography variant="body2">Reminder: Backend</Typography>
-                        </Grid>
-                    </Grid>
-                </Grid>
+                <Box sx={{ ...sectionStyle, borderBottom: "none" }}>
+                    <Typography variant="h6" gutterBottom>
+                        Reminders
+                    </Typography>
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        {currentTask.reminder_datetime ? (
+                            <Typography variant="body2">
+                                Reminder set for:{" "}
+                                {new Date(currentTask.reminder_datetime).toLocaleString([], {
+                                    year: "numeric",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </Typography>
+                        ) : (
+                            <Typography>No reminders set</Typography>
+                        )}
+                    </Paper>
+                </Box>
 
                 <Box sx={{ ...sectionStyle, borderBottom: "none" }}>
                     <Typography variant="h6" gutterBottom>
