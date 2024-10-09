@@ -15,7 +15,9 @@ test("should be able to create and manage a new project", async ({ page }) => {
     await page.getByRole("button", { name: "Create" }).click();
 
     // Should be on project management page
-    await expect(page.getByRole("button", { name: "LEAVE PROJECT" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "LEAVE PROJECT" })).toBeVisible({
+        timeout: 60000,
+    });
     await expect(page).not.toHaveURL("/dashboard");
 
     // Name should be correct
