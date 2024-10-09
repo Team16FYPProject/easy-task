@@ -1,17 +1,16 @@
 import { test as setup, expect } from "@playwright/test";
 
-const authFile = "playwright/.auth/user.json";
+import { baseURL, authFile } from "../playwright.config";
 
 setup("authenticate", async ({ page }) => {
     // Perform authentication steps.
-    await page.goto("http://localhost:3000/login");
-    await page.getByPlaceholder("john@example.com").fill("john@example.com");
-    await page.getByPlaceholder("Password").fill("password");
-    await page.getByRole("button", { name: "Submit" }).click();
-    // Wait until the page receives the cookies.
-    //
-    await page.waitForURL("http://localhost:3000/dashboard");
-
-    // End of authentication steps.
+    await page.goto(`${baseURL}/login`);
+    await page.getByLabel("Email Address *").fill("playwright@easy-task.com");
+    await page.getByLabel("Password *").fill("password123");
+    await page.getByRole("button", { name: "Sign In" }).click();
+    await page.waitForURL("/dashboard");
+    // Wait for page to load in
+    await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+    // Save storage state.
     await page.context().storageState({ path: authFile });
 });
