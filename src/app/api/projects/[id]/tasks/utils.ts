@@ -28,6 +28,12 @@ export async function createTask(
     if (!taskName) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });
     }
+    if (taskName.length > 30) {
+        return badRequestResponse({
+            success: false,
+            data: "Task name must be under 30 characters",
+        });
+    }
     if (!taskDeadline) {
         return badRequestResponse({
             success: false,
