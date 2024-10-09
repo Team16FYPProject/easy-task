@@ -43,10 +43,10 @@ jobs:
               uses: actions/cache@v3
               with:
                   path: /tmp/.docker-cache
-                  key: ${{ runner.os }}-docker-layers-${{ hashFiles('**/Dockerfile') }}
+                  key: ${{ runner.os }}-docker-layers-supabase-v1
                   restore-keys: |
                       ${{ runner.os }}-docker-layers-
-
+                      ${{ runner.os }}-
             # Setup Supabase CLI
             - uses: supabase/setup-cli@v1
               with:
