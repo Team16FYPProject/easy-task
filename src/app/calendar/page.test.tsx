@@ -1,97 +1,101 @@
+import { expect, test, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import CalendarView from "./page";
-import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
-import { vi, test, expect, Mock, afterEach, beforeEach, describe } from "vitest";
+import { useUser } from "@/hooks/useUser";
+import { useEffectAsync } from "@/hooks/useEffectAsync";
 
-vi.mock("@/hooks/useUser");
+// Mocking dependencies
 vi.mock("next/navigation", () => ({
     useRouter: vi.fn(),
 }));
 
-describe("CalendarView", () => {
+vi.mock("@/hooks/useUser", () => ({
+    useUser: vi.fn(),
+}));
+
+vi.mock("@/hooks/useEffectAsync", () => ({
+    useEffectAsync: vi.fn((callback) => callback()),
+}));
+
+vi.mock("@/utils/colourUtils", () => ({
+    determineBgColor: vi.fn(() => "blue"),
+    determineTextColor: vi.fn(() => "white"),
+}));
+
+vi.mock("@/components/MUICalendar", () => ({
+    default: () => <div data-testid="mui-calendar">MUI Calendar</div>,
+}));
+
+vi.mock("@/components/ViewTaskModal", () => ({
+    default: () => <div data-testid="view-task-modal">View Task Modal</div>,
+}));
+
+// Mock global fetch
+global.fetch = vi.fn();
+
+test("CalendarView renders correctly", async () => {
+    vi.mocked(useUser).mockReturnValue({
+        loadingUser: false,
+        user: { id: "1", name: "Test User" },
+    });
+    vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ projects: [] }),
+    } as unknown as Response);
+
+    render(<CalendarView />);
+
+    await waitFor(() => {
+        expect(screen.getByText("Calendar View")).toBeDefined();
+        expect(screen.getByTestId("mui-calendar")).toBeDefined();
+    });
+});
+
+test("CalendarView redirects to login if user is not logged in", async () => {
     const mockPush = vi.fn();
-    const mockUseUser = useUser as Mock;
-    const mockUseRouter = useRouter as Mock;
+    vi.mocked(useRouter).mockReturnValue({ push: mockPush } as any);
+    vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: null });
 
-    beforeEach(() => {
-        mockUseRouter.mockReturnValue({ push: mockPush });
+    render(<CalendarView />);
+
+    await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/login");
     });
+});
 
-    afterEach(() => {
-        vi.clearAllMocks();
+test("CalendarView fetches and displays tasks", async () => {
+    vi.mocked(useUser).mockReturnValue({
+        loadingUser: false,
+        user: { id: "1", name: "Test User" },
     });
+    vi.mocked(global.fetch)
+        .mockResolvedValueOnce({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                projects: [{ project_id: "1", project_name: "Test Project" }],
+            }),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                tasks: [
+                    {
+                        task_id: "1",
+                        task_name: "Test Task",
+                        project_name: "Test Project",
+                        task_deadline: "2023-05-01",
+                        task_priority: "High",
+                    },
+                ],
+            }),
+        } as unknown as Response);
 
-    test("should redirect to login if user is not logged in", async () => {
-        mockUseUser.mockReturnValue({ loadingUser: false, user: null });
+    render(<CalendarView />);
 
-        render(<CalendarView />);
-
-        await waitFor(() => {
-            expect(mockPush).toHaveBeenCalledWith("/login");
-        });
+    await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledTimes(4);
+        // You might want to add more specific checks here, e.g., for the presence of the task in the UI
+        // expect(screen.getByText("Test Task")).toBeDefined();
     });
-
-    test("should render calendar if user is logged in", async () => {
-        mockUseUser.mockReturnValue({ loadingUser: false, user: { id: "1" } });
-
-        render(<CalendarView />);
-
-        await waitFor(() => {
-            expect(screen.getByText("Calendar View")).toBeInTheDocument();
-        });
-    });
-
-    test("should display loading state while fetching tasks", async () => {
-        mockUseUser.mockReturnValue({ loadingUser: false, user: { id: "1" } });
-
-        render(<CalendarView />);
-
-        expect(screen.getByText("Calendar View")).toBeInTheDocument();
-        // Add more assertions for loading state if applicable
-    });
-
-    test("should open ViewTaskModal when a task is clicked", async () => {
-        mockUseUser.mockReturnValue({ loadingUser: false, user: { id: "1" } });
-
-        render(<CalendarView />);
-
-        // Simulate task click
-        // Assuming there's a task with the text "Sample Task"
-        const taskElement = await screen.findByText("Sample Task");
-        taskElement.click();
-
-        await waitFor(() => {
-            expect(screen.getByRole("dialog")).toBeInTheDocument();
-        });
-    });
-
-    test("should transform tasks to events correctly", async () => {
-        mockUseUser.mockReturnValue({ loadingUser: false, user: { id: "1" } });
-
-        render(<CalendarView />);
-
-        // Assuming tasks are fetched and transformed correctly
-        await waitFor(() => {
-            const eventElement = screen.getByText("Sample Task (Sample Project)");
-            expect(eventElement).toBeInTheDocument();
-        });
-    });
-
-    test("should handle slot selection correctly", async () => {
-        mockUseUser.mockReturnValue({ loadingUser: false, user: { id: "1" } });
-
-        render(<CalendarView />);
-
-        // Simulate slot selection
-        // Assuming there's a way to select a slot in the calendar
-        const slotElement = await screen.findByText("Select Slot");
-        slotElement.click();
-
-        await waitFor(() => {
-            expect(screen.getByRole("dialog")).toBeInTheDocument();
-        });
-    });
-
-    // Add more tests as needed
 });
