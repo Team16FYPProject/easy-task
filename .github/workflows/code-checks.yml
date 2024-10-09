@@ -37,12 +37,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            # Setup Supabase CLI
-            - uses: supabase/setup-cli@v1
-              with:
-                  version: latest
-            - run: supabase start
-            - run: supabase status
             # Setup Node.js environment
             - uses: actions/setup-node@v4
               with:
@@ -57,12 +51,6 @@ jobs:
               run: npm run test:e2e
               env:
                   NEXT_PUBLIC_URL: http://localhost:3000
-                  SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-                  NEXT_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-                  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-                  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-                  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-                  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
             # Upload Playwright report as an artifact
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}

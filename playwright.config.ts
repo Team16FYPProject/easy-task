@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-export const baseURL: string = "http://localhost:3000";
+export const baseURL: string = process.env.CI
+    ? "https://easy-task-mauve.vercel.app"
+    : "http://localhost:3000";
 export const authFile: string = "playwright/.auth/user.json";
 
 /**
