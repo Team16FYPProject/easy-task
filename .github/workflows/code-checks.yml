@@ -47,16 +47,16 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-docker-supabase-
 
-            # Pre-pull the Supabase-related Docker images
+            # Pre-pull the specific Supabase Docker images with known tags
             - name: Pre-pull Supabase Docker Images
               run: |
                   export DOCKER_CACHE_DIR=/tmp/.docker-cache
-                  docker pull supabase/postgres:latest
-                  docker pull supabase/storage:latest
-                  docker pull supabase/realtime:latest
-                  docker pull supabase/imgproxy:latest
-                  docker pull supabase/gotrue:latest
-                  docker pull supabase/rest:latest
+                  docker pull supabase/postgres:v14.1.0
+                  docker pull supabase/storage:v1.0.1
+                  docker pull supabase/realtime:v2.0.0
+                  docker pull supabase/imgproxy:v1.1.0
+                  docker pull supabase/gotrue:v2.5.4
+                  docker pull supabase/rest:v1.0.0
 
             # Setup Supabase CLI
             - uses: supabase/setup-cli@v1
@@ -83,7 +83,9 @@ jobs:
               env:
                   NEXT_PUBLIC_URL: http://localhost:3000
                   SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+                  NEXT_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
                   SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+                  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
                   SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
                   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
