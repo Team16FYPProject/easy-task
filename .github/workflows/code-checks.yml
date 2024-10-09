@@ -38,32 +38,21 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            # Cache Supabase Docker images to speed up `supabase start`
-            - name: Cache Supabase Docker images
+            # Cache Docker layers to speed up `supabase start`
+            - name: Cache Docker layers
               uses: actions/cache@v3
               with:
                   path: /tmp/.docker-cache
-                  key: ${{ runner.os }}-docker-supabase-${{ hashFiles('**/Dockerfile') }}
+                  key: ${{ runner.os }}-docker-layers-${{ hashFiles('**/Dockerfile') }}
                   restore-keys: |
-                      ${{ runner.os }}-docker-supabase-
-
-            # Pre-pull the specific Supabase Docker images with known tags
-            - name: Pre-pull Supabase Docker Images
-              run: |
-                  export DOCKER_CACHE_DIR=/tmp/.docker-cache
-                  docker pull supabase/postgres:v14.1.0
-                  docker pull supabase/storage:v1.0.1
-                  docker pull supabase/realtime:v2.0.0
-                  docker pull supabase/imgproxy:v1.1.0
-                  docker pull supabase/gotrue:v2.5.4
-                  docker pull supabase/rest:v1.0.0
+                      ${{ runner.os }}-docker-layers-
 
             # Setup Supabase CLI
             - uses: supabase/setup-cli@v1
               with:
                   version: latest
 
-            # Start Supabase (should use cached images if available)
+            # Start Supabase (utilizing cached Docker layers if available)
             - run: supabase start
             - run: supabase status
 
