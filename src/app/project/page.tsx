@@ -21,7 +21,6 @@ import { useAchievements } from "@/hooks/useAchievements";
 import React from "react";
 import { Project } from "@/utils/types";
 import { RowData, TeamViewData } from "../dashboard/types";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import AddTeamModal from "@/components/AddTeamModal";
 
 const COLORS = ["#0088FE", "#00C49F"];

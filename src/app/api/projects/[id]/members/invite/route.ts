@@ -11,7 +11,7 @@ import { Resend } from "resend";
 import { InviteMemberEmailTemplate } from "@/components/emails/InviteMemberEmailTemplate";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY ?? "re_123");
 
 export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
     const { user } = await getSession();

@@ -2,12 +2,14 @@
 -- -- "$2a$10$wkJHPFspowciPpsTcxD1OOy9nZks9IWDWkwDmkqMt0xM.QR5lOLr6" is the bcrypt hash of the password "password123"
 INSERT INTO auth.users (instance_id, id, email, encrypted_password, email_confirmed_at, created_at, updated_at, role, aud, raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token, email_change_token_new, email_change, is_super_admin)
 VALUES
+  ('00000000-0000-0000-0000-000000000000','fd76e705-84df-42da-9a71-1fc6a0e215a4', 'playwright@easy-task.com', '$2a$10$wlgX6zexWB9xE5NhgKUBGuK35ZqXRC6xb/KeVd5WWgu2fYCh8/k62', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'authenticated', 'authenticated', '{"provider":"email","providers":["email"]}', '{"sub": "fd76e705-84df-42da-9a71-1fc6a0e215a4","email": "playwright@easy-task.com","last_name": "Test","first_name": "Playwright","email_verified": true,"phone_verified": false}','','','','', NULL),
   ('00000000-0000-0000-0000-000000000000','f6508257-5947-4835-a711-979cf0330777', 'jcru0005@student.monash.edu', '$2a$10$wlgX6zexWB9xE5NhgKUBGuK35ZqXRC6xb/KeVd5WWgu2fYCh8/k62', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'authenticated', 'authenticated', '{"provider":"email","providers":["email"]}', '{"sub": "f6508257-5947-4835-a711-979cf0330777","email": "jcru0005@student.monash.edu","last_name": "C","first_name": "Jesse","email_verified": true,"phone_verified": false}','','','','', NULL),
   ('00000000-0000-0000-0000-000000000000','f2c1be6b-25da-40f3-8fe1-8ec45ed5319b', 'klee0081@student.monash.edu', '$2a$10$wlgX6zexWB9xE5NhgKUBGuK35ZqXRC6xb/KeVd5WWgu2fYCh8/k62', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'authenticated', 'authenticated', '{"provider":"email","providers":["email"]}', '{"sub": "f2c1be6b-25da-40f3-8fe1-8ec45ed5319b","email": "klee0081@student.monash.edu","last_name": "L","first_name": "Khanh","email_verified": true,"phone_verified": false}','','','','', NULL),
   ('00000000-0000-0000-0000-000000000000','378fc432-b330-46dc-87ff-62bb2f24ccbb', 'oagu0001@student.monash.edu', '$2a$10$wlgX6zexWB9xE5NhgKUBGuK35ZqXRC6xb/KeVd5WWgu2fYCh8/k62', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'authenticated', 'authenticated', '{"provider":"email","providers":["email"]}', '{"sub": "378fc432-b330-46dc-87ff-62bb2f24ccbb","email": "oagu0001@student.monash.edu","last_name": "A","first_name": "Elijah","email_verified": true,"phone_verified": false}','','','','', NULL),
   ('00000000-0000-0000-0000-000000000000','86c8b615-3dca-406a-b18a-d7e631539191', 'cche0204@student.monash.edu', '$2a$10$wlgX6zexWB9xE5NhgKUBGuK35ZqXRC6xb/KeVd5WWgu2fYCh8/k62', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'authenticated', 'authenticated', '{"provider":"email","providers":["email"]}', '{"sub": "86c8b615-3dca-406a-b18a-d7e631539191","email": "cche0204@student.monash.edu","last_name": "C","first_name": "Chongjie","email_verified": true,"phone_verified": false}','','','','', NULL);
 
 INSERT INTO "auth"."identities" (user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at, id) VALUES
+('f6508257-5947-4835-a711-979cf0330777', 'fd76e705-84df-42da-9a71-1fc6a0e215a4', 'email', '{"sub": "fd76e705-84df-42da-9a71-1fc6a0e215a4","email": "playwright@easy-task.com","last_name": "Test","first_name": "Playwright","email_verified": true,"phone_verified": false}', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'bfe88d4c-f64b-4407-aab2-d321bb3724e8'),
 ('f6508257-5947-4835-a711-979cf0330777', 'f6508257-5947-4835-a711-979cf0330777', 'email', '{"sub": "f6508257-5947-4835-a711-979cf0330777","email": "jcru0005@student.monash.edu","last_name": "C","first_name": "Jesse","email_verified": true,"phone_verified": false}', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'd7dda800-8692-42e4-a7fb-6ec1d200a5e3'),
 ('f2c1be6b-25da-40f3-8fe1-8ec45ed5319b', 'f2c1be6b-25da-40f3-8fe1-8ec45ed5319b', 'email', '{"sub": "f2c1be6b-25da-40f3-8fe1-8ec45ed5319b","email": "klee0081@student.monash.edu","last_name": "L","first_name": "Khanh","email_verified": true,"phone_verified": false}', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', 'ab2dab34-2d67-48b5-8edf-83dfa35f70cd'),
 ('378fc432-b330-46dc-87ff-62bb2f24ccbb', '378fc432-b330-46dc-87ff-62bb2f24ccbb', 'email', '{"sub": "378fc432-b330-46dc-87ff-62bb2f24ccbb","email": "oagu0001@student.monash.edu","last_name": "A","first_name": "Elijah","email_verified": true,"phone_verified": false}', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '2024-09-24 10:07:51.296459 +00:00', '3c0b8a80-a862-4220-803f-331fafa7d59a'),
@@ -71,13 +73,13 @@ SELECT
     (SELECT id FROM auth.users ORDER BY random() LIMIT 1),
     (ARRAY['TODO', 'DOING', 'COMPLETE'])[floor(random() * 3 + 1)]::task_status_enum,
     (ARRAY['LOW', 'MEDIUM', 'HIGH'])[floor(random() * 3 + 1)]::task_priority_enum,
-    CASE 
+    CASE
         WHEN random() < 0.6 THEN 'Remote'
         WHEN random() < 0.9 THEN 'Office'
         ELSE 'On-site'
     END,
     random() < 0.2  -- 20% chance of being a meeting
-FROM 
+FROM
     project p,
     generate_series(1, 10) AS t(task_num);
 
@@ -95,21 +97,21 @@ FROM task;
 
 -- Dummy data for user_achievement table
 INSERT INTO user_achievement (user_id, achievement_id, progress, completed, completed_at)
-SELECT 
+SELECT
     u.id,
     a.achievement_id,
     progress,
-    CASE 
-        WHEN progress = a.max_progress THEN TRUE 
-        ELSE FALSE 
+    CASE
+        WHEN progress = a.max_progress THEN TRUE
+        ELSE FALSE
     END AS completed,
-    CASE 
-        WHEN progress = a.max_progress THEN NOW() - (random() * INTERVAL '30 days') 
-        ELSE NULL 
+    CASE
+        WHEN progress = a.max_progress THEN NOW() - (random() * INTERVAL '30 days')
+        ELSE NULL
     END AS completed_at
-FROM 
+FROM
     unnest(user_ids) AS u(id)
-CROSS JOIN 
+CROSS JOIN
     achievement a,
     LATERAL (
         SELECT floor(random() * (a.max_progress + 1))::INTEGER AS progress
@@ -117,16 +119,16 @@ CROSS JOIN
 
 -- Update progress and completed status
 UPDATE user_achievement ua
-SET 
+SET
     progress = LEAST(ua.progress + floor(random() * 10)::INTEGER, a.max_progress),
     completed = ua.progress >= a.max_progress,
-    completed_at = CASE 
-        WHEN ua.progress >= a.max_progress THEN NOW() - (random() * INTERVAL '30 days') 
-        ELSE NULL 
+    completed_at = CASE
+        WHEN ua.progress >= a.max_progress THEN NOW() - (random() * INTERVAL '30 days')
+        ELSE NULL
     END
-FROM 
+FROM
     achievement a
-WHERE 
+WHERE
     ua.achievement_id = a.achievement_id;
 
 END $$;

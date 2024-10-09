@@ -9,7 +9,7 @@
         "lint": "next lint",
         "test": "npm run test:unit && npm run test:e2e",
         "test:unit": "vitest run",
-        "test:e2e": "npx playwright test",
+        "test:e2e": "npx playwright test --workers=1",
         "test:e2e:ui": "npx playwright test --ui",
         "format": "prettier --write .",
         "prepare": "husky install",
