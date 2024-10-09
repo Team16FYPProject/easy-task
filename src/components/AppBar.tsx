@@ -20,6 +20,7 @@ const NAVIGATION_LINKS: NavigationLink[][] = [
     [
         { name: "Dashboard", link: "/dashboard" },
         { name: "Profile", link: "/profile" },
+        { name: "Projects", link: "/project" },
         { name: "Achievements", link: "/achievement" },
     ],
     [
