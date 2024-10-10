@@ -121,7 +121,7 @@ export default function AddTaskModal({
                 taskLocation: taskLocation || null,
                 taskDuration: taskDuration || null,
                 taskAssignee: taskAssignee || null,
-                reminder_datetime: reminderDate,
+                reminder_datetime: reminderDate ? [{ reminder_datetime: reminderDate }] : [],
             }),
         });
         const data = await response.json();
@@ -145,6 +145,7 @@ export default function AddTaskModal({
             typeof value === "string" ? value.split(",") : value,
         );
     };
+
     useEffect(() => {
         async function fetchTeamMembers() {
             if (project_id && open) {

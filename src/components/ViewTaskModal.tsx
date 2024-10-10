@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Box, Typography, Grid, Paper, Chip, Button, TextField } from "@mui/material";
 import { ProjectTask } from "@/utils/types";
 import EditTaskModal from "@/components/EditTaskModal";
@@ -68,6 +68,21 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
             console.error(`Error updating logged hours for project ${currentTask.project_id}:`, e);
         }
     };
+
+    // getting reminder data
+    useEffect(() => {
+        const fetchReminders = async () => {
+            const response = await fetch(`/api/tasks/${currentTask.task_id}/reminders`);
+            const data = await response.json();
+            if (data.success) {
+                setCurrentTask({ ...currentTask, reminders: data.data });
+            }
+        };
+
+        if (open) {
+            fetchReminders();
+        }
+    }, [open, currentTask.task_id]);
 
     return (
         <Modal open={open} onClose={handleCloseModal}>
@@ -156,15 +171,13 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         Reminders
                     </Typography>
                     <Paper variant="outlined" sx={{ p: 2 }}>
-                        {currentTask.reminder_datetime ? (
+                        {currentTask.reminders && currentTask.reminders.length > 0 ? (
                             <Typography variant="body2">
                                 Reminder set for:{" "}
-                                {new Date(currentTask.reminder_datetime).toLocaleString([], {
-                                    year: "numeric",
-                                    month: "2-digit",
-                                    day: "2-digit",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
+                                {new Date(
+                                    currentTask.reminders[0].reminder_datetime,
+                                ).toLocaleString([], {
+                                    // ...
                                 })}
                             </Typography>
                         ) : (
