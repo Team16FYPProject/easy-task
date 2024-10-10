@@ -75,7 +75,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
             const response = await fetch(`/api/tasks/${currentTask.task_id}/reminders`);
             const data = await response.json();
             if (data.success) {
-                setCurrentTask({ ...currentTask, reminders: data.data });
+                setCurrentTask((prevTask) => ({ ...prevTask, reminders: data.data }));
             }
         };
 
@@ -133,7 +133,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="body2">
-                            Location: {currentTask.task_location}
+                            Location: {currentTask.task_location || "No location set"}
                         </Typography>
                     </Grid>
                 </Grid>
@@ -166,20 +166,25 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
+                {/* Reminders */}
                 <Box sx={{ ...sectionStyle, borderBottom: "none" }}>
                     <Typography variant="h6" gutterBottom>
                         Reminders
                     </Typography>
                     <Paper variant="outlined" sx={{ p: 2 }}>
                         {currentTask.reminders && currentTask.reminders.length > 0 ? (
-                            <Typography variant="body2">
-                                Reminder set for:{" "}
-                                {new Date(
-                                    currentTask.reminders[0].reminder_datetime,
-                                ).toLocaleString([], {
-                                    // ...
-                                })}
-                            </Typography>
+                            currentTask.reminders.map((reminder, index) => (
+                                <Typography variant="body2" key={index}>
+                                    Reminder set for:{" "}
+                                    {new Date(reminder.reminder_datetime).toLocaleString([], {
+                                        year: "numeric",
+                                        month: "2-digit",
+                                        day: "2-digit",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
+                                </Typography>
+                            ))
                         ) : (
                             <Typography>No reminders set</Typography>
                         )}

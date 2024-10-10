@@ -61,10 +61,9 @@ export default function AddTaskModal({
     const [taskDeadline, setTaskDeadline] = useState<Dayjs | null>(null);
     const [taskStatus, setTaskStatus] = useState<string>("");
     const [taskPriority, setTaskPriority] = useState<string>("");
-    const [taskReminder, setTaskReminder] = useState<string>("");
     const [taskLocation, setTaskLocation] = useState<string>("");
     const [taskMeetingBool, setTaskMeetingBool] = useState<boolean>(false);
-    const [taskDuration, setTaskDuration] = useState<string>("");
+    const [taskDuration, setTaskDuration] = useState<string>(""); // Handle as string for easier submission
     const [taskAssignee, setTaskAssignees] = useState<string[]>([]);
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
@@ -73,51 +72,19 @@ export default function AddTaskModal({
     >([]);
 
     const handleModalClose = () => {
-        // reset all form values
+        // Reset all form values
         setTaskName("");
         setTaskDescription("");
         setTaskParent("");
         setTaskDeadline(null);
         setTaskStatus("");
         setTaskPriority("");
-        setTaskReminder("");
         setTaskLocation("");
         setTaskMeetingBool(false);
         setTaskDuration("");
         setTaskAssignees([]);
+        setTaskReminders([]); // Reset reminders
         handleClose();
-    };
-
-    // reminders
-    const [taskReminders, setTaskReminders] = useState<ReminderOption[]>([]);
-    const reminderOptions: ReminderOption[] = [
-        "One Hour Before",
-        "One Day Before",
-        "One Week Before",
-    ];
-
-    const handleReminderChange = (event: SelectChangeEvent<ReminderOption[]>) => {
-        const {
-            target: { value },
-        } = event;
-        setTaskReminders(
-            typeof value === "string" ? [value as ReminderOption] : (value as ReminderOption[]),
-        );
-    };
-
-    const calculateReminderTimestamps = (deadline: Dayjs, reminders: ReminderOption[]): Dayjs[] => {
-        return reminders.map((reminder) => {
-            switch (reminder) {
-                case "One Hour Before":
-                    return deadline.subtract(1, "hour");
-                case "One Day Before":
-                    return deadline.subtract(1, "day");
-                case "One Week Before":
-                    return deadline.subtract(1, "week");
-                default:
-                    return deadline; // Fallback to deadline if unknown option
-            }
-        });
     };
 
     async function handleSubmit(event: FormEvent) {
@@ -130,13 +97,14 @@ export default function AddTaskModal({
             return;
         }
 
+        // Calculate the reminders based on selected options
         const reminderTimestamps = calculateReminderTimestamps(taskDeadline, taskReminders);
 
         const reminders = reminderTimestamps.map((timestamp) => ({
             reminder_datetime: timestamp.toISOString(),
         }));
 
-        // prepare to send data
+        // Prepare to send data
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {
             method: "POST",
@@ -153,8 +121,9 @@ export default function AddTaskModal({
                 taskStatus,
                 taskIsMeeting: taskMeetingBool,
                 taskLocation: taskLocation || null,
-                assignees: taskAssignee.map((assigneeId) => ({ user_id: assigneeId })) || null,
-                reminders: reminders || null,
+                taskAssignee: taskAssignee || null, // Assignees
+                taskReminder: reminders || null, // Reminders
+                taskDuration: taskMeetingBool ? taskDuration : null, // Only set duration if it's a meeting
             }),
         });
 
@@ -162,16 +131,51 @@ export default function AddTaskModal({
         if (!response.ok || !data.success) {
             setError(data.data);
             setIsError(true);
-            setTimeout(() => {
-                setIsError(false);
-            }, 5000);
+            setTimeout(() => setIsError(false), 5000);
         } else {
             setUpdatedTask(data.data);
             handleClose();
         }
     }
 
-    const handleChange = (event: SelectChangeEvent<typeof taskAssignee>) => {
+    {
+        /* Reminder Functions */
+    }
+    const [taskReminders, setTaskReminders] = useState<ReminderOption[]>([]);
+    const reminderOptions: ReminderOption[] = [
+        "One Hour Before",
+        "One Day Before",
+        "One Week Before",
+    ];
+
+    const calculateReminderTimestamps = (deadline: Dayjs, reminders: ReminderOption[]): Dayjs[] => {
+        return reminders.map((reminder) => {
+            switch (reminder) {
+                case "One Hour Before":
+                    return deadline.subtract(1, "hour");
+                case "One Day Before":
+                    return deadline.subtract(1, "day");
+                case "One Week Before":
+                    return deadline.subtract(1, "week");
+                default:
+                    return deadline; // Fallback to deadline if unknown option
+            }
+        });
+    };
+
+    const handleReminderChange = (event: SelectChangeEvent<ReminderOption[]>) => {
+        const {
+            target: { value },
+        } = event;
+        setTaskReminders(
+            typeof value === "string" ? [value as ReminderOption] : (value as ReminderOption[]),
+        );
+    };
+
+    {
+        /* Assignee Functions */
+    }
+    const handleAssigneeChange = (event: SelectChangeEvent<typeof taskAssignee>) => {
         const {
             target: { value },
         } = event;
@@ -199,7 +203,6 @@ export default function AddTaskModal({
         }
         fetchTeamMembers();
     }, [handleClose]);
-
     return (
         <div>
             <Modal
@@ -361,12 +364,21 @@ export default function AddTaskModal({
                                     multiple
                                     value={taskReminders}
                                     onChange={handleReminderChange}
-                                    input={<OutlinedInput />}
+                                    input={<OutlinedInput label="Chip" />}
                                     renderValue={(selected) => (
                                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                            {selected.map((value) => (
-                                                <Chip key={value} label={value} />
-                                            ))}
+                                            {selected
+                                                .sort((a, b) => {
+                                                    const order = [
+                                                        "One Hour Before",
+                                                        "One Day Before",
+                                                        "One Week Before",
+                                                    ];
+                                                    return order.indexOf(a) - order.indexOf(b); // so that the order is always 'One Hour Before' then 'One Day Before' then 'One Week Before'
+                                                })
+                                                .map((value) => (
+                                                    <Chip key={value} label={value} />
+                                                ))}
                                         </Box>
                                     )}
                                 >
@@ -385,7 +397,7 @@ export default function AddTaskModal({
                                     fullWidth
                                     multiple
                                     value={taskAssignee}
-                                    onChange={handleChange}
+                                    onChange={handleAssigneeChange}
                                     input={<OutlinedInput label="Chip" />}
                                     renderValue={(selected) => (
                                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

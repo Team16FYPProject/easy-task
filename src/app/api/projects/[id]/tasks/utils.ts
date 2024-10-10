@@ -24,6 +24,7 @@ export async function createTask(
         taskMeetingBool,
         taskLocation,
         taskAssignee,
+        taskReminder,
     } = data;
     if (!taskName) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });
@@ -117,6 +118,23 @@ export async function createTask(
             }));
         }
     }
+
+    // Handle task reminders
+    if (taskReminder && taskReminder.length > 0) {
+        const reminderInserts = taskReminder.map((reminder: { reminder_datetime: string }) => ({
+            task_id: taskId,
+            reminder_datetime: reminder.reminder_datetime,
+        }));
+
+        const { error: reminderError } = await supabase
+            .from("task_reminder")
+            .upsert(reminderInserts);
+
+        if (reminderError) {
+            console.error("Unable to set reminders for task", reminderError);
+        }
+    }
+
     if (taskError || !data) {
         console.error("Unable to insert task to database", taskError);
         return internalErrorResponse({
@@ -127,6 +145,7 @@ export async function createTask(
     const responseData = {
         ...taskData,
         assignees: assigneeData,
+        reminders: taskReminder,
     };
     if (create) {
         return createdResponse({

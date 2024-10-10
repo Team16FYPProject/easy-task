@@ -14,7 +14,11 @@ export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     // Query the database to find all tasks that match a project id
     const { data: taskData, error: taskError } = await supabase
         .from("task")
-        .select("*,assignees:task_assignee(user_id, profile!inner(email, first_name, last_name))")
+        .select(
+            `*, 
+            assignees:task_assignee(user_id, profile!inner(email, first_name, last_name)), 
+            reminders:task_reminder(reminder_datetime)`,
+        )
         .eq("project_id", id);
 
     // Handle query errors
@@ -24,20 +28,20 @@ export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     }
 
     // Merge user information with tasks
-    const tasksWithUserDetails = taskData?.map((task) => ({
+    // Merge user information and reminders with tasks
+    const tasksWithDetails = taskData?.map((task) => ({
         ...task,
-        assignees: task.assignees.map((assignee) => {
-            return {
-                ...assignee,
-                user: {
-                    email: assignee.profile.email,
-                    name: assignee.profile.first_name + " " + assignee.profile.last_name,
-                },
-            };
-        }),
+        assignees: task.assignees.map((assignee) => ({
+            ...assignee,
+            user: {
+                email: assignee.profile.email,
+                name: assignee.profile.first_name + " " + assignee.profile.last_name,
+            },
+        })),
+        reminders: task.reminders || [], // Attach reminders
     }));
 
-    return okResponse({ success: true, tasks: tasksWithUserDetails || [] });
+    return okResponse({ success: true, tasks: tasksWithDetails || [] });
 }
 
 export async function POST(request: Request, { params: { id } }: ProjectIdParams) {

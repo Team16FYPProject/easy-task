@@ -27,11 +27,6 @@ interface EditTaskModalProps {
     updateTask: (updatedTask: ProjectTask) => void;
 }
 
-interface TeamMember {
-    id: string;
-    name: string;
-}
-
 const EditTaskModal: React.FC<EditTaskModalProps> = ({
     open,
     handleCloseModal,
@@ -79,17 +74,49 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         // py: 1,
     };
 
-    // Reminders
-
-    const convertRemindersToTimestamps = (reminders: string[], deadline: number) => {
-        const timeDifferences: Record<string, number> = {
-            HOUR: 1 * 60 * 60 * 1000,
-            DAY: 24 * 60 * 60 * 1000,
-            WEEK: 7 * 24 * 60 * 60 * 1000,
+    {
+        /* Reminders */
+    }
+    // Convert timestamps to human-readable strings
+    const convertTimestampsToReminders = (reminders: Reminders[], deadline: number) => {
+        const remindersMapping: Record<string, number> = {
+            "One Hour Before": 1 * 60 * 60 * 1000,
+            "One Day Before": 24 * 60 * 60 * 1000,
+            "One Week Before": 7 * 24 * 60 * 60 * 1000,
         };
-        return reminders.map((reminder) => {
-            const timestamp = deadline - (timeDifferences[reminder] || 0);
-            return new Date(timestamp).toISOString();
+
+        return reminders
+            .map((reminder) => {
+                const timeDiff = deadline - new Date(reminder.reminder_datetime).getTime();
+                return (
+                    Object.keys(remindersMapping).find(
+                        (key) => remindersMapping[key] === timeDiff,
+                    ) || null
+                );
+            })
+            .filter(Boolean) as string[]; // Remove null values
+    };
+
+    // Convert reminder strings to timestamps before saving
+    const convertRemindersToTimestamps = (
+        reminderStrings: string[],
+        deadline: number,
+    ): Reminders[] => {
+        const timeDifferences: Record<string, number> = {
+            "One Hour Before": 1 * 60 * 60 * 1000,
+            "One Day Before": 24 * 60 * 60 * 1000,
+            "One Week Before": 7 * 24 * 60 * 60 * 1000,
+        };
+
+        return reminderStrings.map((reminderStr) => {
+            const timestamp = deadline - (timeDifferences[reminderStr] || 0);
+            return {
+                reminder_id: "", // This will be generated on the backend
+                task_id: task.task_id,
+                reminder_datetime: new Date(timestamp).toISOString(),
+                task: task,
+                profile: {} as Profile, // Assuming profile info will be set on backend
+            };
         });
     };
 
@@ -123,6 +150,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         void fetchMembers();
     }, []);
 
+    // useEffect to convert reminder timestamps to reminder strings when task data changes
+    useEffect(() => {
+        if (task && task.task_deadline) {
+            const deadline = new Date(task.task_deadline).getTime();
+            const reminderStrings = convertTimestampsToReminders(task.reminders || [], deadline);
+            setTaskReminders(reminderStrings);
+        }
+    }, [task]);
+
     function updateTaskProperty(key: keyof typeof originalTask, value: any) {
         setTask((_task) => {
             const newTask: Record<string, any> = { ..._task };
@@ -134,19 +170,22 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     async function handleSaveChanges() {
         try {
             setIsSaving(true);
+            const deadline = new Date(task.task_deadline).getTime(); // Task deadline in milliseconds
+            const updatedReminders = convertRemindersToTimestamps(taskReminders, deadline); // Convert back to timestamps
+
             const taskResponse = await fetch(
                 `/api/projects/${task.project_id}/tasks/${task.task_id}`,
                 {
                     method: "PATCH",
                     body: JSON.stringify({
-                        name: task.task_name,
-                        desc: task.task_desc,
-                        deadline: task.task_deadline,
-                        time_spent: task.task_time_spent,
-                        status: task.task_status,
-                        priority: task.task_priority,
-                        location: task.task_location,
-                        is_meeting: task.task_is_meeting,
+                        taskName: task.task_name,
+                        taskDesc: task.task_desc,
+                        taskDeadline: task.task_deadline,
+                        taskTimeSpent: task.task_time_spent,
+                        taskStatus: task.task_status,
+                        taskPriority: task.task_priority,
+                        taskLocation: task.task_location,
+                        taskIsMeeting: task.task_is_meeting,
                     }),
                 },
             );
@@ -176,23 +215,19 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 {
                     method: "PUT",
                     body: JSON.stringify({
-                        ids: taskReminders,
+                        ids: updatedReminders,
                     }),
                 },
             );
+
             const remindersData: ApiResponse<Reminders[]> = await remindersResponse.json();
-            if (!assigneesData.success) {
-                throw new Error(
-                    typeof remindersData.data === "string"
-                        ? remindersData.data
-                        : JSON.stringify(remindersData.data),
-                );
-            }
+            if (!remindersData.success) throw new Error(remindersData.data);
 
             // update task
             updateTask({
                 ...updatedTask,
                 assignees: assigneesData.data,
+                reminders: remindersData.data,
             });
             handleCloseModal();
         } catch (error) {
@@ -306,7 +341,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
-                {/* TODO Decide if we're still doing task reminder. */}
+                {/* Reminder Select */}
 
                 <Grid container spacing={2} sx={sectionStyle}>
                     <FormControl fullWidth>
@@ -315,12 +350,13 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                             fullWidth
                             multiple
                             value={taskReminders}
-                            onChange={(e) => {
-                                const value = e.target.value;
+                            onChange={(e) =>
                                 setTaskReminders(
-                                    typeof value === "string" ? value.split(",") : value,
-                                );
-                            }}
+                                    typeof e.target.value === "string"
+                                        ? e.target.value.split(",")
+                                        : e.target.value,
+                                )
+                            }
                             input={<OutlinedInput label="Chip" />}
                             renderValue={(selected) => (
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -389,7 +425,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                                 )
                                 .map((member) => (
                                     <MenuItem key={member.user_id} value={member.user_id}>
-                                        {member.first_name} {member.last_name}
+                                        {member.first_name} {member.last_name}{" "}
+                                        {/* Note: the lag to fetch this is crazy*/}
                                     </MenuItem>
                                 ))}
                         </Select>
