@@ -56,9 +56,10 @@ test("task_deadline field should only accept future dates", async ({ page }) => 
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Task deadline cannot be in the past")).toBeVisible();
 
-    // Set a date in the past: Expect an error
+    // Set a date in the future: Expect an error
     await page.getByPlaceholder("MM/DD/YYYY hh:mm aa").click();
     await page.getByPlaceholder("MM/DD/YYYY hh:mm aa").type("11/11/2099 11:11 PM");
     await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByText("Task deadline cannot be in the past")).not.toBeVisible();
+    // We have created a task, expect modal to close
+    await expect(page.getByText("Create Task")).not.toBeVisible();
 });
