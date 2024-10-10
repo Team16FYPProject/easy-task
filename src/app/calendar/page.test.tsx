@@ -3,7 +3,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import CalendarView from "./page";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
-import { useEffectAsync } from "@/hooks/useEffectAsync";
 
 // Mocking dependencies
 vi.mock("next/navigation", () => ({
@@ -95,7 +94,5 @@ test("CalendarView fetches and displays tasks", async () => {
 
     await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledTimes(4);
-        // You might want to add more specific checks here, e.g., for the presence of the task in the UI
-        // expect(screen.getByText("Test Task")).toBeDefined();
     });
 });

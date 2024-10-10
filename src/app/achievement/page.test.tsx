@@ -4,7 +4,6 @@ import Achievements from "./page";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useAchievements } from "@/hooks/useAchievements";
-import { useEffectAsync } from "@/hooks/useEffectAsync";
 
 // Mocking dependencies
 vi.mock("next/navigation", () => ({

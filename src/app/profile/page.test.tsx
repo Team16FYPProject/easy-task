@@ -4,7 +4,6 @@ import ProfilePage from "./page";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useAchievements } from "@/hooks/useAchievements";
-import { useEffectAsync } from "@/hooks/useEffectAsync";
 
 // Mocking dependencies
 vi.mock("next/navigation", () => ({
@@ -24,10 +23,12 @@ vi.mock("@/hooks/useEffectAsync", () => ({
 }));
 
 vi.mock("recharts", () => ({
-    ResponsiveContainer: vi.fn(({ children }) => children),
-    PieChart: vi.fn(({ children }) => children),
-    Pie: vi.fn(),
-    Cell: vi.fn(),
+    ResponsiveContainer: vi.fn(({ children }) => (
+        <div data-testid="responsive-container">{children}</div>
+    )),
+    PieChart: vi.fn(({ children }) => <div data-testid="pie-chart">{children}</div>),
+    Pie: vi.fn(({ children }) => <div data-testid="pie">{children}</div>),
+    Cell: vi.fn(() => null),
 }));
 
 // Mock fetch
@@ -40,7 +41,22 @@ const setupMocks = (
 ) => {
     vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: userMock });
     vi.mocked(useAchievements).mockReturnValue({
-        achievements: [],
+        achievements: [
+            {
+                id: "1",
+                name: "Test Achievement",
+                completed: true,
+                progress: 100,
+                max_progress: 100,
+            },
+            {
+                id: "2",
+                name: "In Progress Achievement",
+                completed: false,
+                progress: 50,
+                max_progress: 100,
+            },
+        ],
         loading: false,
         error: null,
     });
@@ -64,6 +80,8 @@ test("ProfilePage renders correctly for logged-in user", async () => {
         expect(screen.getByText("Profile")).toBeDefined();
         expect(screen.getByText("John Doe")).toBeDefined();
         expect(screen.getByText("EDIT PROFILE")).toBeDefined();
+        expect(screen.getByTestId("pie-chart")).toBeDefined();
+        expect(screen.getByTestId("pie")).toBeDefined();
     });
 });
 
@@ -79,51 +97,23 @@ test("ProfilePage redirects to login if user is not logged in", async () => {
     });
 });
 
-test("ProfilePage displays user projects", async () => {
+test("ProfilePage displays projects", async () => {
+    const mockProjects = [{ project_id: "1", project_name: "Test Project" }];
     setupMocks();
     vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: vi.fn().mockResolvedValue({
             success: true,
-            data: { projects: [{ project_id: "1", project_name: "Test Project" }], tasks: [] },
+            data: { projects: mockProjects, tasks: [] },
         }),
     } as unknown as Response);
 
     render(<ProfilePage />);
 
     await waitFor(() => {
+        expect(screen.getByText("Profile")).toBeDefined();
+        expect(screen.getByText("EDIT PROFILE")).toBeDefined();
         expect(screen.getByText("Projects")).toBeDefined();
-        // expect(screen.getByText("Test Project")).toBeDefined();
-    });
-});
-
-test("ProfilePage displays achievements", async () => {
-    setupMocks();
-    vi.mocked(useAchievements).mockReturnValue({
-        achievements: [
-            {
-                id: "1",
-                name: "Test Achievement",
-                completed: true,
-                progress: 100,
-                max_progress: 100,
-            },
-            {
-                id: "2",
-                name: "In Progress Achievement",
-                completed: false,
-                progress: 50,
-                max_progress: 100,
-            },
-        ],
-        loading: false,
-        error: null,
-    });
-
-    render(<ProfilePage />);
-
-    await waitFor(() => {
-        // expect(screen.getByTestId("pie-chart")).toBeDefined();
     });
 });
 
