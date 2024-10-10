@@ -137,24 +137,24 @@ export default function AddTaskModal({
         }));
 
         // prepare to send data
-        const response = await fetch(`/api/projects/${project_id}/tasks`, {
+        const route = `/api/projects/${project_id}/tasks`;
+        const response = await fetch(route, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 project_id,
-                task_name: taskName,
-                task_desc: taskDescription || null,
-                task_deadline: taskDeadline.toISOString(),
-                task_priority: taskPriority,
-                task_parent_id: taskParent || null,
-                task_status: taskStatus,
-                task_is_meeting: taskMeetingBool,
-                task_location: taskLocation || null,
-                task_time_spent: 0,
-                assignees: taskAssignee.map((assigneeId) => ({ user_id: assigneeId })),
-                reminders: reminders,
+                taskName,
+                taskDesc: taskDescription || null,
+                taskDeadline: taskDeadline.toISOString(),
+                taskPriority,
+                taskParentId: taskParent || null,
+                taskStatus,
+                taskIsMeeting: taskMeetingBool,
+                taskLocation: taskLocation || null,
+                assignees: taskAssignee.map((assigneeId) => ({ user_id: assigneeId })) || null,
+                reminders: reminders || null,
             }),
         });
 
