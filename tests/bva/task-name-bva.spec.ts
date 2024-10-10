@@ -38,17 +38,17 @@ test("task_name field should only accept characters of length (0,30]", async ({ 
     await expect(page.getByText("Task deadline is a required field")).toBeVisible();
 
     // Name of length 30: We have provided a valid task name, expect error for other empty fields
-    await page.locator("#outlined-basic").first().fill("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    await page.locator("#outlined-basic").first().fill("a".repeat(30));
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Task deadline is a required field")).toBeVisible();
 
     // Name of length 31: We have provided an invalid task name, expect error
-    await page.locator("#outlined-basic").first().fill("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    await page.locator("#outlined-basic").first().fill("a".repeat(31));
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Task name must be under 30 characters")).toBeVisible();
 
     // Name of length 15: We have provided a valid task name, expect error for other empty fields
-    await page.locator("#outlined-basic").first().fill("aaaaaaaaaaaaaaa");
+    await page.locator("#outlined-basic").first().fill("a".repeat(15));
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Task deadline is a required field")).toBeVisible();
 });
