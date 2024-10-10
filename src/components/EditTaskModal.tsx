@@ -8,8 +8,6 @@ import {
     Button,
     Select,
     MenuItem,
-    Paper,
-    SelectChangeEvent,
     OutlinedInput,
     Chip,
     FormControl,
@@ -17,7 +15,7 @@ import {
 } from "@mui/material";
 import { ProjectTask, Assignee, Profile, ApiResponse, Reminders } from "@/utils/types";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker, DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
 interface EditTaskModalProps {
@@ -39,7 +37,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     );
 
     const [taskReminders, setTaskReminders] = useState<string[]>(
-        task.reminders?.map((reminder) => reminder.task_id) || [],
+        task.reminders?.map((reminder) => reminder.reminder_datetime) || [],
     );
 
     const [errorMsg, setErrorMsg] = useState<string>("");
@@ -77,8 +75,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     {
         /* Reminders */
     }
+
+    const reminderOptions = ["One Hour Before", "One Day Before", "One Week Before"];
+
     // Convert timestamps to human-readable strings
-    const convertTimestampsToReminders = (reminders: Reminders[], deadline: number) => {
+    const convertTimestampsToReminders = (reminders: Reminders[], deadline: number): string[] => {
         const remindersMapping: Record<string, number> = {
             "One Hour Before": 1 * 60 * 60 * 1000,
             "One Day Before": 24 * 60 * 60 * 1000,
@@ -94,30 +95,25 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     ) || null
                 );
             })
-            .filter(Boolean) as string[]; // Remove null values
+            .filter(Boolean) as string[];
     };
 
     // Convert reminder strings to timestamps before saving
     const convertRemindersToTimestamps = (
         reminderStrings: string[],
         deadline: number,
-    ): Reminders[] => {
+    ): { reminder_datetime: string }[] => {
         const timeDifferences: Record<string, number> = {
             "One Hour Before": 1 * 60 * 60 * 1000,
             "One Day Before": 24 * 60 * 60 * 1000,
             "One Week Before": 7 * 24 * 60 * 60 * 1000,
         };
 
-        return reminderStrings.map((reminderStr) => {
-            const timestamp = deadline - (timeDifferences[reminderStr] || 0);
-            return {
-                reminder_id: "", // This will be generated on the backend
-                task_id: task.task_id,
-                reminder_datetime: new Date(timestamp).toISOString(),
-                task: task,
-                profile: {} as Profile, // Assuming profile info will be set on backend
-            };
-        });
+        return reminderStrings.map((reminderStr) => ({
+            reminder_datetime: new Date(
+                deadline - (timeDifferences[reminderStr] || 0),
+            ).toISOString(),
+        }));
     };
 
     // Get team members from the backend
@@ -160,40 +156,39 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     }, [task]);
 
     function updateTaskProperty(key: keyof typeof originalTask, value: any) {
-        setTask((_task) => {
-            const newTask: Record<string, any> = { ..._task };
-            newTask[key] = value;
-            return newTask as ProjectTask;
-        });
+        setTask((prevTask) => ({
+            ...prevTask,
+            [key]: value,
+        }));
     }
 
     async function handleSaveChanges() {
         try {
             setIsSaving(true);
-            const deadline = new Date(task.task_deadline).getTime(); // Task deadline in milliseconds
-            const updatedReminders = convertRemindersToTimestamps(taskReminders, deadline); // Convert back to timestamps
+            const deadline = new Date(task.task_deadline).getTime();
+            const updatedReminders = convertRemindersToTimestamps(taskReminders, deadline);
 
-            const taskResponse = await fetch(
-                `/api/projects/${task.project_id}/tasks/${task.task_id}`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify({
-                        taskName: task.task_name,
-                        taskDesc: task.task_desc,
-                        taskDeadline: task.task_deadline,
-                        taskTimeSpent: task.task_time_spent,
-                        taskStatus: task.task_status,
-                        taskPriority: task.task_priority,
-                        taskLocation: task.task_location,
-                        taskIsMeeting: task.task_is_meeting,
-                    }),
+            const updatedTaskData = {
+                taskName: task.task_name,
+                taskDescription: task.task_desc,
+                taskDeadline: task.task_deadline,
+                taskPriority: task.task_priority,
+                taskParent: task.task_parent_id,
+                taskStatus: task.task_status,
+                taskMeetingBool: task.task_is_meeting,
+                taskLocation: task.task_location,
+                //taskAssignee: taskAssignees,
+                //taskReminder: updatedReminders,
+            };
+
+            const response = await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-            );
-            const taskData: ApiResponse<ProjectTask> = await taskResponse.json();
-            if (!taskData.success) {
-                throw new Error(taskData.data);
-            }
-            const updatedTask = taskData.data;
+                body: JSON.stringify(updatedTaskData),
+            });
+
             // assignees update
             const assigneesResponse = await fetch(
                 `/api/projects/${task.project_id}/tasks/${task.task_id}/task_assignees`,
@@ -210,25 +205,19 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             }
 
             // reminders update
-            const remindersResponse = await fetch(
-                `/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`,
-                {
-                    method: "PUT",
-                    body: JSON.stringify({
-                        ids: updatedReminders,
-                    }),
-                },
-            );
-
-            const remindersData: ApiResponse<Reminders[]> = await remindersResponse.json();
-            if (!remindersData.success) throw new Error(remindersData.data);
-
-            // update task
-            updateTask({
-                ...updatedTask,
-                assignees: assigneesData.data,
-                reminders: remindersData.data,
+            await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`, {
+                method: "PUT",
+                body: JSON.stringify({ ids: updatedReminders }),
             });
+
+            const result: ApiResponse<ProjectTask> = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.data as string);
+            }
+
+            updateTask(result.data as ProjectTask);
+
             handleCloseModal();
         } catch (error) {
             console.error(error);
@@ -376,10 +365,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                             )}
                             MenuProps={MenuProps}
                         >
-                            {/* Task reminder options */}
-                            <MenuItem value="One Hour Before">One Hour Before</MenuItem>
-                            <MenuItem value="One Day Before">One Day Before</MenuItem>
-                            <MenuItem value="One Week Before">One Week Before</MenuItem>
+                            {reminderOptions.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Grid>

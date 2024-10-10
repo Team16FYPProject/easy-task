@@ -2,10 +2,12 @@ import {
     okResponse,
     unauthorizedResponse,
     serverErrorResponse,
+    internalErrorResponse,
 } from "@/utils/server/server.responses.utils";
 import { getSession } from "@/utils/server/auth.server.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
+import { Reminders } from "@/utils/types";
 
 export async function GET(request: Request, { params }: TaskIdParams) {
     const { user } = await getSession();
@@ -21,7 +23,6 @@ export async function GET(request: Request, { params }: TaskIdParams) {
     const supabase = getServiceSupabase();
 
     try {
-        // Fetch task reminders for the specific task
         const { data: remindersData, error: remindersError } = await supabase
             .from("task_reminder")
             .select(
@@ -41,12 +42,12 @@ export async function GET(request: Request, { params }: TaskIdParams) {
                     task_priority,
                     task_location,
                     task_is_meeting,
-                    task_assignee!inner (user_id)
+                    task_reminder!inner (user_id)
                 )
             `,
             )
             .eq("task_id", taskId)
-            .eq("task.task_assignee.user_id", user.id);
+            .eq("task.task_reminder.user_id", user.id);
 
         if (remindersError) {
             console.error(`Unable to fetch reminders for task ${taskId}`, remindersError);
@@ -57,7 +58,6 @@ export async function GET(request: Request, { params }: TaskIdParams) {
             return okResponse({ success: true, data: [] });
         }
 
-        // Fetch project related to the task
         const { data: projectData, error: projectError } = await supabase
             .from("project")
             .select("*")
@@ -69,7 +69,6 @@ export async function GET(request: Request, { params }: TaskIdParams) {
             return okResponse({ success: false, data: "Failed to fetch project details" });
         }
 
-        // Combine reminders with project data
         const reminders = remindersData.map((reminder) => ({
             reminder_id: reminder.reminder_id,
             reminder_datetime: reminder.reminder_datetime,
@@ -86,40 +85,37 @@ export async function GET(request: Request, { params }: TaskIdParams) {
     }
 }
 
-export async function POST(request: Request, { params }: TaskIdParams) {
+export async function PUT(request: Request, { params: { taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
 
-    const { taskId } = params;
-    if (!taskId) {
-        return serverErrorResponse({ success: false, data: "Task ID is required" });
+    const supabase = getServiceSupabase();
+    const { reminder_id, new_datetime } = await request.json();
+
+    if (!reminder_id || !new_datetime) {
+        return serverErrorResponse({
+            success: false,
+            data: "Reminder ID and new datetime are required",
+        });
     }
 
     try {
-        const data = await request.json();
-        const supabase = getServiceSupabase();
-
-        // Create new reminder for the specific task
-        const { data: newReminder, error } = await supabase
+        const { data, error } = await supabase
             .from("task_reminder")
-            .insert({
-                task_id: taskId,
-                reminder_datetime: data.reminder_datetime,
-                // Add any other necessary fields
-            })
-            .select()
-            .single();
+            .update({ reminder_datetime: new_datetime })
+            .eq("reminder_id", reminder_id)
+            .eq("task_id", taskId);
 
         if (error) {
-            console.error("Error creating new reminder:", error);
-            return serverErrorResponse({ success: false, data: "Failed to create reminder" });
+            console.error(`Error updating reminder for task ${taskId}:`, error);
+            return internalErrorResponse({ success: false, data: "Failed to update reminder" });
         }
 
-        return okResponse({ success: true, data: newReminder });
+        return okResponse({ success: true, data });
     } catch (error) {
-        console.error("Error processing POST request:", error);
+        console.error("Error updating reminder:", error);
         return serverErrorResponse({ success: false, data: "An unexpected error occurred" });
     }
 }
