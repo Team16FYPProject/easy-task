@@ -25,21 +25,45 @@ export async function createTask(
         taskLocation,
         taskAssignee,
     } = data;
+
+    // Check if Task Name is empty
     if (!taskName) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });
     }
+
+    // Check if Task Name is more than 30 characters
     if (taskName.length > 30) {
         return badRequestResponse({
             success: false,
             data: "Task name must be under 30 characters",
         });
     }
+
+    // Check if Task Description is more than 50 characters
+    if (taskDescription && taskDescription.length > 50) {
+        return badRequestResponse({
+            success: false,
+            data: "Task description must be under 50 characters",
+        });
+    }
+
+    // Check if we have a deadline
     if (!taskDeadline) {
         return badRequestResponse({
             success: false,
             data: "Task deadline is a required field",
         });
     }
+    // Check if the deadline date occurs after the current date
+    const currentDate = new Date();
+    const deadlineDate = new Date(taskDeadline);
+    if (deadlineDate < currentDate) {
+        return badRequestResponse({
+            success: false,
+            data: "Task deadline cannot be in the past",
+        });
+    }
+
     if (!taskStatus) {
         return badRequestResponse({
             success: false,
