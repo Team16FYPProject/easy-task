@@ -28,6 +28,12 @@ export async function createTask(
     if (!taskName) {
         return badRequestResponse({ success: false, data: "Task name is a required field" });
     }
+    if (taskName.length > 30) {
+        return badRequestResponse({
+            success: false,
+            data: "Task name must be under 30 characters",
+        });
+    }
     if (!taskDeadline) {
         return badRequestResponse({
             success: false,
@@ -78,16 +84,39 @@ export async function createTask(
         .select("*")
         .single();
 
+    let assigneeData: {
+        profile: { email: string; first_name: string; last_name: string };
+        user: { email: string; name: string };
+        user_id: string;
+    }[] = [];
     if (taskAssignee && taskAssignee.length > 0) {
         const { error: assigneeError } = await supabase
             .from("task_assignee")
             .upsert(taskAssignee.map((userId: string) => ({ task_id: taskId, user_id: userId })));
 
+        const { data: userData, error: userProfileError } = await supabase
+            .from("profile")
+            .select("user_id, email, first_name, last_name")
+            .in("user_id", taskAssignee);
+
         if (assigneeError) {
             console.error("Unable to assign users to task", assigneeError);
         }
+        if (userData) {
+            assigneeData = userData.map((user) => ({
+                profile: {
+                    email: user.email,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                },
+                user: {
+                    email: user.email,
+                    name: `${user.first_name} ${user.last_name}`,
+                },
+                user_id: user.user_id,
+            }));
+        }
     }
-
     if (taskError || !data) {
         console.error("Unable to insert task to database", taskError);
         return internalErrorResponse({
@@ -95,9 +124,15 @@ export async function createTask(
             data: "Unable to create task at this time. Please try again later",
         });
     }
-
+    const responseData = {
+        ...taskData,
+        assignees: assigneeData,
+    };
     if (create) {
-        return createdResponse({ success: true, data: { taskData } });
+        return createdResponse({
+            success: true,
+            data: responseData,
+        });
     } else {
         return okResponse({ success: true, data: "Successfully updated your tasks" });
     }
