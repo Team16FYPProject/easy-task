@@ -88,6 +88,7 @@ export interface User {
 export interface Reminders {
     reminder_id: string;
     task: ProjectTask;
+    task_id: string;
     profile: Profile;
     reminder_datetime: string;
 }

@@ -89,9 +89,9 @@ export default function AddTaskModal({
         let reminderDate = null;
         if (taskDeadline) {
             const reminderMapping = {
-                HOUR: 1,
-                DAY: 24,
-                WEEK: 168, // hours in a week
+                "One Hour Before": 1,
+                "One Day Before": 24,
+                "One Week Before": 168, // hours in a week
             };
 
             const taskDeadlineDate = new Date(taskDeadline);
