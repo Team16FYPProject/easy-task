@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
-import TeamMembers from "./page";
 import { useUser } from "@/hooks/useUser";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useRouter } from "next/navigation";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import TeamMembers from "./page";
 
 // Mock the hooks and modules
 vi.mock("@/hooks/useUser");

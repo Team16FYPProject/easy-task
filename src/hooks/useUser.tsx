@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { User } from "@supabase/auth-js";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { getBrowserSupabase } from "@/utils/supabase/client";
+import { User } from "@supabase/auth-js";
+import { useState } from "react";
 
 export const useUser = () => {
     const [loadingUser, setLoadingUser] = useState<boolean>(true);

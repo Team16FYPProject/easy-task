@@ -1,10 +1,10 @@
+import SiteAppBar from "@/components/AppBar";
 import "@/styles/globals.css";
+import theme from "@/styles/theme"; // Adjust the import path as necessary
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import type { Metadata } from "next";
 import React from "react";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import theme from "@/styles/theme"; // Adjust the import path as necessary
-import SiteAppBar from "@/components/AppBar";
 
 export const metadata: Metadata = {
     title: "Home",

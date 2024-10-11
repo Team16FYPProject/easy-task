@@ -1,4 +1,5 @@
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
+import { InviteMemberEmailTemplate } from "@/components/emails/InviteMemberEmailTemplate";
 import { getSession } from "@/utils/server/auth.server.utils";
 import {
     badRequestResponse,
@@ -7,9 +8,8 @@ import {
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { Resend } from "resend";
-import { InviteMemberEmailTemplate } from "@/components/emails/InviteMemberEmailTemplate";
 import { getServiceSupabase } from "@/utils/supabase/server";
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY ?? "re_123");
 

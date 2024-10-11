@@ -1,3 +1,4 @@
+import { ProjectTask } from "@/utils/types";
 import {
     Box,
     Button,
@@ -12,9 +13,8 @@ import {
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import React, { FormEvent, useEffect, useState } from "react";
-import { ProjectTask } from "@/utils/types";
 import dayjs, { Dayjs } from "dayjs";
+import React, { FormEvent, useEffect, useState } from "react";
 
 const style = {
     position: "absolute",
@@ -105,7 +105,6 @@ export default function AddTaskModal({
             type: timestamp.type,
         }));
 
-        // const taskAssignee = taskAssignees;
         // Prepare to send data
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {

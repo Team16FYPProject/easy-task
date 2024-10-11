@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react";
+import { ApiResponse, Assignee, Profile, ProjectTask, Reminder } from "@/utils/types";
 import {
-    Modal,
     Box,
-    Typography,
-    Grid,
-    TextField,
     Button,
-    Select,
-    MenuItem,
-    OutlinedInput,
     Chip,
-    FormControl,
     CircularProgress,
+    FormControl,
+    Grid,
+    MenuItem,
+    Modal,
+    OutlinedInput,
+    Select,
+    TextField,
+    Typography,
 } from "@mui/material";
-import { ProjectTask, Assignee, Profile, ApiResponse, Reminder } from "@/utils/types";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 
 interface EditTaskModalProps {
     open: boolean;
@@ -32,7 +32,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     updateTask,
 }) => {
     const [task, setTask] = useState<ProjectTask>(originalTask);
-    // console.log("task", task);
     const [taskAssignees, setTaskAssignees] = useState<string[]>(
         task.assignees.map((assignee) => assignee.user_id),
     );
@@ -66,11 +65,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 width: 250,
             },
         },
-    };
-
-    const sectionStyle = {
-        // borderBottom: "1px solid #e0e0e0",
-        // py: 1,
     };
 
     {
@@ -158,9 +152,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         if (task && task.task_deadline) {
             const deadline = new Date(task.task_deadline).getTime();
             const reminderStrings = convertTimestampsToReminders(task.reminders || [], deadline);
-            // console.log("task", task);
-            // console.log("reminderStrings", reminderStrings);
-            // console.log("task.reminders", task.reminders);
             setTaskReminders(reminderStrings);
         }
     }, [task]);
@@ -227,7 +218,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             if (!result.success) {
                 throw new Error(result.data as string);
             }
-            // console.log("result.data: ", result.data);
             updateTask(result.data as ProjectTask);
 
             handleCloseModal();
@@ -256,7 +246,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     </Typography>
                 )}
 
-                <Box sx={sectionStyle}>
+                <Box>
                     <TextField
                         fullWidth
                         required
@@ -269,7 +259,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     />
                 </Box>
 
-                <Box sx={sectionStyle}>
+                <Box>
                     <TextField
                         fullWidth
                         id="task-description"
@@ -283,7 +273,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     />
                 </Box>
 
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <Grid item xs={6}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DateTimePicker
@@ -311,7 +301,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
@@ -344,7 +334,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
                 {/* Reminder Select */}
 
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <FormControl fullWidth>
                         <label>Task Reminders</label>
                         <Select
@@ -387,7 +377,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 </Grid>
 
                 {/* </Modal>Assignees - Need to fix backend */}
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <FormControl fullWidth>
                         <label>Task Assignees</label>
                         <Select

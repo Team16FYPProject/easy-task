@@ -1,10 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
+import { useRouter } from "next/navigation";
 
+import AddTaskModal from "@/components/AddTaskModal";
+import ViewTaskModal from "@/components/ViewTaskModal";
+import { ProjectTask } from "@/utils/types";
 import {
     Button,
     Chip,
@@ -21,11 +24,8 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import AddTaskModal from "@/components/AddTaskModal";
-import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
-import { ProjectTask } from "@/utils/types";
-import ViewTaskModal from "@/components/ViewTaskModal";
+import React, { useEffect, useState } from "react";
 
 export default function ListView() {
     const router = useRouter();
@@ -280,16 +280,7 @@ export default function ListView() {
                                         arcLabelRadius: "40%",
                                     },
                                 ]}
-                                slotProps={
-                                    {
-                                        // pieCenter: {
-                                        //     pieCenterLabel: "XX Achievements",
-                                        //     fontSize: 15,
-                                        // },
-                                    }
-                                }
                                 width={400}
-                                // height={200}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={6}>
@@ -311,16 +302,7 @@ export default function ListView() {
                                         arcLabelRadius: "40%",
                                     },
                                 ]}
-                                slotProps={
-                                    {
-                                        // pieCenter: {
-                                        //     pieCenterLabel: "XX Achievements",
-                                        //     fontSize: 15,
-                                        // },
-                                    }
-                                }
                                 width={400}
-                                // height={200}
                             />
                         </Grid>
                     </Grid>
@@ -369,7 +351,6 @@ export default function ListView() {
                 <ViewTaskModal
                     open={viewTaskOpen}
                     handleCloseModal={handleCloseModal}
-                    // onClose={handleCloseModal}
                     task={selectedTask}
                     updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
                     handleDeleteTask={function (taskId: string): void {

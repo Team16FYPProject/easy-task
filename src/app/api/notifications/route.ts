@@ -1,9 +1,9 @@
+import { getSession } from "@/utils/server/auth.server.utils";
 import {
     okResponse,
-    unauthorizedResponse,
     serverErrorResponse,
+    unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { getSession } from "@/utils/server/auth.server.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
 export async function GET() {
@@ -105,7 +105,6 @@ export async function POST(request: Request) {
             .insert({
                 task_id: data.task_id,
                 reminder_datetime: data.reminder_datetime,
-                // Add any other necessary fields
             })
             .select()
             .single();

@@ -1,6 +1,6 @@
-import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
-import { getSession } from "@/utils/server/auth.server.utils";
 import { setProjectSettings } from "@/app/api/projects/utils";
+import { getSession } from "@/utils/server/auth.server.utils";
+import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
 export async function GET() {

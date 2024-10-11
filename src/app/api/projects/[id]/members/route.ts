@@ -1,4 +1,5 @@
 import { ProjectIdParams } from "@/app/api/projects/[id]/types";
+import { isValidEmail } from "@/utils/check.utils";
 import { getSession } from "@/utils/server/auth.server.utils";
 import {
     badRequestResponse,
@@ -7,7 +8,6 @@ import {
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
-import { isValidEmail } from "@/utils/check.utils";
 
 export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();

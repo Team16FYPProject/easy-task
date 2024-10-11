@@ -1,11 +1,11 @@
 import { InviteIdParams } from "@/app/api/invites/[id]/types";
-import { getServiceSupabase } from "@/utils/supabase/server";
+import { getSession } from "@/utils/server/auth.server.utils";
 import {
     badRequestResponse,
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { getSession } from "@/utils/server/auth.server.utils";
+import { getServiceSupabase } from "@/utils/supabase/server";
 
 export async function GET(_: Request, { params: { id } }: InviteIdParams) {
     const session = await getSession();

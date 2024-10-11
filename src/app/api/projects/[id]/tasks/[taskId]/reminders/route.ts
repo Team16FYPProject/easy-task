@@ -1,13 +1,12 @@
-import {
-    okResponse,
-    unauthorizedResponse,
-    serverErrorResponse,
-    internalErrorResponse,
-} from "@/utils/server/server.responses.utils";
 import { getSession } from "@/utils/server/auth.server.utils";
+import {
+    internalErrorResponse,
+    okResponse,
+    serverErrorResponse,
+    unauthorizedResponse,
+} from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
-import { Reminder } from "@/utils/types";
 
 export async function GET(request: Request, { params }: TaskIdParams) {
     const { user } = await getSession();
@@ -42,26 +41,6 @@ export async function GET(request: Request, { params }: TaskIdParams) {
         if (!remindersData || remindersData.length === 0) {
             return okResponse({ success: true, data: [] });
         }
-
-        // const { data: projectData, error: projectError } = await supabase
-        //     .from("project")
-        //     .select("*")
-        //     .eq("project_id", remindersData[0].task.project_id)
-        //     .single();
-
-        // if (projectError) {
-        //     console.error(`Unable to fetch project for task ${taskId}`, projectError);
-        //     return okResponse({ success: false, data: "Failed to fetch project details" });
-        // }
-
-        // const reminders = remindersData.map((reminder) => ({
-        //     reminder_id: reminder.reminder_id,
-        //     reminder_datetime: reminder.reminder_datetime,
-        //     task: {
-        //         ...reminder.task,
-        //         project: projectData,
-        //     },
-        // }));
 
         return okResponse({ success: true, data: remindersData });
     } catch (error) {

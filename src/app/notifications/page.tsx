@@ -1,24 +1,23 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
+import { ApiResponse, Project, Reminder } from "@/utils/types";
 import {
+    Alert,
     Container,
     Grid,
-    Typography,
-    TableContainer,
     Paper,
+    Skeleton,
     Table,
+    TableBody,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
-    TableCell,
-    TableBody,
-    Skeleton,
-    Alert,
+    Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import React from "react";
-import { ApiResponse, Reminder, ProjectTask, Project } from "@/utils/types";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function Notifications() {
     const router = useRouter();
@@ -75,8 +74,6 @@ export default function Notifications() {
 
                 setDisplayedNotifications(notificationsResult.data);
                 setDebugInfo(`Number of notifications: ${notificationsResult.data.length}`);
-
-                // ... (rest of the function remains the same)
             } catch (e) {
                 console.error("Error:", e);
                 setError(e instanceof Error ? e.message : "An unexpected error occurred");
@@ -110,12 +107,11 @@ export default function Notifications() {
             const diffTime = Math.abs(dueDate.getTime() - today.getTime());
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             const project = projects.get(reminder.task.project_id);
-
             return (
                 <TableRow key={reminder.reminder_id}>
-                    <TableCell>{notificationDate.toLocaleDateString()}</TableCell>
+                    <TableCell>{`${notificationDate.toLocaleDateString()} ${notificationDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}</TableCell>
                     <TableCell>
-                        {project ? project.project_name : reminder.task.project_id}
+                        {project ? project.project_name : reminder.task.project.project_name}
                     </TableCell>
                     <TableCell>
                         {`${reminder.task.task_name} is due in ${diffDays} days (on ${dueDate.toLocaleDateString()}). `}
@@ -177,8 +173,8 @@ export default function Notifications() {
                 </Grid>
             </Grid>
             {/* Debug Info*/}
-            <Typography variant="h6">Debug Information</Typography>
-            <pre>{debugInfo}</pre>
+            {/* <Typography variant="h6">Debug Information</Typography>
+            <pre>{debugInfo}</pre> */}
         </Container>
     );
 }

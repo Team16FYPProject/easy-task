@@ -1,4 +1,4 @@
-import { vi, test, describe, expect } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { POST } from "./route";
 
 vi.mock("@/utils/supabase/server", () => ({

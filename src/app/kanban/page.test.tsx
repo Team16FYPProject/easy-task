@@ -1,8 +1,8 @@
-import { expect, test, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
 import Kanban from "@/app/kanban/page";
 import { useUser } from "@/hooks/useUser";
+import { render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
+import { expect, test, vi } from "vitest";
 
 // Mock the hooks and modules
 vi.mock("@/hooks/useUser");
@@ -23,7 +23,14 @@ vi.mock("@/components/Kanban", () => ({
 
 // Setup function to mock fetch and router
 const setup = () => {
-    const mockRouter = { push: vi.fn() };
+    const mockRouter = {
+        push: vi.fn(),
+        back: vi.fn(),
+        forward: vi.fn(),
+        refresh: vi.fn(),
+        replace: vi.fn(),
+        prefetch: vi.fn(),
+    };
     vi.mocked(useRouter).mockReturnValue(mockRouter);
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,

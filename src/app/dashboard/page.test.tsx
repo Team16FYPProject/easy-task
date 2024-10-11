@@ -1,9 +1,9 @@
 // This file contains tests for the Dashboard page component
-import { expect, test, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Dashboard from "@/app/dashboard/page";
 import { useUser } from "@/hooks/useUser";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
+import { expect, test, vi } from "vitest";
 
 // Mock the hooks and modules
 vi.mock("@/hooks/useUser");

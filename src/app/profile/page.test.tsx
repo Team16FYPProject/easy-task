@@ -1,9 +1,9 @@
-import { expect, test, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import ProfilePage from "./page";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/useUser";
 import { useAchievements } from "@/hooks/useAchievements";
+import { useUser } from "@/hooks/useUser";
+import { render, screen, waitFor } from "@testing-library/react";
+import { useRouter } from "next/navigation";
+import { expect, test, vi } from "vitest";
+import ProfilePage from "./page";
 
 // Mocking dependencies
 vi.mock("next/navigation", () => ({

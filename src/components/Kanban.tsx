@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
+import ViewTaskModal from "@/components/ViewTaskModal";
+import { Assignee, ProjectTask, Reminder } from "@/utils/types";
 import { Button, FormControl, InputLabel, MenuItem } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
+import { determineBgColor, determineTextColor } from "../utils/colourUtils";
 import { Project } from "../utils/types";
 import AddTaskModal from "./AddTaskModal";
-import { determineBgColor, determineTextColor } from "../utils/colourUtils";
-import { ProjectTask, Assignee, Reminder } from "@/utils/types";
-import ViewTaskModal from "@/components/ViewTaskModal";
 // Types
 
 /**
@@ -307,7 +307,6 @@ export const Column: React.FC<ColumnProps> = ({
     }
 
     const [active, setActive] = useState(false); // state for active drag
-    // const [error, setError] = useState<string>("");
     const filteredCards = cards.filter((c) => c.task_status === column); // filters cards to only those in the same column
 
     // function to handle the start of a drag
@@ -493,10 +492,6 @@ const Card: React.FC<CardProp> = ({
         setViewTaskOpen(false);
     };
 
-    // const handleDelete = () => {
-    //     handleDeleteTask(task_id);
-    // };
-
     return (
         <>
             <DropIndicator beforeId={task_id} column={task_status} />
@@ -548,7 +543,6 @@ const Card: React.FC<CardProp> = ({
                 <ViewTaskModal
                     open={viewTaskOpen}
                     handleCloseModal={handleCloseModal}
-                    // onClose={handleCloseModal}
                     task={{
                         project_id,
                         task_creator_id,
