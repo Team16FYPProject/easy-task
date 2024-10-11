@@ -25,6 +25,7 @@ import AddTaskModal from "@/components/AddTaskModal";
 import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
 import { ProjectTask } from "@/utils/types";
+import ViewTaskModal from "@/components/ViewTaskModal";
 
 export default function ListView() {
     const router = useRouter();
@@ -41,6 +42,7 @@ export default function ListView() {
         { id: number; value: number; color: string; label: string }[]
     >([]);
     const theme = useTheme(); // Access the MUI theme
+    const [updatedTask, setUpdatedTask] = useState<ProjectTask | null>(null);
 
     // Redirect to login if user is not logged in
     useEffectAsync(async () => {
@@ -179,6 +181,15 @@ export default function ListView() {
         theme.palette.tertiary?.main,
     ]);
 
+    const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
+    const handleRowClick = () => {
+        setViewTaskOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setViewTaskOpen(false);
+    };
+
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
@@ -187,7 +198,7 @@ export default function ListView() {
     // Generate rows for the table
     function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
         return tasks.map((task, index) => (
-            <TableRow key={index}>
+            <TableRow key={index} onClick={() => handleRowClick()}>
                 <TableCell>
                     {new Intl.DateTimeFormat("en-AU", {
                         day: "2-digit",
@@ -209,6 +220,15 @@ export default function ListView() {
                 </TableCell>
                 <TableCell>{task.task_is_meeting ? "Yes" : "No"}</TableCell>
                 <TableCell>{task.task_status}</TableCell>
+                {viewTaskOpen && (
+                    <ViewTaskModal
+                        open={viewTaskOpen}
+                        handleCloseModal={handleCloseModal}
+                        // onClose={handleCloseModal}
+                        task={task}
+                        updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
+                    />
+                )}
             </TableRow>
         ));
     }
