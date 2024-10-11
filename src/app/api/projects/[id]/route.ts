@@ -63,7 +63,7 @@ export async function PATCH(request: Request, { params: { id } }: ProjectIdParam
     return okResponse({ success: true, data: "Project settings updated." });
 }
 
-export async function PUT(request: Request, { params: { id } }: ProjectIdParams) {
+export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session.user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
