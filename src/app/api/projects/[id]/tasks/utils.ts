@@ -147,7 +147,7 @@ export async function createTask(
     }
 
     // Handle task reminders
-    console.log("Task reminder", taskReminder);
+    // console.log("Task reminder", taskReminder);
     if (taskReminder && taskReminder.length > 0) {
         const reminderInserts = taskReminder.map(
             (reminder: { reminder_datetime: string; type: string }) => ({

@@ -85,7 +85,7 @@ export async function POST(request: Request, { params: { taskId } }: TaskIdParam
             data: "Reminder ID and new datetime are required",
         });
     }
-    console.log(new_datetimes);
+    // console.log(new_datetimes);
     const remindersToInsert = new_datetimes.map((datetime) => ({
         task_id: taskId,
         reminder_datetime: datetime.reminder_datetime,

@@ -158,9 +158,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         if (task && task.task_deadline) {
             const deadline = new Date(task.task_deadline).getTime();
             const reminderStrings = convertTimestampsToReminders(task.reminders || [], deadline);
-            console.log("task", task);
-            console.log("reminderStrings", reminderStrings);
-            console.log("task.reminders", task.reminders);
+            // console.log("task", task);
+            // console.log("reminderStrings", reminderStrings);
+            // console.log("task.reminders", task.reminders);
             setTaskReminders(reminderStrings);
         }
     }, [task]);

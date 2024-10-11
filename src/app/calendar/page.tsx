@@ -84,7 +84,7 @@ export default function CalendarView() {
                     tasks.map((task: any) => ({ ...task, project_name })),
                 );
                 setTasks(allTasks);
-                console.log(allTasks);
+                // console.log(allTasks);
             } catch (e) {
                 console.error("Error:", e);
             } finally {

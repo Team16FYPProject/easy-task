@@ -43,6 +43,7 @@ export default function ListView() {
     >([]);
     const theme = useTheme(); // Access the MUI theme
     const [updatedTask, setUpdatedTask] = useState<ProjectTask | null>(null);
+    const [selectedTask, setSelectedTask] = useState<ProjectTask | null>(null);
 
     // Redirect to login if user is not logged in
     useEffectAsync(async () => {
@@ -182,7 +183,8 @@ export default function ListView() {
     ]);
 
     const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
-    const handleRowClick = () => {
+    const handleRowClick = (task: ProjectTask) => {
+        setSelectedTask(task);
         setViewTaskOpen(true);
     };
 
@@ -197,8 +199,13 @@ export default function ListView() {
 
     // Generate rows for the table
     function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
-        return tasks.map((task, index) => (
-            <TableRow key={index} onClick={() => handleRowClick()}>
+        // Sort tasks by date
+        const sortedTasks = tasks.sort(
+            (a, b) => new Date(a.task_deadline).getTime() - new Date(b.task_deadline).getTime(),
+        );
+
+        return sortedTasks.map((task, index) => (
+            <TableRow key={index} onClick={() => handleRowClick(task)}>
                 <TableCell>
                     {new Intl.DateTimeFormat("en-AU", {
                         day: "2-digit",
@@ -220,25 +227,16 @@ export default function ListView() {
                 </TableCell>
                 <TableCell>{task.task_is_meeting ? "Yes" : "No"}</TableCell>
                 <TableCell>{task.task_status}</TableCell>
-                {viewTaskOpen && (
-                    <ViewTaskModal
-                        open={viewTaskOpen}
-                        handleCloseModal={handleCloseModal}
-                        // onClose={handleCloseModal}
-                        task={task}
-                        updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
-                    />
-                )}
             </TableRow>
         ));
     }
 
     return (
         <Container sx={{ padding: 2 }}>
-            <Grid container direction="column" spacing={2}>
+            <Grid container direction="column" spacing={0}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+                    <Grid container spacing={0} alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Typography variant="h4">List View</Typography>
                         </Grid>
@@ -262,7 +260,7 @@ export default function ListView() {
                 </Grid>
                 {/* Insights */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={0}>
                         <Grid item xs={12} sm={6} md={6} style={{ height: "300px" }}>
                             {/* stats chart */}
                             <PieChart
@@ -367,6 +365,18 @@ export default function ListView() {
                     </TableContainer>
                 </Grid>
             </Grid>
+            {viewTaskOpen && (
+                <ViewTaskModal
+                    open={viewTaskOpen}
+                    handleCloseModal={handleCloseModal}
+                    // onClose={handleCloseModal}
+                    task={selectedTask}
+                    updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
+                    handleDeleteTask={function (taskId: string): void {
+                        throw new Error("Function not implemented.");
+                    }}
+                />
+            )}
         </Container>
     );
 }
