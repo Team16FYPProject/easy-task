@@ -16,7 +16,7 @@ export async function createTask(
 ): Promise<Response> {
     const {
         taskName,
-        taskDescription,
+        taskDesc,
         taskDeadline,
         taskPriority,
         taskParent,
@@ -24,6 +24,7 @@ export async function createTask(
         taskMeetingBool,
         taskLocation,
         taskAssignee,
+        taskReminder,
     } = data;
 
     // Check if Task Name is empty
@@ -40,7 +41,7 @@ export async function createTask(
     }
 
     // Check if Task Description is more than 50 characters
-    if (taskDescription && taskDescription.length > 50) {
+    if (taskDesc && taskDesc.length > 50) {
         return badRequestResponse({
             success: false,
             data: "Task description must be under 50 characters",
@@ -95,7 +96,7 @@ export async function createTask(
             task_id: taskId,
             project_id: projectId,
             task_name: taskName,
-            task_desc: taskDescription,
+            task_desc: taskDesc,
             task_deadline: taskDeadline,
             task_time_spent: 0,
             task_creator_id: user.id,
@@ -126,6 +127,9 @@ export async function createTask(
         if (assigneeError) {
             console.error("Unable to assign users to task", assigneeError);
         }
+        if (userProfileError) {
+            console.error("Unable to fetch user profiles", userProfileError);
+        }
         if (userData) {
             assigneeData = userData.map((user) => ({
                 profile: {
@@ -141,6 +145,27 @@ export async function createTask(
             }));
         }
     }
+
+    // Handle task reminders
+    console.log("Task reminder", taskReminder);
+    if (taskReminder && taskReminder.length > 0) {
+        const reminderInserts = taskReminder.map(
+            (reminder: { reminder_datetime: string; type: string }) => ({
+                task_id: taskId,
+                reminder_datetime: reminder.reminder_datetime,
+                type: reminder.type,
+            }),
+        );
+
+        const { error: reminderError } = await supabase
+            .from("task_reminder")
+            .upsert(reminderInserts);
+
+        if (reminderError) {
+            console.error("Unable to set reminders for task", reminderError);
+        }
+    }
+
     if (taskError || !data) {
         console.error("Unable to insert task to database", taskError);
         return internalErrorResponse({
@@ -151,6 +176,7 @@ export async function createTask(
     const responseData = {
         ...taskData,
         assignees: assigneeData,
+        reminders: taskReminder,
     };
     if (create) {
         return createdResponse({

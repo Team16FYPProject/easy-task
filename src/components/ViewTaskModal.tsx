@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Box, Typography, Grid, Paper, Chip, Button, TextField } from "@mui/material";
-import { ProjectTask } from "@/utils/types";
+import { ProjectTask, ReminderType } from "@/utils/types";
 import EditTaskModal from "@/components/EditTaskModal";
 import { determineBgColor } from "@/utils/colourUtils";
 
@@ -9,6 +9,7 @@ interface ViewTaskModalProps {
     handleCloseModal: () => void;
     task: ProjectTask;
     updateTask: (updatedTask: ProjectTask) => void;
+    handleDeleteTask: (taskId: string) => void;
 }
 
 const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
@@ -16,6 +17,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     handleCloseModal,
     task,
     updateTask,
+    handleDeleteTask,
 }) => {
     const [currentTask, setCurrentTask] = React.useState(task);
 
@@ -38,13 +40,22 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
 
     const [taskOpen, setOpen] = React.useState(false);
     const [taskEditOpen, setEditOpen] = React.useState(false);
+    const [taskDeleteOpen, setDeleteOpen] = React.useState(false);
     const handleOpenEditModal = () => setEditOpen(true);
     const handleEditClose = () => setEditOpen(false);
+    const handleOpenDeleteModal = () => setDeleteOpen(true);
+    const handleDeleteClose = () => setDeleteOpen(false);
 
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
     const bgColor = determineBgColor(currentTask.task_priority);
     const [hoursToLog, setHoursToLog] = useState(1);
+
+    const handleDelete = () => {
+        // Perform any additional logic for deleting the task
+        handleDeleteTask(task.task_id);
+        // handleClose();
+    };
 
     const handleLogClick = async () => {
         try {
@@ -69,6 +80,40 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
         }
     };
 
+    export function getReminderDisplayValue(type: string): string {
+        switch (type) {
+            case "OneHour":
+                return ReminderType.OneHour;
+            case "OneDay":
+                return ReminderType.OneDay;
+            case "OneWeek":
+                return ReminderType.OneWeek;
+            default:
+                return type; // Fallback to the original value if not found
+        }
+    }
+
+    // // getting reminder data
+    // useEffect(() => {
+    //     const fetchReminders = async () => {
+    //         const response = await fetch(
+    //             `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/reminders`,
+    //             {
+    //                 method: "GET",
+    //                 credentials: "include",
+    //             },
+    //         );
+    //         const data = await response.json();
+    //         if (data.success) {
+    //             setCurrentTask((prevTask) => ({ ...prevTask, reminders: data.data }));
+    //         }
+    //     };
+
+    //     if (open) {
+    //         fetchReminders();
+    //     }
+    // }, [open, currentTask.task_id]);
+
     return (
         <Modal open={open} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
@@ -83,7 +128,10 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 </Box>
 
                 <Box sx={sectionStyle}>
-                    <Typography variant="body1">{currentTask.task_desc}</Typography>
+                    <Typography variant="body1">
+                        {"Description: " +
+                            (currentTask.task_desc ? currentTask.task_desc : "No description")}
+                    </Typography>
                 </Box>
 
                 <Grid container spacing={2} sx={sectionStyle}>
@@ -102,6 +150,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
+                {/* Reminders */}
                 <Grid container spacing={2} sx={sectionStyle}>
                     <Grid item xs={6}>
                         <Typography variant="body2">
@@ -117,7 +166,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="body2">
-                            Location: {currentTask.task_location}
+                            Location: {currentTask.task_location || "No location set"}
                         </Typography>
                     </Grid>
                 </Grid>
@@ -150,13 +199,31 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={2} sx={sectionStyle}>
-                    <Grid item xs={6}>
-                        <Grid item xs={6}>
-                            <Typography variant="body2">Reminder: Backend</Typography>
-                        </Grid>
-                    </Grid>
-                </Grid>
+                {/* Reminders */}
+                <Box sx={{ ...sectionStyle, borderBottom: "none" }}>
+                    <Typography variant="h6" gutterBottom>
+                        Reminders
+                    </Typography>
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        {currentTask.reminders && currentTask.reminders.length > 0 ? (
+                            currentTask.reminders.map((reminder, index) => (
+                                <Typography variant="body2" key={index}>
+                                    Reminder set for:{" "}
+                                    {new Date(reminder.reminder_datetime).toLocaleString([], {
+                                        year: "numeric",
+                                        month: "2-digit",
+                                        day: "2-digit",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}{" "}
+                                    {getReminderDisplayValue(reminder.type)}
+                                </Typography>
+                            ))
+                        ) : (
+                            <Typography>No reminders set</Typography>
+                        )}
+                    </Paper>
+                </Box>
 
                 <Box sx={{ ...sectionStyle, borderBottom: "none" }}>
                     <Typography variant="h6" gutterBottom>
@@ -193,6 +260,9 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         alignItems: "center",
                     }}
                 >
+                    <Button variant="contained" color="error" onClick={handleOpenDeleteModal}>
+                        DELETE TASK
+                    </Button>
                     <Button variant="contained" color="secondary" onClick={handleOpenEditModal}>
                         EDIT TASK
                     </Button>
@@ -205,6 +275,51 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                             updateTask(updatedTask);
                         }}
                     />
+                    <Modal open={taskDeleteOpen} onClose={handleDeleteClose}>
+                        <Box sx={modalStyle}>
+                            <Typography variant="h6" component="h2" gutterBottom>
+                                Confirm Task Deletion
+                            </Typography>
+                            <Typography variant="body2" sx={{ mb: 2 }}>
+                                Are you sure you want to delete this task? This action cannot be
+                                undone.
+                            </Typography>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleDeleteClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={async () => {
+                                        try {
+                                            const route = `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}`;
+                                            await fetch(route, {
+                                                method: "DELETE",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                            });
+                                            handleDelete();
+                                            handleDeleteClose();
+                                            handleCloseModal();
+                                        } catch (e) {
+                                            console.error(
+                                                `Error deleting task ${currentTask.task_id}:`,
+                                                e,
+                                            );
+                                        }
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Modal>
                 </Box>
             </Box>
         </Modal>
