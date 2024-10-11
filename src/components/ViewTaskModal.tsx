@@ -80,7 +80,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
         }
     };
 
-    export function getReminderDisplayValue(type: string): string {
+    function getReminderDisplayValue(type: string): string {
         switch (type) {
             case "OneHour":
                 return ReminderType.OneHour;
