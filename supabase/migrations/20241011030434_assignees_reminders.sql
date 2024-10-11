@@ -1,4 +1,4 @@
-CREATE TYPE task_reminder_type_enum AS ENUM ('1H', '1D', '1W');
+CREATE TYPE task_reminder_type_enum AS ENUM ('OneHour', 'OneDay', 'OneWeek');
 ALTER TABLE "task_reminder"
 ADD COLUMN "type" task_reminder_type_enum NOT NULL;
 

@@ -93,9 +93,16 @@ export interface User {
 }
 
 export interface Reminder {
+    type: string;
     reminder_id: string;
     task: ProjectTask;
     task_id: string;
     profile: Profile;
     reminder_datetime: string;
+}
+
+export enum ReminderType {
+    OneHour = "1 Hour Before",
+    OneDay = "1 Day Before",
+    OneWeek = "1 Week Before",
 }

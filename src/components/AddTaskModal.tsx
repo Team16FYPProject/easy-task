@@ -101,9 +101,11 @@ export default function AddTaskModal({
         const reminderTimestamps = calculateReminderTimestamps(taskDeadline, taskReminders);
 
         const reminders = reminderTimestamps.map((timestamp) => ({
-            reminder_datetime: timestamp.toISOString(),
+            reminder_datetime: timestamp.reminder_datetime.toISOString(),
+            type: timestamp.type,
         }));
 
+        // const taskAssignee = taskAssignees;
         // Prepare to send data
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {
@@ -121,8 +123,8 @@ export default function AddTaskModal({
                 taskStatus,
                 taskIsMeeting: taskMeetingBool,
                 taskLocation: taskLocation || null,
-                // taskAssignee: taskAssignee || null, // Assignees
-                // taskReminder: reminders || null, // Reminders
+                taskAssignee: taskAssignee || null, // Assignees
+                taskReminder: reminders || null, // Reminders
                 taskDuration: taskMeetingBool ? taskDuration : null, // Only set duration if it's a meeting
             }),
         });
@@ -152,17 +154,20 @@ export default function AddTaskModal({
         "One Week Before",
     ];
 
-    const calculateReminderTimestamps = (deadline: Dayjs, reminders: ReminderOption[]): Dayjs[] => {
+    const calculateReminderTimestamps = (
+        deadline: Dayjs,
+        reminders: ReminderOption[],
+    ): { reminder_datetime: Dayjs; type: string }[] => {
         return reminders.map((reminder) => {
             switch (reminder) {
                 case "One Hour Before":
-                    return deadline.subtract(1, "hour");
+                    return { reminder_datetime: deadline.subtract(1, "hour"), type: "1H" };
                 case "One Day Before":
-                    return deadline.subtract(1, "day");
+                    return { reminder_datetime: deadline.subtract(1, "day"), type: "1D" };
                 case "One Week Before":
-                    return deadline.subtract(1, "week");
+                    return { reminder_datetime: deadline.subtract(1, "week"), type: "1W" };
                 default:
-                    return deadline; // Fallback to deadline if unknown option
+                    return { reminder_datetime: deadline, type: "UNKNOWN" }; // Fallback to deadline if unknown option
             }
         });
     };

@@ -22,6 +22,7 @@ type ColumnProps = {
     setCards: React.Dispatch<React.SetStateAction<ProjectTask[]>>;
     setTasksDict: React.Dispatch<React.SetStateAction<Map<string, { tasks: ProjectTask[] }>>>;
     setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    handleDeleteTask: (taskId: string) => void;
 };
 /**
  * @param project_id: The id of the project
@@ -57,6 +58,7 @@ type CardProp = {
     task_status: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => void;
     setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    handleDeleteTask: (taskId: string) => void;
 };
 /**
  * @param beforeId: The id of the column it is being dragged from

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Box, Typography, Grid, Paper, Chip, Button, TextField } from "@mui/material";
-import { ProjectTask } from "@/utils/types";
+import { ProjectTask, ReminderType } from "@/utils/types";
 import EditTaskModal from "@/components/EditTaskModal";
 import { determineBgColor } from "@/utils/colourUtils";
 
@@ -80,26 +80,39 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
         }
     };
 
-    // getting reminder data
-    useEffect(() => {
-        const fetchReminders = async () => {
-            const response = await fetch(
-                `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/reminders`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                },
-            );
-            const data = await response.json();
-            if (data.success) {
-                setCurrentTask((prevTask) => ({ ...prevTask, reminders: data.data }));
-            }
-        };
-
-        if (open) {
-            fetchReminders();
+    export function getReminderDisplayValue(type: string): string {
+        switch (type) {
+            case "OneHour":
+                return ReminderType.OneHour;
+            case "OneDay":
+                return ReminderType.OneDay;
+            case "OneWeek":
+                return ReminderType.OneWeek;
+            default:
+                return type; // Fallback to the original value if not found
         }
-    }, [open, currentTask.task_id]);
+    }
+
+    // // getting reminder data
+    // useEffect(() => {
+    //     const fetchReminders = async () => {
+    //         const response = await fetch(
+    //             `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/reminders`,
+    //             {
+    //                 method: "GET",
+    //                 credentials: "include",
+    //             },
+    //         );
+    //         const data = await response.json();
+    //         if (data.success) {
+    //             setCurrentTask((prevTask) => ({ ...prevTask, reminders: data.data }));
+    //         }
+    //     };
+
+    //     if (open) {
+    //         fetchReminders();
+    //     }
+    // }, [open, currentTask.task_id]);
 
     return (
         <Modal open={open} onClose={handleCloseModal}>
@@ -115,7 +128,10 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 </Box>
 
                 <Box sx={sectionStyle}>
-                    <Typography variant="body1">{currentTask.task_desc}</Typography>
+                    <Typography variant="body1">
+                        {"Description: " +
+                            (currentTask.task_desc ? currentTask.task_desc : "No description")}
+                    </Typography>
                 </Box>
 
                 <Grid container spacing={2} sx={sectionStyle}>
@@ -199,7 +215,8 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                                         day: "2-digit",
                                         hour: "2-digit",
                                         minute: "2-digit",
-                                    })}
+                                    })}{" "}
+                                    {getReminderDisplayValue(reminder.type)}
                                 </Typography>
                             ))
                         ) : (

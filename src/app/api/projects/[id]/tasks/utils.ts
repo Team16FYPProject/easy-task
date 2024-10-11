@@ -16,7 +16,7 @@ export async function createTask(
 ): Promise<Response> {
     const {
         taskName,
-        taskDescription,
+        taskDesc,
         taskDeadline,
         taskPriority,
         taskParent,
@@ -72,7 +72,7 @@ export async function createTask(
             task_id: taskId,
             project_id: projectId,
             task_name: taskName,
-            task_desc: taskDescription,
+            task_desc: taskDesc,
             task_deadline: taskDeadline,
             task_time_spent: 0,
             task_creator_id: user.id,
@@ -103,6 +103,9 @@ export async function createTask(
         if (assigneeError) {
             console.error("Unable to assign users to task", assigneeError);
         }
+        if (userProfileError) {
+            console.error("Unable to fetch user profiles", userProfileError);
+        }
         if (userData) {
             assigneeData = userData.map((user) => ({
                 profile: {
@@ -120,11 +123,15 @@ export async function createTask(
     }
 
     // Handle task reminders
+    console.log("Task reminder", taskReminder);
     if (taskReminder && taskReminder.length > 0) {
-        const reminderInserts = taskReminder.map((reminder: { reminder_datetime: string }) => ({
-            task_id: taskId,
-            reminder_datetime: reminder.reminder_datetime,
-        }));
+        const reminderInserts = taskReminder.map(
+            (reminder: { reminder_datetime: string; type: string }) => ({
+                task_id: taskId,
+                reminder_datetime: reminder.reminder_datetime,
+                type: reminder.type,
+            }),
+        );
 
         const { error: reminderError } = await supabase
             .from("task_reminder")
