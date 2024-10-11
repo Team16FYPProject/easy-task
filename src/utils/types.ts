@@ -70,6 +70,7 @@ export type ProjectTask = {
     task_time_spent: number;
     task_status: string;
     assignees: Assignee[];
+    reminders: Reminder[];
 };
 
 // Interface for Assignee
@@ -79,14 +80,29 @@ export interface Assignee {
     user: User;
 }
 
+// export interface Reminder {
+//     reminder_id: string;
+//     task_id: string;
+//     reminder_datetime: string;
+//     type: string;
+// }
+
 export interface User {
     email: string;
     name: string;
 }
 
-export interface Reminders {
+export interface Reminder {
+    type: string;
     reminder_id: string;
     task: ProjectTask;
+    task_id: string;
     profile: Profile;
     reminder_datetime: string;
+}
+
+export enum ReminderType {
+    OneHour = "1 Hour Before",
+    OneDay = "1 Day Before",
+    OneWeek = "1 Week Before",
 }

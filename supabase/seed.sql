@@ -91,9 +91,9 @@ CROSS JOIN unnest(user_ids) AS u(id)
 WHERE random() > 0.5;  -- 50% chance of each user being assigned to each task
 
 -- Dummy data for task_reminder table
-INSERT INTO task_reminder (task_id, reminder_datetime)
-SELECT task_id, task_deadline - (random() * INTERVAL '3 days')
-FROM task;
+-- INSERT INTO task_reminder (task_id, reminder_datetime)
+-- SELECT task_id, task_deadline - (random() * INTERVAL '3 days')
+-- FROM task;
 
 -- Dummy data for user_achievement table
 INSERT INTO user_achievement (user_id, achievement_id, progress, completed, completed_at)

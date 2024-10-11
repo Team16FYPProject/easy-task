@@ -33,3 +33,7 @@ export const acceptedResponse = (data: any) => {
 export const noContentResponse = (data: any) => {
     return Response.json(data, { status: 204 });
 };
+
+export const serverErrorResponse = (data: any) => {
+    return Response.json(data, { status: 500 });
+};
