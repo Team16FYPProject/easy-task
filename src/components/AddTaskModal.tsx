@@ -139,6 +139,7 @@ export default function AddTaskModal({
             setIsError(true);
             setTimeout(() => setIsError(false), 5000);
         } else {
+            setIsError(false);
             setUpdatedTask(data.data);
             handleClose();
         }

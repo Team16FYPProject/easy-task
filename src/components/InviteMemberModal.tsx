@@ -101,17 +101,29 @@ export default function InviteMemberModal({
                                 onChange={handleInputChange}
                             />
                         </Grid>
-                        <Grid item>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={handleSubmit}
-                                className="w-full"
-                                sx={{ mr: 2 }}
-                            >
-                                INVITE
-                            </Button>
-                        </Grid>
+
+                        {/* Cancel/Update Buttons */}
+                        <div className="flex w-full justify-end">
+                            <Box sx={{ display: "flex", gap: 2, paddingTop: 2 }}>
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={handleClose}
+                                    className="w-full"
+                                >
+                                    Cancel
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleSubmit}
+                                    className="w-full"
+                                >
+                                    INVITE
+                                </Button>
+                            </Box>
+                        </div>
                     </Grid>
                 </Box>
             </Modal>

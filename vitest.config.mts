@@ -12,5 +12,7 @@ export default defineConfig({
             "**/dist/**",
             "./src/**/*.{spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
         ],
+        setupFiles: ["./vitest.setup.ts"],
+        globals: true,
     },
 });
