@@ -121,11 +121,15 @@ export default function AddTaskModal({
                 taskStatus,
                 taskIsMeeting: taskMeetingBool,
                 taskLocation: taskLocation || null,
-                taskAssignee: taskAssignee || null, // Assignees
-                taskReminder: reminders || null, // Reminders
+                // taskAssignee: taskAssignee || null, // Assignees
+                // taskReminder: reminders || null, // Reminders
                 taskDuration: taskMeetingBool ? taskDuration : null, // Only set duration if it's a meeting
             }),
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data = await response.json();
         if (!response.ok || !data.success) {

@@ -13,7 +13,7 @@ import {
     FormControl,
     CircularProgress,
 } from "@mui/material";
-import { ProjectTask, Assignee, Profile, ApiResponse, Reminders } from "@/utils/types";
+import { ProjectTask, Assignee, Profile, ApiResponse, Reminder } from "@/utils/types";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -32,6 +32,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     updateTask,
 }) => {
     const [task, setTask] = useState<ProjectTask>(originalTask);
+    // console.log("task", task);
     const [taskAssignees, setTaskAssignees] = useState<string[]>(
         task.assignees.map((assignee) => assignee.user_id),
     );
@@ -79,7 +80,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     const reminderOptions = ["One Hour Before", "One Day Before", "One Week Before"];
 
     // Convert timestamps to human-readable strings
-    const convertTimestampsToReminders = (reminders: Reminders[], deadline: number): string[] => {
+    const convertTimestampsToReminders = (reminders: Reminder[], deadline: number): string[] => {
         const remindersMapping: Record<string, number> = {
             "One Hour Before": 1 * 60 * 60 * 1000,
             "One Day Before": 24 * 60 * 60 * 1000,
@@ -102,17 +103,23 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     const convertRemindersToTimestamps = (
         reminderStrings: string[],
         deadline: number,
-    ): { reminder_datetime: string }[] => {
+    ): { date: string; reminder: string }[] => {
         const timeDifferences: Record<string, number> = {
             "One Hour Before": 1 * 60 * 60 * 1000,
             "One Day Before": 24 * 60 * 60 * 1000,
             "One Week Before": 7 * 24 * 60 * 60 * 1000,
+        };
+        const types: Record<string, string> = {
+            "One Hour Before": "1H",
+            "One Day Before": "1D",
+            "One Week Before": "1W",
         };
 
         return reminderStrings.map((reminderStr) => ({
             reminder_datetime: new Date(
                 deadline - (timeDifferences[reminderStr] || 0),
             ).toISOString(),
+            type: types[reminderStr],
         }));
     };
 
@@ -151,6 +158,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         if (task && task.task_deadline) {
             const deadline = new Date(task.task_deadline).getTime();
             const reminderStrings = convertTimestampsToReminders(task.reminders || [], deadline);
+            console.log("task", task);
+            console.log("reminderStrings", reminderStrings);
+            console.log("task.reminders", task.reminders);
             setTaskReminders(reminderStrings);
         }
     }, [task]);
@@ -193,7 +203,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             const assigneesResponse = await fetch(
                 `/api/projects/${task.project_id}/tasks/${task.task_id}/task_assignees`,
                 {
-                    method: "PUT",
+                    method: "POST",
                     body: JSON.stringify({
                         ids: taskAssignees,
                     }),
@@ -204,18 +214,20 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 throw new Error(assigneesData.data);
             }
 
-            // reminders update
-            await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`, {
-                method: "PUT",
-                body: JSON.stringify({ ids: updatedReminders }),
-            });
+            if (updatedReminders) {
+                // reminders update
+                await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`, {
+                    method: "POST",
+                    body: JSON.stringify({ new_datetimes: updatedReminders }),
+                });
+            }
 
             const result: ApiResponse<ProjectTask> = await response.json();
 
             if (!result.success) {
                 throw new Error(result.data as string);
             }
-
+            // console.log("result.data: ", result.data);
             updateTask(result.data as ProjectTask);
 
             handleCloseModal();

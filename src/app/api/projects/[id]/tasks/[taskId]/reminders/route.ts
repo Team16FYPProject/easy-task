@@ -7,7 +7,7 @@ import {
 import { getSession } from "@/utils/server/auth.server.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
-import { Reminders } from "@/utils/types";
+import { Reminder } from "@/utils/types";
 
 export async function GET(request: Request, { params }: TaskIdParams) {
     const { user } = await getSession();
@@ -29,25 +29,10 @@ export async function GET(request: Request, { params }: TaskIdParams) {
                 `
                 reminder_id,
                 reminder_datetime,
-                task!inner (
-                    task_id,
-                    project_id,
-                    task_name,
-                    task_desc,
-                    task_deadline,
-                    task_time_spent,
-                    task_creator_id,
-                    task_parent_id,
-                    task_status,
-                    task_priority,
-                    task_location,
-                    task_is_meeting,
-                    task_reminder!inner (user_id)
-                )
+                type
             `,
             )
-            .eq("task_id", taskId)
-            .eq("task.task_reminder.user_id", user.id);
+            .eq("task_id", taskId);
 
         if (remindersError) {
             console.error(`Unable to fetch reminders for task ${taskId}`, remindersError);
@@ -58,55 +43,57 @@ export async function GET(request: Request, { params }: TaskIdParams) {
             return okResponse({ success: true, data: [] });
         }
 
-        const { data: projectData, error: projectError } = await supabase
-            .from("project")
-            .select("*")
-            .eq("project_id", remindersData[0].task.project_id)
-            .single();
+        // const { data: projectData, error: projectError } = await supabase
+        //     .from("project")
+        //     .select("*")
+        //     .eq("project_id", remindersData[0].task.project_id)
+        //     .single();
 
-        if (projectError) {
-            console.error(`Unable to fetch project for task ${taskId}`, projectError);
-            return okResponse({ success: false, data: "Failed to fetch project details" });
-        }
+        // if (projectError) {
+        //     console.error(`Unable to fetch project for task ${taskId}`, projectError);
+        //     return okResponse({ success: false, data: "Failed to fetch project details" });
+        // }
 
-        const reminders = remindersData.map((reminder) => ({
-            reminder_id: reminder.reminder_id,
-            reminder_datetime: reminder.reminder_datetime,
-            task: {
-                ...reminder.task,
-                project: projectData,
-            },
-        }));
+        // const reminders = remindersData.map((reminder) => ({
+        //     reminder_id: reminder.reminder_id,
+        //     reminder_datetime: reminder.reminder_datetime,
+        //     task: {
+        //         ...reminder.task,
+        //         project: projectData,
+        //     },
+        // }));
 
-        return okResponse({ success: true, data: reminders });
+        return okResponse({ success: true, data: remindersData });
     } catch (error) {
         console.error("Error fetching reminders:", error);
         return serverErrorResponse({ success: false, data: "An unexpected error occurred" });
     }
 }
 
-export async function PUT(request: Request, { params: { taskId } }: TaskIdParams) {
+export async function POST(request: Request, { params: { taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
 
     const supabase = getServiceSupabase();
-    const { reminder_id, new_datetime } = await request.json();
+    const { new_datetimes } = await request.json();
 
-    if (!reminder_id || !new_datetime) {
+    if (!new_datetimes) {
         return serverErrorResponse({
             success: false,
             data: "Reminder ID and new datetime are required",
         });
     }
+    console.log(new_datetimes);
+    const remindersToInsert = new_datetimes.map((datetime) => ({
+        task_id: taskId,
+        reminder_datetime: datetime.reminder_datetime,
+        type: datetime.type,
+    }));
 
     try {
-        const { data, error } = await supabase
-            .from("task_reminder")
-            .update({ reminder_datetime: new_datetime })
-            .eq("reminder_id", reminder_id)
-            .eq("task_id", taskId);
+        const { data, error } = await supabase.from("task_reminder").insert(remindersToInsert);
 
         if (error) {
             console.error(`Error updating reminder for task ${taskId}:`, error);

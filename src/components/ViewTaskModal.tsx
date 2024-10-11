@@ -9,6 +9,7 @@ interface ViewTaskModalProps {
     handleCloseModal: () => void;
     task: ProjectTask;
     updateTask: (updatedTask: ProjectTask) => void;
+    handleDeleteTask: (taskId: string) => void;
 }
 
 const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
@@ -16,6 +17,7 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     handleCloseModal,
     task,
     updateTask,
+    handleDeleteTask,
 }) => {
     const [currentTask, setCurrentTask] = React.useState(task);
 
@@ -38,13 +40,22 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
 
     const [taskOpen, setOpen] = React.useState(false);
     const [taskEditOpen, setEditOpen] = React.useState(false);
+    const [taskDeleteOpen, setDeleteOpen] = React.useState(false);
     const handleOpenEditModal = () => setEditOpen(true);
     const handleEditClose = () => setEditOpen(false);
+    const handleOpenDeleteModal = () => setDeleteOpen(true);
+    const handleDeleteClose = () => setDeleteOpen(false);
 
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
     const bgColor = determineBgColor(currentTask.task_priority);
     const [hoursToLog, setHoursToLog] = useState(1);
+
+    const handleDelete = () => {
+        // Perform any additional logic for deleting the task
+        handleDeleteTask(task.task_id);
+        // handleClose();
+    };
 
     const handleLogClick = async () => {
         try {
@@ -72,7 +83,13 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     // getting reminder data
     useEffect(() => {
         const fetchReminders = async () => {
-            const response = await fetch(`/api/tasks/${currentTask.task_id}/reminders`);
+            const response = await fetch(
+                `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/reminders`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                },
+            );
             const data = await response.json();
             if (data.success) {
                 setCurrentTask((prevTask) => ({ ...prevTask, reminders: data.data }));
@@ -226,6 +243,9 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                         alignItems: "center",
                     }}
                 >
+                    <Button variant="contained" color="error" onClick={handleOpenDeleteModal}>
+                        DELETE TASK
+                    </Button>
                     <Button variant="contained" color="secondary" onClick={handleOpenEditModal}>
                         EDIT TASK
                     </Button>
@@ -238,6 +258,51 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                             updateTask(updatedTask);
                         }}
                     />
+                    <Modal open={taskDeleteOpen} onClose={handleDeleteClose}>
+                        <Box sx={modalStyle}>
+                            <Typography variant="h6" component="h2" gutterBottom>
+                                Confirm Task Deletion
+                            </Typography>
+                            <Typography variant="body2" sx={{ mb: 2 }}>
+                                Are you sure you want to delete this task? This action cannot be
+                                undone.
+                            </Typography>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleDeleteClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={async () => {
+                                        try {
+                                            const route = `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}`;
+                                            await fetch(route, {
+                                                method: "DELETE",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                            });
+                                            handleDelete();
+                                            handleDeleteClose();
+                                            handleCloseModal();
+                                        } catch (e) {
+                                            console.error(
+                                                `Error deleting task ${currentTask.task_id}:`,
+                                                e,
+                                            );
+                                        }
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Modal>
                 </Box>
             </Box>
         </Modal>

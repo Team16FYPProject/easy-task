@@ -18,12 +18,12 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import React from "react";
-import { ApiResponse, Reminders, ProjectTask, Project } from "@/utils/types";
+import { ApiResponse, Reminder, ProjectTask, Project } from "@/utils/types";
 
 export default function Notifications() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
-    const [displayedNotifications, setDisplayedNotifications] = React.useState<Reminders[]>([]);
+    const [displayedNotifications, setDisplayedNotifications] = React.useState<Reminder[]>([]);
     const [projects, setProjects] = React.useState<Map<string, Project>>(new Map());
     const [loadingNotifications, setLoadingNotifications] = React.useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -63,7 +63,7 @@ export default function Notifications() {
                     throw new Error(`HTTP error! status: ${notificationsResponse.status}`);
                 }
 
-                const notificationsResult: ApiResponse<Reminders[]> =
+                const notificationsResult: ApiResponse<Reminder[]> =
                     await notificationsResponse.json();
                 setDebugInfo(`Notifications result: ${JSON.stringify(notificationsResult)}`);
 
@@ -95,7 +95,7 @@ export default function Notifications() {
     }
 
     // Generate table row function
-    function generateRowFunction(reminders: Reminders[]): React.ReactNode {
+    function generateRowFunction(reminders: Reminder[]): React.ReactNode {
         if (!reminders || reminders.length === 0) {
             return (
                 <TableRow>
@@ -103,7 +103,7 @@ export default function Notifications() {
                 </TableRow>
             );
         }
-        return reminders.map((reminder: Reminders) => {
+        return reminders.map((reminder: Reminder) => {
             const notificationDate = new Date(reminder.reminder_datetime);
             const dueDate = new Date(reminder.task.task_deadline);
             const today = new Date();

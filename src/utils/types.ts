@@ -70,7 +70,7 @@ export type ProjectTask = {
     task_time_spent: number;
     task_status: string;
     assignees: Assignee[];
-    reminders: Reminders[];
+    reminders: Reminder[];
 };
 
 // Interface for Assignee
@@ -80,12 +80,19 @@ export interface Assignee {
     user: User;
 }
 
+// export interface Reminder {
+//     reminder_id: string;
+//     task_id: string;
+//     reminder_datetime: string;
+//     type: string;
+// }
+
 export interface User {
     email: string;
     name: string;
 }
 
-export interface Reminders {
+export interface Reminder {
     reminder_id: string;
     task: ProjectTask;
     task_id: string;
