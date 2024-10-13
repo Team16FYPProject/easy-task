@@ -59,14 +59,14 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
 
     const handleLogClick = async () => {
         try {
-            const route = `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/logged_hours`;
+            const route = `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}`;
             await fetch(route, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    task_logged_hours: currentTask.task_time_spent + hoursToLog,
+                    taskTimeSpent: currentTask.task_time_spent + hoursToLog,
                 }),
             });
             const updatedTask = {

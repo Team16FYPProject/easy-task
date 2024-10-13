@@ -8,6 +8,10 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { isValidEmail } from "@/utils/check.utils";
+import {
+    checkAndUpdateAchievementProgress,
+    increaseAchievementProgress,
+} from "@/utils/server/achievements.utils";
 
 export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
@@ -91,6 +95,9 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
         console.error(insertError);
         return internalErrorResponse({ success: false, data: "Unable to remove that member" });
     }
+
+    // When a user joins a new project, increase their progress on the Team Player achievement.
+    void increaseAchievementProgress(userData.user_id, "Team Player", 1);
     return okResponse({ success: true, data: userData });
 }
 
