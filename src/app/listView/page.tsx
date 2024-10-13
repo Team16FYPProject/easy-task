@@ -25,6 +25,7 @@ import AddTaskModal from "@/components/AddTaskModal";
 import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
 import { ProjectTask } from "@/utils/types";
+import SelectTeamModal from "@/components/SelectTeamModal";
 
 export default function ListView() {
     const router = useRouter();
@@ -36,6 +37,9 @@ export default function ListView() {
     const [loadingTasks, setLoadingTasks] = useState(true);
     const [pieChartProgressData, setPieChartProgressData] = useState<
         { id: number; value: number; color: string; label: string }[]
+    >([]);
+    const [allProjects, setAllProjects] = React.useState<
+        { project_id: string; project_name: string }[]
     >([]);
     const [pieChartAssignmentData, setPieChartAssignmentData] = useState<
         { id: number; value: number; color: string; label: string }[]
@@ -73,7 +77,7 @@ export default function ListView() {
                         project_name: project.project_name,
                     }),
                 );
-
+                setAllProjects(projectIDsAndNames);
                 // Fetch tasks for each project
                 const fetchPromises = projectIDsAndNames.map(
                     ({ project_id, project_name }: { project_id: string; project_name: string }) =>
@@ -226,17 +230,16 @@ export default function ListView() {
                             <Button variant="contained" color="secondary" onClick={handleOpen}>
                                 CREATE TASK
                             </Button>
-                            <AddTaskModal
+                            <SelectTeamModal
                                 open={open}
                                 handleClose={handleClose}
-                                project_id={""}
                                 setUpdatedTask={function (
                                     value: React.SetStateAction<ProjectTask | null>,
                                 ): void {
                                     throw new Error("Function not implemented.");
                                 }}
-                                projectTasks={[]}
-                            />
+                                allProjects={allProjects}
+                            ></SelectTeamModal>
                         </Grid>
                     </Grid>
                 </Grid>
