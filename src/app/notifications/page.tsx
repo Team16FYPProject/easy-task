@@ -177,8 +177,8 @@ export default function Notifications() {
                 </Grid>
             </Grid>
             {/* Debug Info*/}
-            <Typography variant="h6">Debug Information</Typography>
-            <pre>{debugInfo}</pre>
+            {/* <Typography variant="h6">Debug Information</Typography>
+            <pre>{debugInfo}</pre> */}
         </Container>
     );
 }
