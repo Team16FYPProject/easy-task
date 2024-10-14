@@ -43,27 +43,22 @@ const MenuProps = {
 export default function SelectTeamModal({
     open,
     handleClose,
-    setUpdatedTask,
+    setNewProject,
     allProjects,
+    setCreateTask,
 }: {
     open: boolean;
     handleClose: () => void;
-    setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    setNewProject: React.Dispatch<React.SetStateAction<string>>;
     allProjects: { project_id: string; project_name: string }[];
+    setCreateTask: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
     const [projectID, setProjectID] = React.useState("");
 
     const handleOnClick = () => {
+        setNewProject(projectID);
+        setCreateTask(true);
         handleClose();
-        <AddTaskModal
-            open={open}
-            handleClose={handleClose}
-            project_id={projectID}
-            setUpdatedTask={function (value: React.SetStateAction<ProjectTask | null>): void {
-                throw new Error("Function not implemented.");
-            }}
-            projectTasks={[]}
-        ></AddTaskModal>;
     };
 
     return (

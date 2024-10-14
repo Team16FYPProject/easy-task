@@ -28,6 +28,10 @@ import { ProjectTask } from "@/utils/types";
 import SelectTeamModal from "@/components/SelectTeamModal";
 
 export default function ListView() {
+    const [createNewTask, setCreateNewTask] = useState(false);
+    const [currentProjectID, setCurrentProjectID] = useState("");
+    const [projectTasks, setProjectTasks] = useState<ProjectTask[]>([]);
+    const [updatedTask, setUpdatedTask] = useState<ProjectTask | null>(null);
     const router = useRouter();
     const { loadingUser, user } = useUser();
     const [open, setOpen] = React.useState(false);
@@ -46,6 +50,10 @@ export default function ListView() {
     >([]);
     const theme = useTheme(); // Access the MUI theme
 
+    const handleCreateTaskModalClose = () => {
+        setCreateNewTask(false);
+        handleClose();
+    };
     // Redirect to login if user is not logged in
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -53,6 +61,46 @@ export default function ListView() {
             return;
         }
     }, [loadingUser, user]);
+
+    async function fetchTasksForCurrentProject(project_id: string) {
+        try {
+            const route = `/api/projects/${project_id}/tasks`;
+            const response = await fetch(route, {
+                method: "GET",
+                credentials: "include",
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.data || "Failed to fetch tasks");
+            }
+            return result.tasks;
+        } catch {
+            return [];
+        }
+    }
+
+    // Everytime our ProjectID is set, fetch the respective tasks from database
+    useEffect(() => {
+        async function loadTasks() {
+            if (currentProjectID) {
+                const tasks = await fetchTasksForCurrentProject(currentProjectID);
+                setProjectTasks(tasks);
+            }
+        }
+        loadTasks();
+    }, [currentProjectID]);
+
+    // Everytime we update a task, append to our tasks array
+    useEffect(() => {
+        async function updateTasks() {
+            if (updatedTask) {
+                const newUpdatedTasks = [...tasks, updatedTask];
+                setTasks(newUpdatedTasks);
+            }
+        }
+        updateTasks();
+    }, [updatedTask]);
 
     // Fetch tasks
     useEffect(() => {
@@ -94,6 +142,7 @@ export default function ListView() {
                             }));
                         }),
                 );
+                console.log(fetchPromises);
 
                 const results = await Promise.all(fetchPromises);
                 // Flatten the results and include project names with tasks
@@ -230,15 +279,19 @@ export default function ListView() {
                             <Button variant="contained" color="secondary" onClick={handleOpen}>
                                 CREATE TASK
                             </Button>
+                            <AddTaskModal
+                                open={createNewTask}
+                                handleClose={handleCreateTaskModalClose}
+                                project_id={currentProjectID}
+                                setUpdatedTask={setUpdatedTask}
+                                projectTasks={projectTasks}
+                            ></AddTaskModal>
                             <SelectTeamModal
                                 open={open}
+                                setNewProject={setCurrentProjectID}
                                 handleClose={handleClose}
-                                setUpdatedTask={function (
-                                    value: React.SetStateAction<ProjectTask | null>,
-                                ): void {
-                                    throw new Error("Function not implemented.");
-                                }}
                                 allProjects={allProjects}
+                                setCreateTask={setCreateNewTask}
                             ></SelectTeamModal>
                         </Grid>
                     </Grid>
