@@ -336,110 +336,142 @@ export default function Dashboard() {
     const onButtonClick = (link: String) => router.push(`/${link}`);
     return (
         <Container sx={{ padding: 2 }}>
-            <Grid container direction="column" spacing={2}>
-                {/* Title and Create Team Button */}
+            <Grid container direction="column" spacing={3}>
+                {/* Projects Section */}
                 <Grid item xs={12}>
-                    <Grid container spacing={1} alignItems="center" justifyContent="space-between">
-                        <Grid item>
-                            <Typography variant="h4">Projects</Typography>
+                    <Paper elevation={3} sx={{ padding: 3 }}>
+                        <Grid container direction="column" spacing={2}>
+                            <Grid item xs={12}>
+                                <Grid
+                                    container
+                                    spacing={1}
+                                    alignItems="center"
+                                    justifyContent="space-between"
+                                >
+                                    <Grid item>
+                                        <Typography variant="h4">Projects</Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={handleOpen}
+                                        >
+                                            CREATE PROJECT
+                                        </Button>
+                                        <AddTeamModal open={open} handleClose={handleClose} />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={12}>
+                                {loadingProjects ? (
+                                    <Skeleton
+                                        variant="rounded"
+                                        width={"100%"}
+                                        height={dataTableHeight}
+                                    />
+                                ) : (
+                                    <DataTable />
+                                )}
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <Button variant="contained" color="secondary" onClick={handleOpen}>
-                                CREATE PROJECT
-                            </Button>
-                            <AddTeamModal open={open} handleClose={handleClose} />
-                        </Grid>
-                    </Grid>
+                    </Paper>
                 </Grid>
-                {/* Team Cards */}
-                <Grid item xs={12}>
-                    {loadingProjects ? (
-                        <Skeleton variant="rounded" width={"100%"} height={dataTableHeight} />
-                    ) : (
-                        <DataTable />
-                    )}
-                </Grid>
+
                 {/* Available Views Title */}
                 <Grid item xs={12}>
-                    <Typography variant="h4">Available Views</Typography>
+                    <Paper elevation={3} sx={{ padding: 3 }}>
+                        <Grid container direction="column" spacing={2}>
+                            <Grid item xs={12}>
+                                <Typography variant="h4">Available Views</Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            fullWidth
+                                            onClick={() => onButtonClick("calendar")}
+                                        >
+                                            CALENDAR VIEW
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            fullWidth
+                                            onClick={() => onButtonClick("listView")}
+                                        >
+                                            LIST VIEW
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            fullWidth
+                                            onClick={() => onButtonClick("kanban")}
+                                        >
+                                            KANBAN VIEW
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Paper>
                 </Grid>
-                {/* View Buttons */}
-                <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                fullWidth
-                                onClick={() => onButtonClick("calendar")}
-                            >
-                                CALENDAR VIEW
-                            </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                fullWidth
-                                onClick={() => onButtonClick("listView")}
-                            >
-                                LIST VIEW
-                            </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                fullWidth
-                                onClick={() => onButtonClick("kanban")}
-                            >
-                                KANBAN VIEW
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Grid>
+
                 {/* Upcoming Tasks Title */}
+
                 <Grid item xs={12}>
-                    <Typography variant="h4">Upcoming Tasks</Typography>
-                </Grid>
-                {/* Upcoming Tasks Table */}
-                <Grid item xs={12}>
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Date and Time</TableCell>
-                                    <TableCell>Project/Task</TableCell>
-                                    <TableCell>Priority</TableCell>
-                                    <TableCell>Meeting</TableCell>
-                                    <TableCell>Status</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {loadingTasks
-                                    ? [...Array(5)].map((_, index) => (
-                                          <TableRow key={index}>
-                                              <TableCell>
-                                                  <Skeleton variant="text" />
-                                              </TableCell>
-                                              <TableCell>
-                                                  <Skeleton variant="text" />
-                                              </TableCell>
-                                              <TableCell>
-                                                  <Skeleton variant="text" />
-                                              </TableCell>
-                                              <TableCell>
-                                                  <Skeleton variant="text" />
-                                              </TableCell>
-                                              <TableCell>
-                                                  <Skeleton variant="text" />
-                                              </TableCell>
-                                          </TableRow>
-                                      ))
-                                    : generateRowFunction(tasks)}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <Paper elevation={3} sx={{ padding: 3 }}>
+                        <Grid container direction="column" spacing={2}>
+                            <Grid item xs={12}>
+                                <Typography variant="h4">Upcoming Tasks</Typography>
+                            </Grid>
+                            {/* Upcoming Tasks Table */}
+                            <Grid item xs={12}>
+                                <TableContainer>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Date and Time</TableCell>
+                                                <TableCell>Project/Task</TableCell>
+                                                <TableCell>Priority</TableCell>
+                                                <TableCell>Meeting</TableCell>
+                                                <TableCell>Status</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {loadingTasks
+                                                ? [...Array(5)].map((_, index) => (
+                                                      <TableRow key={index}>
+                                                          <TableCell>
+                                                              <Skeleton variant="text" />
+                                                          </TableCell>
+                                                          <TableCell>
+                                                              <Skeleton variant="text" />
+                                                          </TableCell>
+                                                          <TableCell>
+                                                              <Skeleton variant="text" />
+                                                          </TableCell>
+                                                          <TableCell>
+                                                              <Skeleton variant="text" />
+                                                          </TableCell>
+                                                          <TableCell>
+                                                              <Skeleton variant="text" />
+                                                          </TableCell>
+                                                      </TableRow>
+                                                  ))
+                                                : generateRowFunction(tasks)}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
+                    </Paper>
                 </Grid>
             </Grid>
         </Container>
