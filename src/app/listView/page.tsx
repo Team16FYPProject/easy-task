@@ -18,6 +18,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
     Typography,
     useTheme,
 } from "@mui/material";
@@ -28,6 +29,7 @@ import { ProjectTask } from "@/utils/types";
 import SelectTeamModal from "@/components/SelectTeamModal";
 
 export default function ListView() {
+    const [displayedTasks, setDisplayedTasks] = useState<ProjectTask[]>([]);
     const [createNewTask, setCreateNewTask] = useState(false);
     const [currentProjectID, setCurrentProjectID] = useState("");
     const [projectTasks, setProjectTasks] = useState<ProjectTask[]>([]);
@@ -49,6 +51,7 @@ export default function ListView() {
         { id: number; value: number; color: string; label: string }[]
     >([]);
     const theme = useTheme(); // Access the MUI theme
+    const [search, setSearch] = useState<string>("");
 
     const handleCreateTaskModalClose = () => {
         setCreateNewTask(false);
@@ -102,6 +105,22 @@ export default function ListView() {
         updateTasks();
     }, [updatedTask]);
 
+    // Set Filtered Tasks
+    useEffect(() => {
+        const searchQuery = search.toLowerCase() || "";
+        setDisplayedTasks(
+            tasks.filter(
+                (task) =>
+                    task.task_name.toLowerCase().includes(searchQuery) ||
+                    allProjects
+                        .filter((project) =>
+                            project.project_name.toLowerCase().includes(searchQuery),
+                        )
+                        .find((e) => e.project_id === task.project_id),
+            ),
+        );
+    }, [search, tasks]);
+
     // Fetch tasks
     useEffect(() => {
         async function fetchTasks() {
@@ -142,8 +161,6 @@ export default function ListView() {
                             }));
                         }),
                 );
-                console.log(fetchPromises);
-
                 const results = await Promise.all(fetchPromises);
                 // Flatten the results and include project names with tasks
                 const allTasks = results.flatMap(({ tasks, project_name }) =>
@@ -363,6 +380,16 @@ export default function ListView() {
                         </Grid>
                     </Grid>
                 </Grid>
+                <Grid item>
+                    <TextField
+                        className="w-2/5"
+                        id="search-tasks"
+                        label="Search"
+                        placeholder="Enter Task Name or Team Name..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </Grid>
                 {/* Upcoming Tasks Table */}
                 <Grid item xs={12}>
                     <TableContainer component={Paper}>
@@ -397,7 +424,7 @@ export default function ListView() {
                                               </TableCell>
                                           </TableRow>
                                       ))
-                                    : generateRowFunction(tasks)}
+                                    : generateRowFunction(displayedTasks)}
                             </TableBody>
                         </Table>
                     </TableContainer>
