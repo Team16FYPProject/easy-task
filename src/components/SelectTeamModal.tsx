@@ -74,7 +74,7 @@ export default function SelectTeamModal({
         <div>
             <Modal
                 open={open}
-                onClose={handleClose}
+                onClose={handleModalClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
