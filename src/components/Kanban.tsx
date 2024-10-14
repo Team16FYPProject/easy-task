@@ -287,14 +287,14 @@ export const Column: React.FC<ColumnProps> = ({
             return;
         }
         try {
-            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}/task_status`;
+            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
             await fetch(route, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    task_status: cardToBeTransferred.task_status,
+                    taskStatus: cardToBeTransferred.task_status,
                 }),
             });
         } catch (e) {
