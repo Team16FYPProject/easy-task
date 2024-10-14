@@ -117,7 +117,6 @@ export default function ListView() {
     // Set Filtered Tasks
     useEffect(() => {
         const searchQuery = search.toLowerCase() || "";
-        console.log(tasks);
         setDisplayedTasks(
             tasks.filter(
                 (task) =>
