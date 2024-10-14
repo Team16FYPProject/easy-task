@@ -105,18 +105,36 @@ export default function ListView() {
         updateTasks();
     }, [updatedTask]);
 
+    const formatDate = (date: string): string => {
+        return new Intl.DateTimeFormat("en-AU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(new Date(date));
+    };
     // Set Filtered Tasks
     useEffect(() => {
         const searchQuery = search.toLowerCase() || "";
+        console.log(tasks);
         setDisplayedTasks(
             tasks.filter(
                 (task) =>
+                    // Filter Task Name
                     task.task_name.toLowerCase().includes(searchQuery) ||
+                    // Filter Project Name
                     allProjects
                         .filter((project) =>
                             project.project_name.toLowerCase().includes(searchQuery),
                         )
-                        .find((e) => e.project_id === task.project_id),
+                        .find((e) => e.project_id === task.project_id) ||
+                    // Filter Status
+                    task.task_status.toLowerCase() === searchQuery ||
+                    // Filter Priority
+                    task.task_priority.toLowerCase() === searchQuery ||
+                    // // Filter Deadline
+                    formatDate(task.task_deadline).startsWith(searchQuery),
             ),
         );
     }, [search, tasks]);
