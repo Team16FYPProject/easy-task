@@ -22,8 +22,10 @@ const style = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "75%",
-    height: "75%",
+    width: "justifyContent",
+    height: "justifyContent",
+    minHeight: "25%",
+    minWidth: "25%",
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
@@ -56,11 +58,18 @@ export default function SelectTeamModal({
     const [projectID, setProjectID] = React.useState("");
 
     const handleOnClick = () => {
-        setNewProject(projectID);
-        setCreateTask(true);
-        handleClose();
+        if (projectID) {
+            setNewProject(projectID);
+            setCreateTask(true);
+            setProjectID("");
+            handleClose();
+        }
     };
 
+    const handleModalClose = () => {
+        setProjectID("");
+        handleClose();
+    };
     return (
         <div>
             <Modal
@@ -85,16 +94,26 @@ export default function SelectTeamModal({
                             ))}
                         </Select>
                     </FormControl>
-                    <div className="flex w-full justify-end">
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                            <Button variant="outlined" color="primary" onClick={handleClose}>
-                                Cancel
-                            </Button>
-                            <Button variant="contained" color="secondary" onClick={handleOnClick}>
-                                Submit
-                            </Button>
-                        </Box>
-                    </div>
+                    <Box sx={{ mt: 1 }}>
+                        <div className="flex w-full justify-end">
+                            <Box sx={{ display: "flex", gap: 2 }}>
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={handleModalClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleOnClick}
+                                >
+                                    Submit
+                                </Button>
+                            </Box>
+                        </div>
+                    </Box>
                 </Box>
             </Modal>
         </div>
