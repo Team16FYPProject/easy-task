@@ -1,9 +1,9 @@
-import { getServerSupabase } from "@/utils/supabase/server";
 import {
     badRequestResponse,
     internalErrorResponse,
     okResponse,
 } from "@/utils/server/server.responses.utils";
+import { getServerSupabase } from "@/utils/supabase/server";
 
 export async function GET() {
     const supabase = getServerSupabase();

@@ -36,7 +36,13 @@ global.fetch = vi.fn();
 test("CalendarView renders correctly", async () => {
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,
-        user: { id: "1", name: "Test User" },
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
     });
     vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
@@ -66,7 +72,13 @@ test("CalendarView redirects to login if user is not logged in", async () => {
 test("CalendarView fetches and displays tasks", async () => {
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,
-        user: { id: "1", name: "Test User" },
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
     });
     vi.mocked(global.fetch)
         .mockResolvedValueOnce({

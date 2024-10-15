@@ -1,7 +1,7 @@
-import { cookies } from "next/headers";
+import { Database } from "@/utils/supabase/database.types";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "@/utils/supabase/database.types";
+import { cookies } from "next/headers";
 
 export function getServerSupabase() {
     const cookieStore = cookies();

@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react";
+import { ApiResponse, Assignee, Profile, ProjectTask, Reminder } from "@/utils/types";
 import {
-    Modal,
     Box,
-    Typography,
-    Grid,
-    TextField,
     Button,
-    Select,
-    MenuItem,
-    OutlinedInput,
     Chip,
-    FormControl,
     CircularProgress,
+    FormControl,
+    Grid,
+    MenuItem,
+    Modal,
+    OutlinedInput,
+    Select,
+    TextField,
+    Typography,
 } from "@mui/material";
-import { ProjectTask, Assignee, Profile, ApiResponse, Reminder } from "@/utils/types";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 
 interface EditTaskModalProps {
     open: boolean;
@@ -32,7 +32,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     updateTask,
 }) => {
     const [task, setTask] = useState<ProjectTask>(originalTask);
-    // console.log("task", task);
     const [taskAssignees, setTaskAssignees] = useState<string[]>(
         task.assignees.map((assignee) => assignee.user_id),
     );
@@ -68,11 +67,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         },
     };
 
-    const sectionStyle = {
-        // borderBottom: "1px solid #e0e0e0",
-        // py: 1,
-    };
-
     {
         /* Reminders */
     }
@@ -103,16 +97,16 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     const convertRemindersToTimestamps = (
         reminderStrings: string[],
         deadline: number,
-    ): { date: string; reminder: string }[] => {
+    ): { reminder_datetime: string; type: string }[] => {
         const timeDifferences: Record<string, number> = {
             "One Hour Before": 1 * 60 * 60 * 1000,
             "One Day Before": 24 * 60 * 60 * 1000,
             "One Week Before": 7 * 24 * 60 * 60 * 1000,
         };
         const types: Record<string, string> = {
-            "One Hour Before": "1H",
-            "One Day Before": "1D",
-            "One Week Before": "1W",
+            "One Hour Before": "OneHour",
+            "One Day Before": "OneDay",
+            "One Week Before": "OneWeek",
         };
 
         return reminderStrings.map((reminderStr) => ({
@@ -158,9 +152,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         if (task && task.task_deadline) {
             const deadline = new Date(task.task_deadline).getTime();
             const reminderStrings = convertTimestampsToReminders(task.reminders || [], deadline);
-            console.log("task", task);
-            console.log("reminderStrings", reminderStrings);
-            console.log("task.reminders", task.reminders);
             setTaskReminders(reminderStrings);
         }
     }, [task]);
@@ -187,8 +178,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 taskStatus: task.task_status,
                 taskMeetingBool: task.task_is_meeting,
                 taskLocation: task.task_location,
-                //taskAssignee: taskAssignees,
-                //taskReminder: updatedReminders,
+                // taskAssignee: taskAssignees,
+                // taskReminder: updatedReminders,
             };
 
             const response = await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}`, {
@@ -214,21 +205,32 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 throw new Error(assigneesData.data);
             }
 
-            if (updatedReminders) {
-                // reminders update
-                await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`, {
+            // if (updatedReminders) {
+            // reminders update
+            const reminderResponse = await fetch(
+                `/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`,
+                {
                     method: "POST",
                     body: JSON.stringify({ new_datetimes: updatedReminders }),
-                });
+                },
+            );
+            const reminderData: ApiResponse<Reminder[]> = await reminderResponse.json();
+            if (!reminderData.success) {
+                throw new Error(reminderData.data);
             }
+            // }
 
             const result: ApiResponse<ProjectTask> = await response.json();
-
             if (!result.success) {
                 throw new Error(result.data as string);
             }
-            // console.log("result.data: ", result.data);
-            updateTask(result.data as ProjectTask);
+            const updateTaskData = {
+                ...result.data,
+                reminders: reminderData.data,
+                assignees: assigneesData.data,
+            };
+            console.log("updateTaskData", updateTaskData);
+            updateTask(updateTaskData as ProjectTask);
 
             handleCloseModal();
         } catch (error) {
@@ -256,7 +258,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     </Typography>
                 )}
 
-                <Box sx={sectionStyle}>
+                <Box>
                     <TextField
                         fullWidth
                         required
@@ -269,7 +271,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     />
                 </Box>
 
-                <Box sx={sectionStyle}>
+                <Box>
                     <TextField
                         fullWidth
                         id="task-description"
@@ -283,7 +285,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     />
                 </Box>
 
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <Grid item xs={6}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DateTimePicker
@@ -311,7 +313,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
@@ -344,7 +346,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
                 {/* Reminder Select */}
 
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <FormControl fullWidth>
                         <label>Task Reminders</label>
                         <Select
@@ -387,7 +389,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 </Grid>
 
                 {/* </Modal>Assignees - Need to fix backend */}
-                <Grid container spacing={2} sx={sectionStyle}>
+                <Grid container spacing={2}>
                     <FormControl fullWidth>
                         <label>Task Assignees</label>
                         <Select
@@ -413,6 +415,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                                                         ? `${user.first_name} ${user.last_name}`
                                                         : value
                                                 }
+                                                onDelete={() => {
+                                                    setTaskAssignees((prev) =>
+                                                        prev.filter((id) => id !== value),
+                                                    );
+                                                }}
                                             />
                                         );
                                     })}
@@ -420,17 +427,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                             )}
                             MenuProps={MenuProps}
                         >
-                            {members
-                                .filter(
-                                    (member) =>
-                                        !taskAssignees.some((userId) => userId === member.user_id),
-                                )
-                                .map((member) => (
-                                    <MenuItem key={member.user_id} value={member.user_id}>
-                                        {member.first_name} {member.last_name}{" "}
-                                        {/* Note: the lag to fetch this is crazy*/}
-                                    </MenuItem>
-                                ))}
+                            {members.map((member) => (
+                                <MenuItem key={member.user_id} value={member.user_id}>
+                                    {member.first_name} {member.last_name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Grid>

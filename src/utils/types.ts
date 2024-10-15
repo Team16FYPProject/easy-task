@@ -57,6 +57,7 @@ export interface Project {
  * @param assignees: The assignees of the task;
  */
 export type ProjectTask = {
+    project: any;
     project_id: string;
     task_creator_id: string;
     task_deadline: string;
@@ -97,7 +98,7 @@ export interface Reminder {
     reminder_id: string;
     task: ProjectTask;
     task_id: string;
-    profile: Profile;
+    profile: Profile | null;
     reminder_datetime: string;
 }
 

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Box, Typography, Grid, Paper, Chip, Button, TextField } from "@mui/material";
-import { ProjectTask, ReminderType } from "@/utils/types";
 import EditTaskModal from "@/components/EditTaskModal";
 import { determineBgColor } from "@/utils/colourUtils";
+import { ProjectTask, ReminderType } from "@/utils/types";
+import { Box, Button, Chip, Grid, Modal, Paper, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
 
 interface ViewTaskModalProps {
     open: boolean;
@@ -46,15 +46,11 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
     const handleOpenDeleteModal = () => setDeleteOpen(true);
     const handleDeleteClose = () => setDeleteOpen(false);
 
-    // const handleOpen = () => setOpen(true);
-    // const handleClose = () => setOpen(false);
     const bgColor = determineBgColor(currentTask.task_priority);
     const [hoursToLog, setHoursToLog] = useState(1);
 
     const handleDelete = () => {
-        // Perform any additional logic for deleting the task
         handleDeleteTask(task.task_id);
-        // handleClose();
     };
 
     const handleLogClick = async () => {
@@ -92,27 +88,6 @@ const ViewTaskModal: React.FC<ViewTaskModalProps> = ({
                 return type; // Fallback to the original value if not found
         }
     }
-
-    // // getting reminder data
-    // useEffect(() => {
-    //     const fetchReminders = async () => {
-    //         const response = await fetch(
-    //             `/api/projects/${currentTask.project_id}/tasks/${currentTask.task_id}/reminders`,
-    //             {
-    //                 method: "GET",
-    //                 credentials: "include",
-    //             },
-    //         );
-    //         const data = await response.json();
-    //         if (data.success) {
-    //             setCurrentTask((prevTask) => ({ ...prevTask, reminders: data.data }));
-    //         }
-    //     };
-
-    //     if (open) {
-    //         fetchReminders();
-    //     }
-    // }, [open, currentTask.task_id]);
 
     return (
         <Modal open={open} onClose={handleCloseModal}>

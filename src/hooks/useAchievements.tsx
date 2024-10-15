@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { getBrowserSupabase } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
 
 export function useAchievements(userId: string) {
     const [achievements, setAchievements] = useState<any[]>([]);

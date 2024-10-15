@@ -1,3 +1,4 @@
+import { InviteIdParams } from "@/app/api/invites/[id]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
 import {
     badRequestResponse,
@@ -5,7 +6,6 @@ import {
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { InviteIdParams } from "@/app/api/invites/[id]/types";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
 export async function POST(_: Request, { params: { id } }: InviteIdParams) {

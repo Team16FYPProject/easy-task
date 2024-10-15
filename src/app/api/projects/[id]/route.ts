@@ -1,11 +1,11 @@
+import { ProjectIdParams } from "@/app/api/projects/[id]/types";
+import { setProjectSettings } from "@/app/api/projects/utils";
 import { getSession } from "@/utils/server/auth.server.utils";
 import {
     internalErrorResponse,
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { setProjectSettings } from "@/app/api/projects/utils";
-import { ProjectIdParams } from "@/app/api/projects/[id]/types";
 
 import { getServiceSupabase } from "@/utils/supabase/server";
 

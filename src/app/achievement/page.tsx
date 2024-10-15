@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useAchievements } from "@/hooks/useAchievements";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import { useAchievements } from "@/hooks/useAchievements";
 import {
+    Box,
     Container,
     Grid,
     Paper,
@@ -15,10 +15,9 @@ import {
     TableHead,
     TableRow,
     Typography,
-    Box,
 } from "@mui/material";
-// import { PieChart } from "@mui/x-charts";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { useRouter } from "next/navigation";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#b862ec", "#0055cc", "#113a44"];
 

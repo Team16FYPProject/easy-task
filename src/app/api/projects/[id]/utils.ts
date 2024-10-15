@@ -1,7 +1,6 @@
 import { Session } from "@/utils/server/auth.server.utils";
 import {
     badRequestResponse,
-    createdResponse,
     internalErrorResponse,
     okResponse,
 } from "@/utils/server/server.responses.utils";
@@ -11,7 +10,6 @@ export async function changeProjectSettings(
     id: string,
     data: FormData,
     session: Session,
-    create: boolean,
 ): Promise<Response> {
     const name = data.get("name");
     const description = data.get("description");

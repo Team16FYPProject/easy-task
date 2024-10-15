@@ -1,9 +1,9 @@
 // This file contains tests for the Dashboard page component
-import { expect, test, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Dashboard from "@/app/dashboard/page";
 import { useUser } from "@/hooks/useUser";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
+import { expect, test, vi } from "vitest";
 
 // Mock the hooks and modules
 vi.mock("@/hooks/useUser");
@@ -36,11 +36,24 @@ vi.mock("@/components/TeamCard", () => ({
 
 // Setup function to mock fetch and router
 const setup = () => {
-    const mockRouter = { push: vi.fn() };
+    const mockRouter = {
+        push: vi.fn(),
+        back: vi.fn(),
+        forward: vi.fn(),
+        refresh: vi.fn(),
+        replace: vi.fn(),
+        prefetch: vi.fn(),
+    };
     vi.mocked(useRouter).mockReturnValue(mockRouter);
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,
-        user: { id: "1", name: "Test User" },
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: "2023-01-01T00:00:00.000Z",
+        },
     });
 
     global.fetch = vi.fn().mockImplementation((url: string) => {

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/useUser";
-import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { KanbanBoard } from "@/components/Kanban";
-import React from "react";
+import { useEffectAsync } from "@/hooks/useEffectAsync";
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { Project } from "../../utils/types";
 
 export default function Kanban() {
