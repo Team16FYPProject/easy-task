@@ -49,7 +49,7 @@ describe("TeamMembers Component", () => {
         render(<TeamMembers params={{ id: "1" }} />);
 
         await waitFor(() => {
-            expect(screen.getByText(/Project Test Project Members/i)).toBeDefined();
+            expect(screen.getByText(/Test Project Members/i)).toBeDefined();
             expect(screen.getByText("Test Description")).toBeDefined();
             expect(screen.getByText("John Doe")).toBeDefined();
             expect(screen.getByText("Jane Doe")).toBeDefined();
@@ -136,7 +136,7 @@ describe("TeamMembers Component", () => {
 
         // Wait for the initial data to load
         await waitFor(() => {
-            expect(screen.getByText("Project Test Project Members")).toBeDefined();
+            expect(screen.getByText("Test Project Members")).toBeDefined();
         });
 
         // Verify that the initial GET request was made
@@ -180,7 +180,7 @@ describe("TeamMembers Component", () => {
 
         // Wait for the component to finish rendering and data to load
         await waitFor(() => {
-            expect(screen.getByText("Project Test Project Members")).toBeDefined();
+            expect(screen.getByText("Test Project Members")).toBeDefined();
         });
 
         // Find the table body specifically

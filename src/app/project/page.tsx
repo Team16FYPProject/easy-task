@@ -59,13 +59,22 @@ export default function ProjectPage() {
             return;
         }
         if (user) {
-            const response = await fetch("/api/user/profile");
-            const data: ApiResponse<ProfileResponse> = await response.json();
-            if (!data.success) {
-                alert("Unable to load your project data.");
+            try {
+                const response = await fetch("/api/user/profile");
+                const data: ApiResponse<ProfileResponse> = await response.json();
+                if (!response.ok) {
+                    throw new Error((data.data as string) || "Failed to fetch profile");
+                }
+                if (!data.success) {
+                    alert("Unable to load your project data.");
+                    return;
+                }
+                setProfile(data.data);
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                alert("Unable to load your profile data.");
                 return;
             }
-            setProfile(data.data);
         }
     }, [loadingUser, user]);
 

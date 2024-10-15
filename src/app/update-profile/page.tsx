@@ -50,17 +50,24 @@ export default function UpdateProfile() {
             return;
         }
         if (user) {
-            const response = await fetch("/api/user/profile");
-            const data: ApiResponse<Profile> = await response.json();
-            if (!data.success) {
-                alert("Unable to load your profile data.");
-                return;
+            try {
+                const response = await fetch("/api/user/profile");
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                const data: ApiResponse<Profile> = await response.json();
+                if (!data.success) {
+                    throw new Error("Unable to load your profile data.");
+                }
+                const profile = data.data;
+                setFirstName(profile.first_name);
+                setLastName(profile.last_name);
+                setEmail(profile.email);
+                setBio(profile.profile_bio ?? "");
+            } catch (error) {
+                console.error("Failed to fetch profile data:", error);
+                alert(error.message || "An unexpected error occurred.");
             }
-            const profile = data.data;
-            setFirstName(profile.first_name);
-            setLastName(profile.last_name);
-            setEmail(profile.email);
-            setBio(profile.profile_bio ?? "");
         }
     }, [loadingUser, user]);
     const [value, setValue] = React.useState(0);
@@ -70,22 +77,27 @@ export default function UpdateProfile() {
     };
 
     const handleUpdate = async () => {
-        const formData = new FormData();
-        formData.append("first_name", firstName);
-        formData.append("last_name", lastName);
-        formData.append("email", email);
-        formData.append("bio", bio);
-        const response = await fetch("/api/user/profile", {
-            method: "PATCH",
-            body: formData,
-        });
-        const data: ApiResponse<string> = await response.json();
-        if (!response.ok || !data.success) {
-            alert("Unable to update your profile details.");
-            return;
+        try {
+            const formData = new FormData();
+            formData.append("first_name", firstName);
+            formData.append("last_name", lastName);
+            formData.append("email", email);
+            formData.append("bio", bio);
+            const response = await fetch("/api/user/profile", {
+                method: "PATCH",
+                body: formData,
+            });
+            const data: ApiResponse<string> = await response.json();
+            if (!response.ok || !data.success) {
+                alert("Unable to update your profile details.");
+                return;
+            }
+            alert("Profile details updated.");
+            router.push("/profile");
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("An error occurred while updating your profile. Please try again later.");
         }
-        alert("Profile details updated.");
-        router.push("/profile");
     };
 
     return (
