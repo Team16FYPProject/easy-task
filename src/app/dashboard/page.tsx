@@ -27,6 +27,7 @@ import React, { useEffect, useState } from "react";
 import { RowData, TeamViewData } from "./types";
 import { Project } from "@/utils/types";
 import { ApiResponse, DashboardResponse, ProjectTask } from "@/utils/types";
+import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
 
 export default function Dashboard() {
     const router = useRouter();
@@ -279,16 +280,6 @@ export default function Dashboard() {
         );
     }
 
-    const determineBgColor = (task_priority: String) => {
-        if (task_priority === "LOW") {
-            return "bg-green-200";
-        } else if (task_priority === "MEDIUM") {
-            return "bg-yellow-200";
-        } else {
-            return "bg-red-400";
-        }
-    };
-
     const getProjectById = (projectId: string): Project | undefined => {
         return projects.find((project) => project.project_id === projectId);
     };
@@ -318,8 +309,12 @@ export default function Dashboard() {
                 </TableCell>
                 <TableCell>
                     <Chip
-                        className={`${determineBgColor(task.task_priority)}`}
+                        // className={`${determineBgColor(task.task_priority)}`}
                         label={task.task_priority}
+                        style={{
+                            color: determineTextColor(task.task_priority),
+                            backgroundColor: determineBgColor(task.task_priority),
+                        }}
                     />
                 </TableCell>
                 <TableCell>{task.task_is_meeting ? "Yes" : "No"}</TableCell>
