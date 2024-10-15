@@ -422,7 +422,7 @@ export default function ListView() {
                             <TableBody>
                                 {loadingTasks
                                     ? [...Array(5)].map((_, index) => (
-                                          <TableRow key={index}>
+                                          <TableRow key={index} data-testid="skeleton-row">
                                               <TableCell>
                                                   <Skeleton variant="text" />
                                               </TableCell>

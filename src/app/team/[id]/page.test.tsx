@@ -178,31 +178,39 @@ describe("TeamMembers Component", () => {
 
         render(<TeamMembers params={{ id: "1" }} />);
 
-        // Wait for the component to finish rendering and data to load
         await waitFor(() => {
-            expect(screen.getByText("Test Project Members")).toBeDefined();
+            expect(screen.getByText("Test Project Members")).toBeInTheDocument();
         });
 
-        // Find the table body specifically
         const tableBody = screen.getByRole("table").querySelector("tbody");
         expect(tableBody).not.toBeNull();
 
-        // Find Jane Doe's row
-        const janeDoeRow = within(tableBody!).getByText("Jane Doe").closest("tr");
+        await waitFor(() => {
+            const janeDoeCell = within(tableBody!).getByText(
+                (_content, element) => {
+                    return (
+                        element?.textContent === "Jane Doe" ||
+                        (element?.textContent?.includes("Jane") &&
+                            element?.textContent?.includes("Doe")) ||
+                        false
+                    );
+                },
+                { selector: "tr" },
+            );
+            expect(janeDoeCell).toBeInTheDocument();
 
-        expect(janeDoeRow).not.toBeNull();
+            // Find the REMOVE button in Jane Doe's row
+            const removeButton = within(janeDoeCell!).getByText("REMOVE");
+            expect(removeButton).toBeDefined();
 
-        // Find the REMOVE button in Jane Doe's row
-        const removeButton = within(janeDoeRow!).getByText("REMOVE");
-        expect(removeButton).toBeDefined();
+            // Mock the DELETE request for removing a member
+            vi.mocked(global.fetch).mockResolvedValueOnce({
+                json: vi.fn().mockResolvedValue({ success: true }),
+            } as any);
 
-        // Mock the DELETE request for removing a member
-        vi.mocked(global.fetch).mockResolvedValueOnce({
-            json: vi.fn().mockResolvedValue({ success: true }),
-        } as any);
-
-        // Click the remove button for Jane Doe
-        fireEvent.click(removeButton);
+            // Click the remove button for Jane Doe
+            fireEvent.click(removeButton);
+        });
 
         // Mock the confirm dialog
         vi.spyOn(window, "confirm").mockReturnValue(true);

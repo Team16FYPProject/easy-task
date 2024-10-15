@@ -66,7 +66,7 @@ export default function UpdateProfile() {
                 setBio(profile.profile_bio ?? "");
             } catch (error) {
                 console.error("Failed to fetch profile data:", error);
-                alert(error.message || "An unexpected error occurred.");
+                alert("An unexpected error occurred.");
             }
         }
     }, [loadingUser, user]);
