@@ -1,10 +1,10 @@
-import React from "react";
-import { test, expect, vi, Mock, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
-import ListView from "./page";
-import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { useRouter } from "next/navigation";
+import React from "react";
+import { Mock, afterEach, beforeEach, expect, test, vi } from "vitest";
+import ListView from "./page";
 
 // Mock the dependencies
 vi.mock("next/navigation", () => ({
@@ -53,23 +53,45 @@ test("renders ListView component and displays loading skeletons", async () => {
     (useUser as Mock).mockReturnValue({ loadingUser: false, user: { name: "Test User" } });
     (useRouter as Mock).mockReturnValue({ push: vi.fn() });
 
-    (global.fetch as Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ projects: [] }),
+    // Mock fetch to delay response
+    (global.fetch as Mock).mockImplementation(
+        () =>
+            new Promise((resolve) =>
+                setTimeout(
+                    () =>
+                        resolve({
+                            ok: true,
+                            json: async () => ({ projects: [] }),
+                        }),
+                    100, // delay of 100ms
+                ),
+            ),
+    );
+
+    let component;
+    await act(async () => {
+        component = render(<ListView />, { wrapper: Wrapper });
     });
-
-    render(<ListView />, { wrapper: Wrapper });
-
-    expect(screen.getByText("List View")).toBeInTheDocument();
-    expect(screen.getByText("CREATE TASK")).toBeInTheDocument();
 
     // Check for loading skeletons
-    const skeletonRows = screen.getAllByRole("row").slice(1); // Exclude header row
+    const skeletonRows = screen.getAllByTestId("skeleton-row");
     expect(skeletonRows).toHaveLength(5);
+
     skeletonRows.forEach((row) => {
         expect(row.querySelectorAll("td")).toHaveLength(5);
-        expect(row.textContent).toBe(""); // Skeleton rows should be empty
+        row.querySelectorAll("td").forEach((cell) => {
+            expect(cell.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+        });
     });
+
+    // Wait for content to load
+    await waitFor(() => {
+        expect(screen.getByText("List View")).toBeInTheDocument();
+        expect(screen.getByText("CREATE TASK")).toBeInTheDocument();
+    });
+
+    // After loading, skeleton rows should be gone
+    expect(screen.queryAllByTestId("skeleton-row")).toHaveLength(0);
 });
 
 test("displays tasks when loaded", async () => {

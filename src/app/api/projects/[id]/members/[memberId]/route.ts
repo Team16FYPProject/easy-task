@@ -1,3 +1,4 @@
+import { MemberIdParams } from "@/app/api/projects/[id]/members/[memberId]/types";
 import { getSession } from "@/utils/server/auth.server.utils";
 import {
     internalErrorResponse,
@@ -5,7 +6,6 @@ import {
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
-import { MemberIdParams } from "@/app/api/projects/[id]/members/[memberId]/types";
 
 export async function DELETE(request: Request, { params: { id, memberId } }: MemberIdParams) {
     const session = await getSession();

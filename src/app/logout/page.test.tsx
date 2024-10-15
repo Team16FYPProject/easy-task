@@ -1,5 +1,5 @@
-import { expect, test, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import { expect, test, vi } from "vitest";
 import Logout from "./page";
 
 // Mock the dependencies

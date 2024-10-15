@@ -65,7 +65,16 @@ test("Achievements page redirects to login if user is not logged in", async () =
 });
 
 test("Achievements page renders achievements data", async () => {
-    vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: { id: "1" } });
+    vi.mocked(useUser).mockReturnValue({
+        loadingUser: false,
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
+    });
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [
             {
@@ -105,7 +114,16 @@ test("Achievements page renders achievements data", async () => {
 });
 
 test("Achievements page renders PieChart with correct data", async () => {
-    vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: { id: "1" } });
+    vi.mocked(useUser).mockReturnValue({
+        loadingUser: false,
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
+    });
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [
             { achievement_id: "1", completed: true, progress: 100, max_progress: 100 },
@@ -124,7 +142,16 @@ test("Achievements page renders PieChart with correct data", async () => {
 });
 
 test("Achievements page renders AchievementTree", async () => {
-    vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: { id: "1" } });
+    vi.mocked(useUser).mockReturnValue({
+        loadingUser: false,
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
+    });
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [
             { achievement_id: "1", completed: true, progress: 100, max_progress: 100 },

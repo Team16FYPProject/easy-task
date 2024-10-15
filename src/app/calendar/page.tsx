@@ -1,34 +1,31 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
 import { Button, Container, Grid, Paper, Typography } from "@mui/material";
-// import AddTaskModal from "@/components/AddTaskModal";
-import React, { useEffect, useState } from "react";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import moment from "moment";
-import { momentLocalizer, Views } from "react-big-calendar";
+import { useRouter } from "next/navigation";
 import MUICalendar from "@/components/MUICalendar";
 import ViewTaskModal from "@/components/ViewTaskModal";
 import { ProjectTask } from "@/utils/types";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { momentLocalizer, Views } from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
 export default function CalendarView() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    // const handleClose = () => setOpen(false);
     const [tasks, setTasks] = React.useState<ProjectTask[]>([]);
     const [taskEventsList, setTaskEventsList] = React.useState<any[]>([]);
     const [loadingTasks, setLoadingTasks] = useState(true);
     const localizer = momentLocalizer(moment);
-    // const [newTask, setNewTask] = useState("");
     const [view, setView] = useState<"month" | "week" | "day">(Views.MONTH);
     const [date, setDate] = useState(new Date());
-
     const [openedTask, setOpenedTask] = useState<ProjectTask | null>(null);
+
     // Redirect to login if user is not logged in
     useEffectAsync(async () => {
         if (!loadingUser && !user) {
@@ -84,7 +81,6 @@ export default function CalendarView() {
                     tasks.map((task: any) => ({ ...task, project_name })),
                 );
                 setTasks(allTasks);
-                console.log(allTasks);
             } catch (e) {
                 console.error("Error:", e);
             } finally {
@@ -121,9 +117,7 @@ export default function CalendarView() {
     }, [tasks]);
 
     const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-        console.log("Selected slot:", start, end);
-        // You can add logic here to create a new event
-        handleOpen(); // This will open your AddTaskModal
+        handleOpen();
     };
 
     async function updateTask(task: ProjectTask) {
@@ -278,7 +272,6 @@ export default function CalendarView() {
                         | undefined;
                 }) => <Typography variant="subtitle1">{props.label}</Typography>,
             },
-            // Add more custom components as needed
         },
         month: {
             header: (props: {
@@ -325,7 +318,6 @@ export default function CalendarView() {
                     | undefined;
             }) => <Typography variant="subtitle1">{props.label}</Typography>,
         },
-        // Add more custom components as needed
     };
 
     // If user is not logged in, return empty fragment
@@ -341,6 +333,9 @@ export default function CalendarView() {
                     task={openedTask}
                     handleCloseModal={() => setOpenedTask(null)}
                     updateTask={updateTask}
+                    handleDeleteTask={function (taskId: string): void {
+                        throw new Error("Function not implemented.");
+                    }}
                 />
             )}
             <Grid container direction="column" spacing={2}>

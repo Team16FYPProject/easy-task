@@ -1,9 +1,9 @@
-import { expect, test, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import ProfilePage from "./page";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/useUser";
 import { useAchievements } from "@/hooks/useAchievements";
+import { useUser } from "@/hooks/useUser";
+import { render, screen, waitFor } from "@testing-library/react";
+import { useRouter } from "next/navigation";
+import { expect, test, vi } from "vitest";
+import ProfilePage from "./page";
 
 // Mocking dependencies
 vi.mock("next/navigation", () => ({
@@ -36,7 +36,14 @@ global.fetch = vi.fn();
 
 // Utility function to setup mocks
 const setupMocks = (
-    userMock = { id: "1", name: "Test User" },
+    userMock = {
+        id: "1",
+        name: "Test User",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+    },
     profileMock = { first_name: "John", last_name: "Doe" },
 ) => {
     vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: userMock });
@@ -120,7 +127,13 @@ test("ProfilePage displays projects", async () => {
 test("ProfilePage handles API errors gracefully", async () => {
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,
-        user: { id: "1", name: "Test User" },
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
     });
     vi.mocked(global.fetch).mockRejectedValueOnce(new Error("API Error"));
 

@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
-import TeamMembers from "./page";
 import { useUser } from "@/hooks/useUser";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useRouter } from "next/navigation";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import TeamMembers from "./page";
 
 // Mock the hooks and modules
 vi.mock("@/hooks/useUser");
@@ -20,7 +20,14 @@ vi.mock("@/components/InviteMemberModal", () => ({
 global.fetch = vi.fn();
 
 describe("TeamMembers Component", () => {
-    const mockUser = { id: "1", name: "Test User" };
+    const mockUser = {
+        id: "1",
+        name: "Test User",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+    };
     const mockProject = { project_name: "Test Project", project_desc: "Test Description" };
     const mockMembers = [
         { user_id: "1", first_name: "John", last_name: "Doe", email: "john@example.com" },
@@ -42,7 +49,7 @@ describe("TeamMembers Component", () => {
         render(<TeamMembers params={{ id: "1" }} />);
 
         await waitFor(() => {
-            expect(screen.getByText(/Project Test Project Members/i)).toBeDefined();
+            expect(screen.getByText(/Test Project Members/i)).toBeDefined();
             expect(screen.getByText("Test Description")).toBeDefined();
             expect(screen.getByText("John Doe")).toBeDefined();
             expect(screen.getByText("Jane Doe")).toBeDefined();
@@ -95,7 +102,13 @@ describe("TeamMembers Component", () => {
         // Mock user
         vi.mocked(useUser).mockReturnValue({
             loadingUser: false,
-            user: { id: "1", name: "Test User" },
+            user: {
+                id: "1",
+                app_metadata: {},
+                user_metadata: {},
+                aud: "authenticated",
+                created_at: new Date().toISOString(),
+            },
         });
 
         // Reset the fetch mock to clear previous calls
@@ -123,7 +136,7 @@ describe("TeamMembers Component", () => {
 
         // Wait for the initial data to load
         await waitFor(() => {
-            expect(screen.getByText("Project Test Project Members")).toBeDefined();
+            expect(screen.getByText("Test Project Members")).toBeDefined();
         });
 
         // Verify that the initial GET request was made
@@ -165,31 +178,39 @@ describe("TeamMembers Component", () => {
 
         render(<TeamMembers params={{ id: "1" }} />);
 
-        // Wait for the component to finish rendering and data to load
         await waitFor(() => {
-            expect(screen.getByText("Project Test Project Members")).toBeDefined();
+            expect(screen.getByText("Test Project Members")).toBeInTheDocument();
         });
 
-        // Find the table body specifically
         const tableBody = screen.getByRole("table").querySelector("tbody");
         expect(tableBody).not.toBeNull();
 
-        // Find Jane Doe's row
-        const janeDoeRow = within(tableBody!).getByText("Jane Doe").closest("tr");
+        await waitFor(() => {
+            const janeDoeCell = within(tableBody!).getByText(
+                (_content, element) => {
+                    return (
+                        element?.textContent === "Jane Doe" ||
+                        (element?.textContent?.includes("Jane") &&
+                            element?.textContent?.includes("Doe")) ||
+                        false
+                    );
+                },
+                { selector: "tr" },
+            );
+            expect(janeDoeCell).toBeInTheDocument();
 
-        expect(janeDoeRow).not.toBeNull();
+            // Find the REMOVE button in Jane Doe's row
+            const removeButton = within(janeDoeCell!).getByText("REMOVE");
+            expect(removeButton).toBeDefined();
 
-        // Find the REMOVE button in Jane Doe's row
-        const removeButton = within(janeDoeRow!).getByText("REMOVE");
-        expect(removeButton).toBeDefined();
+            // Mock the DELETE request for removing a member
+            vi.mocked(global.fetch).mockResolvedValueOnce({
+                json: vi.fn().mockResolvedValue({ success: true }),
+            } as any);
 
-        // Mock the DELETE request for removing a member
-        vi.mocked(global.fetch).mockResolvedValueOnce({
-            json: vi.fn().mockResolvedValue({ success: true }),
-        } as any);
-
-        // Click the remove button for Jane Doe
-        fireEvent.click(removeButton);
+            // Click the remove button for Jane Doe
+            fireEvent.click(removeButton);
+        });
 
         // Mock the confirm dialog
         vi.spyOn(window, "confirm").mockReturnValue(true);

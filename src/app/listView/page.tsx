@@ -1,10 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
 import { determineBgColor, determineTextColor } from "@/utils/colourUtils";
+import { useRouter } from "next/navigation";
 
+import AddTaskModal from "@/components/AddTaskModal";
+import ViewTaskModal from "@/components/ViewTaskModal";
+import { ProjectTask } from "@/utils/types";
 import {
     Button,
     Chip,
@@ -22,10 +25,8 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import AddTaskModal from "@/components/AddTaskModal";
-import React, { useEffect, useState } from "react";
 import { PieChart } from "@mui/x-charts";
-import { ProjectTask } from "@/utils/types";
+import React, { useEffect, useState } from "react";
 import SelectTeamModal from "@/components/SelectTeamModal";
 
 export default function ListView() {
@@ -51,6 +52,7 @@ export default function ListView() {
         { id: number; value: number; color: string; label: string }[]
     >([]);
     const theme = useTheme(); // Access the MUI theme
+    const [selectedTask, setSelectedTask] = useState<ProjectTask | null>(null);
     const [search, setSearch] = useState<string>("");
 
     const handleCreateTaskModalClose = () => {
@@ -266,6 +268,16 @@ export default function ListView() {
         theme.palette.tertiary?.main,
     ]);
 
+    const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
+    const handleRowClick = (task: ProjectTask) => {
+        setSelectedTask(task);
+        setViewTaskOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setViewTaskOpen(false);
+    };
+
     // If user is not logged in, return empty fragment
     if (!user) {
         return <></>;
@@ -273,8 +285,13 @@ export default function ListView() {
 
     // Generate rows for the table
     function generateRowFunction(tasks: ProjectTask[]): React.ReactNode {
-        return tasks.map((task, index) => (
-            <TableRow key={index}>
+        // Sort tasks by date
+        const sortedTasks = tasks.sort(
+            (a, b) => new Date(a.task_deadline).getTime() - new Date(b.task_deadline).getTime(),
+        );
+
+        return sortedTasks.map((task, index) => (
+            <TableRow key={index} onClick={() => handleRowClick(task)}>
                 <TableCell>
                     {new Intl.DateTimeFormat("en-AU", {
                         day: "2-digit",
@@ -302,10 +319,10 @@ export default function ListView() {
 
     return (
         <Container sx={{ padding: 2 }}>
-            <Grid container direction="column" spacing={2}>
+            <Grid container direction="column" spacing={0}>
                 {/* Title and Create Team Button */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+                    <Grid container spacing={0} alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Typography variant="h4">List View</Typography>
                         </Grid>
@@ -332,7 +349,7 @@ export default function ListView() {
                 </Grid>
                 {/* Insights */}
                 <Grid item xs={12}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={0}>
                         <Grid item xs={12} sm={6} md={6} style={{ height: "300px" }}>
                             {/* stats chart */}
                             <PieChart
@@ -352,16 +369,7 @@ export default function ListView() {
                                         arcLabelRadius: "40%",
                                     },
                                 ]}
-                                slotProps={
-                                    {
-                                        // pieCenter: {
-                                        //     pieCenterLabel: "XX Achievements",
-                                        //     fontSize: 15,
-                                        // },
-                                    }
-                                }
                                 width={400}
-                                // height={200}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={6}>
@@ -383,16 +391,7 @@ export default function ListView() {
                                         arcLabelRadius: "40%",
                                     },
                                 ]}
-                                slotProps={
-                                    {
-                                        // pieCenter: {
-                                        //     pieCenterLabel: "XX Achievements",
-                                        //     fontSize: 15,
-                                        // },
-                                    }
-                                }
                                 width={400}
-                                // height={200}
                             />
                         </Grid>
                     </Grid>
@@ -423,7 +422,7 @@ export default function ListView() {
                             <TableBody>
                                 {loadingTasks
                                     ? [...Array(5)].map((_, index) => (
-                                          <TableRow key={index}>
+                                          <TableRow key={index} data-testid="skeleton-row">
                                               <TableCell>
                                                   <Skeleton variant="text" />
                                               </TableCell>
@@ -447,6 +446,17 @@ export default function ListView() {
                     </TableContainer>
                 </Grid>
             </Grid>
+            {viewTaskOpen && selectedTask && (
+                <ViewTaskModal
+                    open={viewTaskOpen}
+                    handleCloseModal={handleCloseModal}
+                    task={selectedTask}
+                    updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
+                    handleDeleteTask={function (taskId: string): void {
+                        throw new Error("Function not implemented.");
+                    }}
+                />
+            )}
         </Container>
     );
 }

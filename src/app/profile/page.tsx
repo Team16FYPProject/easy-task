@@ -1,8 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import TeamCard from "@/components/TeamCard";
+import { useAchievements } from "@/hooks/useAchievements";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
+import type { ApiResponse, DashboardResponse, ProfileResponse, ProjectTask } from "@/utils/types";
+import { Project } from "@/utils/types";
 import {
     Avatar,
     Box,
@@ -14,16 +17,11 @@ import {
     Skeleton,
     Typography,
 } from "@mui/material";
-import Image from "next/image";
-import TeamCard from "@/components/TeamCard";
-import { useEffect, useState } from "react";
-import type { ApiResponse, DashboardResponse, ProfileResponse, ProjectTask } from "@/utils/types";
-import { useAchievements } from "@/hooks/useAchievements";
-import { ResponsiveContainer, Pie, Cell, PieChart } from "recharts";
-import React from "react";
-import { Project } from "@/utils/types";
-import { RowData, TeamViewData } from "../dashboard/types";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { RowData, TeamViewData } from "../dashboard/types";
 // Tested using Vitest for NEXT.js
 
 const COLORS = ["#b862ec", "#0055cc", "#113a44"];

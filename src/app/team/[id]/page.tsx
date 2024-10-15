@@ -1,30 +1,29 @@
 "use client";
+import { TeamIdParams } from "@/app/team/[id]/types";
+import InviteMemberModal from "@/components/InviteMemberModal";
 import TeamSettingsModal from "@/components/TeamSettingsModal";
-import { useRouter } from "next/navigation";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
+import { ApiResponse, Profile, Project } from "@/utils/types";
+import SettingsFilled from "@mui/icons-material/Settings";
 import {
     Button,
     Container,
     Grid,
-    Typography,
     IconButton,
-    TextField,
-    TableContainer,
     Paper,
+    Skeleton,
     Table,
+    TableBody,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
-    TableCell,
-    TableBody,
-    Skeleton,
+    TextField,
+    Typography,
 } from "@mui/material";
-import SettingsFilled from "@mui/icons-material/Settings";
-import { TeamIdParams } from "@/app/team/[id]/types";
-import { useEffect, useState } from "react";
-import React from "react";
-import { ApiResponse, Profile, Project } from "@/utils/types";
-import InviteMemberModal from "@/components/InviteMemberModal";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function TeamMembers({ params: { id } }: TeamIdParams) {
     const router = useRouter();
@@ -272,8 +271,4 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
             </Grid>
         </Container>
     );
-}
-
-function setOpen(arg0: boolean) {
-    throw new Error("Function not implemented.");
 }

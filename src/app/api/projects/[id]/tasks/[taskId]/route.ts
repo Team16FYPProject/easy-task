@@ -26,19 +26,6 @@ export async function GET(_: Request, { params: { taskId } }: TaskIdParams) {
         return internalErrorResponse({ success: false, data: "Unable to get task data" });
     }
 
-    // Merge user information and reminders with tasks
-    // const tasksWithDetails = data?.map((task) => ({
-    //     ...task,
-    //     assignees: task.assignees.map((assignee) => ({
-    //         ...assignee,
-    //         user: {
-    //             email: assignee.profile.email,
-    //             name: assignee.profile.first_name + " " + assignee.profile.last_name,
-    //         },
-    //     })),
-    //     reminders: task.reminders || [], // Attach reminders
-    // }));
-
     return okResponse({ success: true, data: data });
 }
 
@@ -69,8 +56,6 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
         if (data.taskLocation !== undefined) updateFields.task_location = data.taskLocation;
         if (data.taskMeetingBool !== undefined) updateFields.task_is_meeting = data.taskMeetingBool;
         if (data.taskTimeSpent !== undefined) updateFields.task_time_spent = data.taskTimeSpent;
-
-        console.log("Fields to update:", updateFields);
 
         const { data: updateData, error: updateError } = await supabase
             .from("task")
@@ -113,20 +98,19 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
         console.log("Update successful. Updated data:", updateData);
 
         // Merge user information and reminders with tasks
-        const tasksWithDetails = updateData?.map((task) => ({
-            ...task,
-            assignees: task.assignees.map((assignee) => ({
-                ...assignee,
-                user: {
-                    email: assignee.profile.email,
-                    name: assignee.profile.first_name + " " + assignee.profile.last_name,
-                },
-            })),
-            // reminders: task.
-            // reminders: task.reminders || [], // Attach reminders
-        }));
+        // const taskWithDetails = {
+        //     ...updateData,
+        //     assignees: updateData.assignees?.map((assignee: any) => ({
+        //         ...assignee,
+        //         user: {
+        //             email: assignee.profile.email,
+        //             name: assignee.profile.first_name + " " + assignee.profile.last_name,
+        //         },
+        //     })),
+        //     // reminders: updateData.reminders || [], // Attach reminders
+        // };
 
-        return okResponse({ success: true, data: tasksWithDetails });
+        return okResponse({ success: true, data: updateData });
     } catch (error) {
         console.error("Unexpected error:", error);
         return internalErrorResponse({ success: false, data: "An unexpected error occurred" });
@@ -146,49 +130,3 @@ export async function DELETE(_: Request, { params: { taskId } }: TaskIdParams) {
     }
     return okResponse({ success: true, data: "Task deleted" });
 }
-
-// export async function PATCH(request: Request, { params: { taskId } }: TaskIdParams) {
-//     const { user } = await getSession();
-//     if (!user) {
-//         return unauthorizedResponse({ success: false, data: "Unauthorized" });
-//     }
-//     const data = await request.json();
-//     console.log(data);
-
-//     // First, check if the task exists
-//     const { data: existingTask, error: checkError } = await getServiceSupabase()
-//         .from("task")
-//         .select("task_id")
-//         .eq("task_id", taskId)
-//         .single();
-
-//     if (checkError) {
-//         if (checkError.code === "PGRST116") {
-//             return okResponse({ success: false, data: "Task not found" });
-//         }
-//         console.error(checkError);
-//         return internalErrorResponse({ success: false, data: "Error checking task existence" });
-//     }
-
-//     // Update the task in the database and return the newly updated task
-//     const { data: updateData, error: updateError } = await getServiceSupabase()
-//         .from("task")
-//         .update({
-//             task_name: data.name ?? undefined,
-//             task_desc: data.desc ?? undefined,
-//             task_time_spent: data.time_spent ?? undefined,
-//             task_parent_id: data.parent_id ?? undefined,
-//             task_status: data.status ?? undefined,
-//             task_priority: data.priority ?? undefined,
-//             task_location: data.location ?? undefined,
-//             task_is_meeting: data.is_meeting ?? undefined,
-//         })
-//         .eq("task_id", taskId)
-//         .select("*");
-//     // .single();
-//     if (updateError) {
-//         console.error(updateError);
-//         return internalErrorResponse({ success: false, data: "Unable to update the task" });
-//     }
-//     return okResponse({ success: true, data: updateData });
-// }

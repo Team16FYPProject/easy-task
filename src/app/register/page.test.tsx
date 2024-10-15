@@ -1,5 +1,5 @@
-import { expect, test, vi, Mock } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { expect, Mock, test, vi } from "vitest";
 import SignUp from "./page";
 
 // Mock the next/navigation module

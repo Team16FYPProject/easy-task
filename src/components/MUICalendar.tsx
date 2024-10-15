@@ -1,8 +1,8 @@
+import { Paper, Theme, useTheme } from "@mui/material";
+import { ThemeProvider, styled } from "@mui/material/styles";
+import { MUIStyledCommonProps } from "@mui/system";
 import React from "react";
 import { Calendar, CalendarProps } from "react-big-calendar";
-import { ThemeProvider, styled } from "@mui/material/styles";
-import { Paper, Theme, useTheme } from "@mui/material";
-import { MUIStyledCommonProps } from "@mui/system";
 
 const StyledCalendar = styled(Calendar)(({ theme }) => ({
     "& .rbc-header": {
@@ -22,7 +22,6 @@ const StyledCalendar = styled(Calendar)(({ theme }) => ({
         backgroundColor: theme.palette.secondary.main,
         color: theme.palette.secondary.contrastText,
     },
-    // Add more custom styles here
 }));
 
 const MUICalendar = (
@@ -30,7 +29,7 @@ const MUICalendar = (
         CalendarProps<object, object> &
         MUIStyledCommonProps<Theme> & { ref?: React.Ref<Calendar<object, object>> | undefined },
 ) => {
-    const theme = useTheme(); // Use your custom theme here if you have one
+    const theme = useTheme();
 
     return (
         <ThemeProvider theme={theme}>

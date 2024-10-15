@@ -1,6 +1,6 @@
-import { getServiceSupabase } from "@/utils/supabase/server";
-import { badRequestResponse, okResponse } from "@/utils/server/server.responses.utils";
 import { getSession } from "@/utils/server/auth.server.utils";
+import { badRequestResponse, okResponse } from "@/utils/server/server.responses.utils";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import { DashboardResponse, Project, ProjectTask } from "@/utils/types";
 
 export async function GET() {

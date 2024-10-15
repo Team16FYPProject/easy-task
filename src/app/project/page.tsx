@@ -1,29 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import AddTeamModal from "@/components/AddTeamModal";
+import TeamCard from "@/components/TeamCard";
+// import { useAchievements } from "@/hooks/useAchievements";
 import { useEffectAsync } from "@/hooks/useEffectAsync";
 import { useUser } from "@/hooks/useUser";
-import {
-    Avatar,
-    Box,
-    Button,
-    ButtonBase,
-    Container,
-    Grid,
-    Paper,
-    Skeleton,
-    Typography,
-} from "@mui/material";
-import TeamCard from "@/components/TeamCard";
-import { useEffect, useState } from "react";
 import type { ApiResponse, DashboardResponse, ProfileResponse, ProjectTask } from "@/utils/types";
-import { useAchievements } from "@/hooks/useAchievements";
-import React from "react";
 import { Project } from "@/utils/types";
-import { RowData, TeamViewData } from "../dashboard/types";
-import AddTeamModal from "@/components/AddTeamModal";
-
-const COLORS = ["#0088FE", "#00C49F"];
+import { Box, Button, ButtonBase, Container, Grid, Paper, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { RowData } from "../dashboard/types";
 
 const AchievementTree = ({ filledCount }: { filledCount: number }) => {
     const treeHeight = 300; // Fixed tree height
@@ -56,7 +43,7 @@ const AchievementTree = ({ filledCount }: { filledCount: number }) => {
 export default function ProjectPage() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
-    const { achievements, loading: loadingAchievements } = useAchievements(user?.id || "");
+    // const { achievements, loading: loadingAchievements } = useAchievements(user?.id || "");
     const [profile, setProfile] = useState<ProfileResponse | null>(null);
     const [projects, setProjects] = React.useState<Project[]>([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
@@ -72,13 +59,22 @@ export default function ProjectPage() {
             return;
         }
         if (user) {
-            const response = await fetch("/api/user/profile");
-            const data: ApiResponse<ProfileResponse> = await response.json();
-            if (!data.success) {
-                alert("Unable to load your project data.");
+            try {
+                const response = await fetch("/api/user/profile");
+                const data: ApiResponse<ProfileResponse> = await response.json();
+                if (!response.ok) {
+                    throw new Error((data.data as string) || "Failed to fetch profile");
+                }
+                if (!data.success) {
+                    alert("Unable to load your project data.");
+                    return;
+                }
+                setProfile(data.data);
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                alert("Unable to load your profile data.");
                 return;
             }
-            setProfile(data.data);
         }
     }, [loadingUser, user]);
 

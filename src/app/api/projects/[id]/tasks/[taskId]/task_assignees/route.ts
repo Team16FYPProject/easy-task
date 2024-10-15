@@ -1,43 +1,12 @@
+import { getSession } from "@/utils/server/auth.server.utils";
 import {
     internalErrorResponse,
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
-import { TaskIdParams } from "./types";
-import { getSession } from "@/utils/server/auth.server.utils";
 import { Assignee } from "@/utils/types";
-
-// export async function POST(request: Request, { params: { id, taskId } }: TaskIdParams) {
-//     const { user } = await getSession();
-//     if (!user) {
-//         return unauthorizedResponse({ success: false, data: "Unauthorized" });
-//     }
-
-//     const { assignee } = await request.json();
-
-//     // Add the user ID to the task_assignees table
-//     const { error: insertError } = await getServiceSupabase()
-//         .from("task_assignee")
-//         .insert({ task_id: taskId, user_id: assignee });
-
-//     if (insertError) {
-//         console.error(`Error adding assignees to task ${taskId}:`, insertError);
-//         return internalErrorResponse({
-//             success: false,
-//             data: `Unable to add user to task assignees. Error: ${insertError.message}`,
-//         });
-//     }
-
-//     // if (error) {
-//     //     console.error(`Error updating task ${taskId}:`, error);
-//     //     return internalErrorResponse({
-//     //         success: false,
-//     //         data: `Unable to update task status. Error: ${error.message}`,
-//     //     });
-//     // }
-//     return okResponse({ success: true });
-// }
+import { TaskIdParams } from "./types";
 
 export async function POST(request: Request, { params: { id, taskId } }: TaskIdParams) {
     const { user } = await getSession();
@@ -65,14 +34,13 @@ export async function POST(request: Request, { params: { id, taskId } }: TaskIdP
     const idsToInsert: string[] = ids.filter((id: string) => !currentIds.includes(id));
     // Get the assignees that need to be deleted
     const idsToDelete: string[] = currentIds.filter((id: string) => !ids.includes(id));
-
     const insertQuery = serviceSupabase
         .from("task_assignee")
         .insert(idsToInsert.map((id) => ({ task_id: taskId, user_id: id })));
     const deleteQuery = serviceSupabase
         .from("task_assignee")
         .delete()
-        .eq("task_id", id)
+        .eq("task_id", taskId)
         .in("user_id", idsToDelete);
 
     // Update the assignees, insert new ones and delete remove assignees.

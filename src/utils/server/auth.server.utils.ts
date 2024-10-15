@@ -1,8 +1,8 @@
-import { cache } from "react";
 import { getServerSupabase } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { User } from "@supabase/auth-js";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 
 export interface Session {
     user: User;

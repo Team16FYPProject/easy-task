@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "@/utils/supabase/server";
+import { getSession } from "@/utils/server/auth.server.utils";
 import {
     badRequestResponse,
     createdResponse,
@@ -6,7 +6,7 @@ import {
     okResponse,
     unauthorizedResponse,
 } from "@/utils/server/server.responses.utils";
-import { getSession } from "@/utils/server/auth.server.utils";
+import { getServiceSupabase } from "@/utils/supabase/server";
 import { ProfileResponse } from "@/utils/types";
 
 export async function GET() {
