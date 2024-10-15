@@ -32,6 +32,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     updateTask,
 }) => {
     const [task, setTask] = useState<ProjectTask>(originalTask);
+    console.log("task", task);
     const [taskAssignees, setTaskAssignees] = useState<string[]>(
         task.assignees.map((assignee) => assignee.user_id),
     );
@@ -97,21 +98,23 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     const convertRemindersToTimestamps = (
         reminderStrings: string[],
         deadline: number,
-    ): { date: string; reminder: string }[] => {
+    ): { reminder_datetime: string; type: string }[] => {
         const timeDifferences: Record<string, number> = {
             "One Hour Before": 1 * 60 * 60 * 1000,
             "One Day Before": 24 * 60 * 60 * 1000,
             "One Week Before": 7 * 24 * 60 * 60 * 1000,
         };
         const types: Record<string, string> = {
-            "One Hour Before": "1H",
-            "One Day Before": "1D",
-            "One Week Before": "1W",
+            "One Hour Before": "OneHour",
+            "One Day Before": "OneDay",
+            "One Week Before": "OneWeek",
         };
 
         return reminderStrings.map((reminderStr) => ({
-            date: new Date(deadline - (timeDifferences[reminderStr] || 0)).toISOString(),
-            reminder: types[reminderStr],
+            reminder_datetime: new Date(
+                deadline - (timeDifferences[reminderStr] || 0),
+            ).toISOString(),
+            type: types[reminderStr],
         }));
     };
 
@@ -176,8 +179,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 taskStatus: task.task_status,
                 taskMeetingBool: task.task_is_meeting,
                 taskLocation: task.task_location,
-                taskAssignee: taskAssignees,
-                //taskReminder: updatedReminders,
+                // taskAssignee: taskAssignees,
+                // taskReminder: updatedReminders,
             };
 
             const response = await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}`, {
@@ -202,21 +205,30 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             if (!assigneesData.success) {
                 throw new Error(assigneesData.data);
             }
-
+            console.log("assigneesData", assigneesData);
             if (updatedReminders) {
                 // reminders update
-                await fetch(`/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`, {
-                    method: "POST",
-                    body: JSON.stringify({ new_datetimes: updatedReminders }),
-                });
+                const reminderResponse = await fetch(
+                    `/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify({ new_datetimes: updatedReminders }),
+                    },
+                );
+                console.log("reminderResponse", reminderResponse);
             }
 
             const result: ApiResponse<ProjectTask> = await response.json();
-
+            console.log("result", result);
             if (!result.success) {
                 throw new Error(result.data as string);
             }
-            updateTask(result.data as ProjectTask);
+            updateTask({
+                ...result.data,
+                reminders: task.reminders, //reminderResponse.data,
+                assignees: assigneesData.data,
+            } as ProjectTask);
+            // updateTask(result.data as ProjectTask);
 
             handleCloseModal();
         } catch (error) {

@@ -20,7 +20,14 @@ vi.mock("@/components/InviteMemberModal", () => ({
 global.fetch = vi.fn();
 
 describe("TeamMembers Component", () => {
-    const mockUser = { id: "1", name: "Test User" };
+    const mockUser = {
+        id: "1",
+        name: "Test User",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+    };
     const mockProject = { project_name: "Test Project", project_desc: "Test Description" };
     const mockMembers = [
         { user_id: "1", first_name: "John", last_name: "Doe", email: "john@example.com" },

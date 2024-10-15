@@ -513,6 +513,7 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                         assignees,
                         reminders,
+                        project: undefined,
                     })
                 }
                 style={{
@@ -558,6 +559,7 @@ const Card: React.FC<CardProp> = ({
                         task_time_spent,
                         assignees,
                         reminders,
+                        project: undefined,
                     }}
                     updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
                     handleDeleteTask={handleDeleteTask}
