@@ -52,6 +52,8 @@ const setupMocks = (
             {
                 id: "1",
                 name: "Test Achievement",
+                desc: "Test Achievement",
+                icon: "",
                 completed: true,
                 progress: 100,
                 max_progress: 100,
@@ -59,6 +61,8 @@ const setupMocks = (
             {
                 id: "2",
                 name: "In Progress Achievement",
+                desc: "In Progress Achievement",
+                icon: "",
                 completed: false,
                 progress: 50,
                 max_progress: 100,
