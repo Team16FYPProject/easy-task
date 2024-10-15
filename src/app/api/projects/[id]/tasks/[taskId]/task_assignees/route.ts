@@ -34,8 +34,6 @@ export async function POST(request: Request, { params: { id, taskId } }: TaskIdP
     const idsToInsert: string[] = ids.filter((id: string) => !currentIds.includes(id));
     // Get the assignees that need to be deleted
     const idsToDelete: string[] = currentIds.filter((id: string) => !ids.includes(id));
-    console.log("idsToInsert", idsToInsert);
-    console.log("idsToDelete", idsToDelete);
     const insertQuery = serviceSupabase
         .from("task_assignee")
         .insert(idsToInsert.map((id) => ({ task_id: taskId, user_id: id })));

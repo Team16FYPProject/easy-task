@@ -117,7 +117,6 @@ export default function CalendarView() {
     }, [tasks]);
 
     const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-        console.log("Selected slot:", start, end);
         handleOpen();
     };
 

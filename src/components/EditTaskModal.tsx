@@ -32,7 +32,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     updateTask,
 }) => {
     const [task, setTask] = useState<ProjectTask>(originalTask);
-    console.log("task", task);
     const [taskAssignees, setTaskAssignees] = useState<string[]>(
         task.assignees.map((assignee) => assignee.user_id),
     );
@@ -205,30 +204,33 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             if (!assigneesData.success) {
                 throw new Error(assigneesData.data);
             }
-            console.log("assigneesData", assigneesData);
-            if (updatedReminders) {
-                // reminders update
-                const reminderResponse = await fetch(
-                    `/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`,
-                    {
-                        method: "POST",
-                        body: JSON.stringify({ new_datetimes: updatedReminders }),
-                    },
-                );
-                console.log("reminderResponse", reminderResponse);
+
+            // if (updatedReminders) {
+            // reminders update
+            const reminderResponse = await fetch(
+                `/api/projects/${task.project_id}/tasks/${task.task_id}/reminders`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({ new_datetimes: updatedReminders }),
+                },
+            );
+            const reminderData: ApiResponse<Reminder[]> = await reminderResponse.json();
+            if (!reminderData.success) {
+                throw new Error(reminderData.data);
             }
+            // }
 
             const result: ApiResponse<ProjectTask> = await response.json();
-            console.log("result", result);
             if (!result.success) {
                 throw new Error(result.data as string);
             }
-            updateTask({
+            const updateTaskData = {
                 ...result.data,
-                reminders: task.reminders, //reminderResponse.data,
+                reminders: reminderData.data,
                 assignees: assigneesData.data,
-            } as ProjectTask);
-            // updateTask(result.data as ProjectTask);
+            };
+            console.log("updateTaskData", updateTaskData);
+            updateTask(updateTaskData as ProjectTask);
 
             handleCloseModal();
         } catch (error) {

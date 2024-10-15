@@ -144,7 +144,6 @@ export default function ListView() {
                             }));
                         }),
                 );
-                console.log(fetchPromises);
 
                 const results = await Promise.all(fetchPromises);
                 // Flatten the results and include project names with tasks

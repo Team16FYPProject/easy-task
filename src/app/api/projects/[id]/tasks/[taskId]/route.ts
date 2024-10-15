@@ -57,8 +57,6 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
         if (data.taskMeetingBool !== undefined) updateFields.task_is_meeting = data.taskMeetingBool;
         if (data.taskTimeSpent !== undefined) updateFields.task_time_spent = data.taskTimeSpent;
 
-        console.log("Fields to update:", updateFields);
-
         const { data: updateData, error: updateError } = await supabase
             .from("task")
             .update(updateFields)

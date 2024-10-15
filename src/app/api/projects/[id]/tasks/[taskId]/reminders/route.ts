@@ -7,6 +7,7 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
+import { Reminder } from "@/utils/types";
 
 export async function GET(request: Request, { params }: TaskIdParams) {
     const { user } = await getSession();
@@ -64,7 +65,6 @@ export async function POST(request: Request, { params: { taskId } }: TaskIdParam
             data: "Reminder ID and new datetime are required",
         });
     }
-    console.log(new_datetimes);
     const remindersToInsert = new_datetimes.map(
         (datetime: { reminder_datetime: any; type: any }) => ({
             task_id: taskId,
@@ -83,7 +83,29 @@ export async function POST(request: Request, { params: { taskId } }: TaskIdParam
             return internalErrorResponse({ success: false, data: "Failed to update reminder" });
         }
 
-        return okResponse({ success: true, data });
+        // Query the db to fetch the new assignees to match the required response.
+        const { data: remindersData, error: remindersError } = await supabase
+            .from("task_reminder")
+            .select(
+                "*", //, profile!inner(user_id, first_name, last_name, email, profile_bio, profile_display_name, profile_avatar)",
+            )
+            .eq("task_id", taskId);
+
+        if (remindersError) {
+            console.error(remindersError);
+            return internalErrorResponse({
+                success: false,
+                data: "Unable to complete updating reminders. Please refresh and try again",
+            });
+        }
+        // console.log("remindersData", remindersData);
+        // const reminders: Reminder[] =
+        //     remindersData?.map((reminder) => ({
+        //         ...reminder,
+
+        //     })) ?? [];
+
+        return okResponse({ success: true, data: remindersData });
     } catch (error) {
         console.error("Error updating reminder:", error);
         return serverErrorResponse({ success: false, data: "An unexpected error occurred" });

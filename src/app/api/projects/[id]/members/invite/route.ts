@@ -54,7 +54,6 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
     }
 
     const inviteLink = `${process.env.NEXT_PUBLIC_URL}/invite/${inviteData.invite_id}`;
-    // console.log(inviteLink);
 
     const { error } = await resend.emails.send({
         from: "Easy-Task <no-reply@easy-task.com>",
