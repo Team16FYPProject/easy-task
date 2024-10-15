@@ -402,7 +402,7 @@ export default function ListView() {
                     </TableContainer>
                 </Grid>
             </Grid>
-            {viewTaskOpen && (
+            {viewTaskOpen && selectedTask && (
                 <ViewTaskModal
                     open={viewTaskOpen}
                     handleCloseModal={handleCloseModal}

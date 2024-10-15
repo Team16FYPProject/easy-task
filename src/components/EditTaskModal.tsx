@@ -110,10 +110,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         };
 
         return reminderStrings.map((reminderStr) => ({
-            reminder_datetime: new Date(
-                deadline - (timeDifferences[reminderStr] || 0),
-            ).toISOString(),
-            type: types[reminderStr],
+            date: new Date(deadline - (timeDifferences[reminderStr] || 0)).toISOString(),
+            reminder: types[reminderStr],
         }));
     };
 
@@ -178,7 +176,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 taskStatus: task.task_status,
                 taskMeetingBool: task.task_is_meeting,
                 taskLocation: task.task_location,
-                //taskAssignee: taskAssignees,
+                taskAssignee: taskAssignees,
                 //taskReminder: updatedReminders,
             };
 

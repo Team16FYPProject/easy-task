@@ -57,6 +57,7 @@ export interface Project {
  * @param assignees: The assignees of the task;
  */
 export type ProjectTask = {
+    project: any;
     project_id: string;
     task_creator_id: string;
     task_deadline: string;

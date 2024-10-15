@@ -24,7 +24,16 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Utility function to setup mocks
-const setupMocks = (userMock = { id: "1", name: "Test User" }) => {
+const setupMocks = (
+    userMock = {
+        id: "1",
+        name: "Test User",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+    },
+) => {
     vi.mocked(useUser).mockReturnValue({ loadingUser: false, user: userMock });
     mockFetch.mockResolvedValueOnce({
         ok: true,

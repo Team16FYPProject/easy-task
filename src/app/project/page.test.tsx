@@ -31,7 +31,14 @@ global.fetch = vi.fn();
 
 // Utility function to setup mocks
 const setupMocks = (
-    userMock = { id: "1", name: "Test User" },
+    userMock = {
+        id: "1",
+        name: "Test User",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+    },
     profileMock = { first_name: "John", last_name: "Doe" },
     projectsMock = [{ project_id: "1", project_name: "Test Project" }],
 ) => {
@@ -39,6 +46,7 @@ const setupMocks = (
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [],
         loading: false,
+        error: null,
     });
     vi.mocked(global.fetch)
         .mockResolvedValueOnce({

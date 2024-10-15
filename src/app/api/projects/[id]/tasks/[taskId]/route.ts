@@ -26,19 +26,6 @@ export async function GET(_: Request, { params: { taskId } }: TaskIdParams) {
         return internalErrorResponse({ success: false, data: "Unable to get task data" });
     }
 
-    // Merge user information and reminders with tasks
-    // const tasksWithDetails = data?.map((task) => ({
-    //     ...task,
-    //     assignees: task.assignees.map((assignee) => ({
-    //         ...assignee,
-    //         user: {
-    //             email: assignee.profile.email,
-    //             name: assignee.profile.first_name + " " + assignee.profile.last_name,
-    //         },
-    //     })),
-    //     reminders: task.reminders || [], // Attach reminders
-    // }));
-
     return okResponse({ success: true, data: data });
 }
 
@@ -113,19 +100,19 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
         console.log("Update successful. Updated data:", updateData);
 
         // Merge user information and reminders with tasks
-        const tasksWithDetails = updateData?.map((task) => ({
-            ...task,
-            assignees: task.assignees.map((assignee) => ({
+        const taskWithDetails = {
+            ...updateData,
+            assignees: updateData.assignees?.map((assignee: any) => ({
                 ...assignee,
                 user: {
                     email: assignee.profile.email,
                     name: assignee.profile.first_name + " " + assignee.profile.last_name,
                 },
             })),
-            // reminders: task.reminders || [], // Attach reminders
-        }));
+            // reminders: updateData.reminders || [], // Attach reminders
+        };
 
-        return okResponse({ success: true, data: tasksWithDetails });
+        return okResponse({ success: true, data: taskWithDetails });
     } catch (error) {
         console.error("Unexpected error:", error);
         return internalErrorResponse({ success: false, data: "An unexpected error occurred" });

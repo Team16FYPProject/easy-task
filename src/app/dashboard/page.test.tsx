@@ -36,11 +36,24 @@ vi.mock("@/components/TeamCard", () => ({
 
 // Setup function to mock fetch and router
 const setup = () => {
-    const mockRouter = { push: vi.fn() };
+    const mockRouter = {
+        push: vi.fn(),
+        back: vi.fn(),
+        forward: vi.fn(),
+        refresh: vi.fn(),
+        replace: vi.fn(),
+        prefetch: vi.fn(),
+    };
     vi.mocked(useRouter).mockReturnValue(mockRouter);
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,
-        user: { id: "1", name: "Test User" },
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: "2023-01-01T00:00:00.000Z",
+        },
     });
 
     global.fetch = vi.fn().mockImplementation((url: string) => {

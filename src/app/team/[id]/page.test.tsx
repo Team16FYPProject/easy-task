@@ -95,7 +95,13 @@ describe("TeamMembers Component", () => {
         // Mock user
         vi.mocked(useUser).mockReturnValue({
             loadingUser: false,
-            user: { id: "1", name: "Test User" },
+            user: {
+                id: "1",
+                app_metadata: {},
+                user_metadata: {},
+                aud: "authenticated",
+                created_at: new Date().toISOString(),
+            },
         });
 
         // Reset the fetch mock to clear previous calls

@@ -65,11 +65,13 @@ export async function POST(request: Request, { params: { taskId } }: TaskIdParam
         });
     }
     // console.log(new_datetimes);
-    const remindersToInsert = new_datetimes.map((datetime) => ({
-        task_id: taskId,
-        reminder_datetime: datetime.reminder_datetime,
-        type: datetime.type,
-    }));
+    const remindersToInsert = new_datetimes.map(
+        (datetime: { reminder_datetime: any; type: any }) => ({
+            task_id: taskId,
+            reminder_datetime: datetime.reminder_datetime,
+            type: datetime.type,
+        }),
+    );
 
     try {
         const { data, error } = await supabase.from("task_reminder").insert(remindersToInsert);
