@@ -51,7 +51,7 @@ export default function ListView() {
     const [pieChartAssignmentData, setPieChartAssignmentData] = useState<
         { id: number; value: number; color: string; label: string }[]
     >([]);
-    const theme = getTheme(); // Access the MUI theme
+    const theme = getTheme("light"); // Access the MUI theme
     const [selectedTask, setSelectedTask] = useState<ProjectTask | null>(null);
     const [search, setSearch] = useState<string>("");
 
