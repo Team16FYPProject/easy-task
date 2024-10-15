@@ -33,11 +33,11 @@ const MUICalendar = (
     const theme = getTheme("light");
 
     return (
-        <ThemeProvider theme={theme}>
-            <Paper elevation={0}>
-                <StyledCalendar {...props} />
-            </Paper>
-        </ThemeProvider>
+        // <ThemeProvider theme={theme}>
+        <Paper elevation={0}>
+            <StyledCalendar {...props} />
+        </Paper>
+        // </ThemeProvider>
     );
 };
 

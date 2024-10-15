@@ -34,6 +34,11 @@ const getTheme = (mode: "light" | "dark"): ThemeOptions => ({
         text: {
             primary: mode === "light" ? "#000000" : "#ffffff",
         },
+        action: {
+            selected: mode === "light" ? "#f5f5f5" : "#424242",
+            disabledBackground: mode === "light" ? "#f5f5f5" : "#424242",
+            disabled: mode === "light" ? "#000000" : "#ffffff",
+        },
     },
 });
 

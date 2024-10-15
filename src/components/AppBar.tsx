@@ -101,11 +101,13 @@ export default function SiteAppBar({
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Easy Task
                     </Typography>
+                    <Typography variant="subtitle2">Light</Typography>
                     <Switch
                         checked={currentMode === "dark"}
                         onChange={toggleTheme}
                         inputProps={{ "aria-label": "toggle theme" }}
                     />
+                    <Typography variant="subtitle2">Dark</Typography>
                 </Toolbar>
             </AppBar>
             <Drawer open={open} onClose={toggleDrawer(false)}>
