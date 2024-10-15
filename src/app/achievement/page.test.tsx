@@ -78,18 +78,18 @@ test("Achievements page renders achievements data", async () => {
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [
             {
-                achievement_id: "1",
-                achievement_name: "Test Achievement",
-                achievement_desc: "Test Description",
+                id: "1",
+                name: "Test Achievement",
+                desc: "Test Description",
                 completed: true,
                 progress: 100,
                 max_progress: 100,
                 icon: "🏆",
             },
             {
-                achievement_id: "2",
-                achievement_name: "In Progress Achievement",
-                achievement_desc: "Another Test Description",
+                id: "2",
+                name: "In Progress Achievement",
+                desc: "Another Test Description",
                 completed: false,
                 progress: 50,
                 max_progress: 100,
@@ -126,8 +126,24 @@ test("Achievements page renders PieChart with correct data", async () => {
     });
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [
-            { achievement_id: "1", completed: true, progress: 100, max_progress: 100 },
-            { achievement_id: "2", completed: false, progress: 50, max_progress: 100 },
+            {
+                id: "1",
+                name: "1",
+                desc: "1",
+                icon: "",
+                completed: true,
+                progress: 100,
+                max_progress: 100,
+            },
+            {
+                id: "2",
+                name: "2",
+                desc: "2",
+                icon: "",
+                completed: false,
+                progress: 50,
+                max_progress: 100,
+            },
         ],
         loading: false,
         error: null,
@@ -154,8 +170,24 @@ test("Achievements page renders AchievementTree", async () => {
     });
     vi.mocked(useAchievements).mockReturnValue({
         achievements: [
-            { achievement_id: "1", completed: true, progress: 100, max_progress: 100 },
-            { achievement_id: "2", completed: false, progress: 50, max_progress: 100 },
+            {
+                id: "1",
+                name: "1",
+                desc: "1",
+                icon: "",
+                completed: true,
+                progress: 100,
+                max_progress: 100,
+            },
+            {
+                id: "2",
+                name: "2",
+                desc: "2",
+                icon: "",
+                completed: false,
+                progress: 50,
+                max_progress: 100,
+            },
         ],
         loading: false,
         error: null,

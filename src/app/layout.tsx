@@ -7,8 +7,8 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-    title: "Home",
-    description: "Welcome to Next.js",
+    title: "EasyTask",
+    description: "The ultimate student project manager",
 };
 
 export default function RootLayout({

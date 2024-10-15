@@ -3,19 +3,21 @@ import {
     internalErrorResponse,
     okResponse,
 } from "@/utils/server/server.responses.utils";
-import { getServerSupabase } from "@/utils/supabase/server";
+import { getServiceSupabase } from "@/utils/supabase/server";
+import { getSession } from "@/utils/server/auth.server.utils";
 
 export async function GET() {
-    const supabase = getServerSupabase();
-    const user = (await supabase.auth.getUser())?.data?.user;
+    const { user } = await getSession();
     if (!user) {
         return badRequestResponse({ success: false, data: "Unauthorized" });
     }
-    const { data, error } = await supabase
+
+    const serviceSupabase = getServiceSupabase();
+    const { data, error } = await serviceSupabase
         .from("user_achievement")
-        .select("achievement_id, achievement!inner(*)")
+        .select("*, achievement!inner(*)")
         .eq("user_id", user.id);
-    if (error || !data) {
+    if (error) {
         return internalErrorResponse({ success: false, data: "Unable to load achievements" });
     }
 
@@ -25,6 +27,10 @@ export async function GET() {
             id: achievement.achievement_id,
             name: achievement.achievement.achievement_name,
             desc: achievement.achievement.achievement_desc,
+            icon: achievement.achievement.icon,
+            progress: achievement.progress,
+            max_progress: achievement.achievement.max_progress,
+            completed: achievement.completed,
         })),
     });
 }
