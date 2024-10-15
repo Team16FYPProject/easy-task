@@ -1,4 +1,3 @@
-import { getSession } from "@/utils/server/auth.server.utils";
 import {
     internalErrorResponse,
     okResponse,
@@ -6,6 +5,11 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
+import { getSession } from "@/utils/server/auth.server.utils";
+import {
+    checkAndUpdateAchievementProgress,
+    increaseAchievementProgress,
+} from "@/utils/server/achievements.utils";
 
 export async function GET(_: Request, { params: { taskId } }: TaskIdParams) {
     const { user } = await getSession();
@@ -82,6 +86,28 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
                 return okResponse({ success: false, data: "Task not found" });
             }
             return internalErrorResponse({ success: false, data: "Unable to update the task" });
+        }
+
+        if (data.taskTimeSpent) {
+            void increaseAchievementProgress(user.id, "Time Wizard", data.taskTimeSpent);
+        }
+
+        if (data.taskStatus === "DOING") {
+            void checkAndUpdateAchievementProgress(user.id, "Multitasker");
+        } else if (data.taskStatus === "COMPLETE") {
+            const date = new Date();
+            // If the user marked a task as COMPLETE before 9AM, increase their progress for the 'Early Bird' achievement.
+            if (date.getHours() <= 9) {
+                void increaseAchievementProgress(user.id, "Early Bird", 1);
+            }
+
+            if (updateData.task_deadline) {
+                const deadline = new Date(updateData.task_deadline);
+                // If the user completed the task before the deadline, mark increase their progress for the 'Deadline Crusher'
+                if (date.getTime() < deadline.getTime()) {
+                    void increaseAchievementProgress(user.id, "Deadline Crusher", 1);
+                }
+            }
         }
 
         console.log("Update successful. Updated data:", updateData);

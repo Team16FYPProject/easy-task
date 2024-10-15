@@ -19,7 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#0088FE", "#00C49F"];
+const COLORS = ["#b862ec", "#0055cc", "#113a44"];
 
 const AchievementTree = ({ filledCount }: { filledCount: number }) => {
     const treeHeight = 300; // Fixed tree height

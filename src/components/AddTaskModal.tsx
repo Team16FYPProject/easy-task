@@ -124,7 +124,7 @@ export default function AddTaskModal({
                 taskLocation: taskLocation || null,
                 taskAssignee: taskAssignee || null, // Assignees
                 taskReminder: reminders || null, // Reminders
-                taskDuration: taskMeetingBool ? taskDuration : null, // Only set duration if it's a meeting
+                taskDuration: taskMeetingBool && taskDuration ? taskDuration : null, // Only set duration if it's a meeting
             }),
         });
 
@@ -248,6 +248,8 @@ export default function AddTaskModal({
                                     setTaskDescription(e.target.value);
                                 }}
                             />
+
+                            {/* Task Deadline */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>
@@ -262,6 +264,8 @@ export default function AddTaskModal({
                                         />
                                     </LocalizationProvider>
                                 </div>
+
+                                {/* Task Parent */}
                                 <div className="flex w-full flex-col">
                                     <label>Task Parent</label>
                                     <FormControl fullWidth>
@@ -280,6 +284,8 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                             </div>
+
+                            {/* Task Status */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>
@@ -332,20 +338,20 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                             </div>
+
+                            {/* Designate Meeting */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>Designate Meeting</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            defaultValue={false}
+                                            value={taskMeetingBool ? "true" : "false"}
                                             onChange={(e) => {
-                                                setTaskMeetingBool(
-                                                    e.target.value === "true" ? true : false,
-                                                );
+                                                setTaskMeetingBool(e.target.value === "true");
                                             }}
                                         >
-                                            <MenuItem value={"true"}>True</MenuItem>
-                                            <MenuItem value={"false"}>False</MenuItem>
+                                            <MenuItem value="true">True</MenuItem>
+                                            <MenuItem value="false">False</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
@@ -353,14 +359,13 @@ export default function AddTaskModal({
                                     <label>Meeting Duration</label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <TimePicker
-                                            onChange={() => {
+                                            disabled={!taskMeetingBool}
+                                            onChange={(newValue) => {
                                                 setTaskDuration(
-                                                    taskDuration
-                                                        ? taskDuration.toString().split("T")[0]
-                                                        : "",
+                                                    newValue ? newValue.format("HH:mm:ss") : "",
                                                 );
                                             }}
-                                            ampm={false} // 24-hour format
+                                            ampm={false}
                                         />
                                     </LocalizationProvider>
                                 </div>

@@ -6,6 +6,7 @@ import {
     okResponse,
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
+import { increaseAchievementProgress } from "@/utils/server/achievements.utils";
 
 export async function createTask(
     projectId: string,
@@ -82,6 +83,8 @@ export async function createTask(
     let taskId: string;
     if (create) {
         taskId = crypto.randomUUID();
+        // Increment the 'Task Organizer' achievement whenever the user makes a new task.
+        void increaseAchievementProgress(user.id, "Task Organizer", 1);
     } else {
         if (!id) {
             return badRequestResponse({ success: false, data: "Task id is a required field" });

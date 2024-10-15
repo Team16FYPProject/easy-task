@@ -24,7 +24,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { RowData, TeamViewData } from "../dashboard/types";
 // Tested using Vitest for NEXT.js
 
-const COLORS = ["#0088FE", "#00C49F"];
+const COLORS = ["#b862ec", "#0055cc", "#113a44"];
 
 const AchievementTree = ({ filledCount }: { filledCount: number }) => {
     const treeHeight = 300; // Fixed tree height

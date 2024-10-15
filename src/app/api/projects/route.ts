@@ -2,6 +2,7 @@ import { setProjectSettings } from "@/app/api/projects/utils";
 import { getSession } from "@/utils/server/auth.server.utils";
 import { okResponse, unauthorizedResponse } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
+import { increaseAchievementProgress } from "@/utils/server/achievements.utils";
 
 export async function GET() {
     const { user } = await getSession();
@@ -27,6 +28,8 @@ export async function GET() {
             "project_id",
             memberData!.map((data) => data.project_id),
         );
+    // When a user creates a new project, increase their progress on the Team Player achievement.
+    void increaseAchievementProgress(user.id, "Team Player", 1);
     return okResponse({ success: true, projects: projectData });
 }
 

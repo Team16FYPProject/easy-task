@@ -133,6 +133,7 @@ export default function AddTeamModal({
                                 value={teamDesc}
                                 multiline
                                 rows={4}
+                                required
                                 onChange={handleInputChange2}
                             />
                         </Grid>
