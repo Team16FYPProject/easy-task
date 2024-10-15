@@ -85,17 +85,6 @@ test("Add Task Works", async () => {
     // Fill out the form
     fireEvent.change(screen.getByLabelText(/Task Name/i), { target: { value: "New Task" } });
 
-    // For DateTimePicker, we need to use a different approach
-    const dateInput = screen.getByLabelText(/Task Deadline/i);
-    fireEvent.change(dateInput, { target: { value: "11/11/2099 12:00 AM" } });
-
-    // For select inputs, we need to use a different approach
-    fireEvent.mouseDown(screen.getByLabelText(/Task Status/i));
-    fireEvent.click(screen.getByText(/TODO/i));
-
-    fireEvent.mouseDown(screen.getByLabelText(/Task Priority/i));
-    fireEvent.click(screen.getByText(/HIGH/i));
-
     // Fill out other fields
     fireEvent.change(screen.getByLabelText(/Task Description/i), {
         target: { value: "New Task Description" },
@@ -111,6 +100,17 @@ test("Add Task Works", async () => {
     // For Designate Meeting
     fireEvent.mouseDown(screen.getByLabelText(/Designate Meeting/i));
     fireEvent.click(screen.getByText(/False/i));
+
+    // For select inputs, we need to use a different approach
+    fireEvent.mouseDown(screen.getByLabelText(/Task Status/i));
+    fireEvent.click(screen.getByText(/TODO/i));
+
+    fireEvent.mouseDown(screen.getByLabelText(/Task Priority/i));
+    fireEvent.click(screen.getByText(/HIGH/i));
+
+    // For DateTimePicker, we need to use a different approach
+    const dateInput = screen.getByLabelText(/Task Deadline/i);
+    fireEvent.change(dateInput, { target: { value: "11/11/2099 12:00 AM" } });
 
     // Submit the form
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));

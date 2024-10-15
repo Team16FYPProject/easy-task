@@ -252,7 +252,7 @@ export default function AddTaskModal({
                             {/* Task Deadline */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
-                                    <label>
+                                    <label htmlFor="task-deadline">
                                         Task Deadline<span className="text-red-600">*</span>
                                     </label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -267,13 +267,14 @@ export default function AddTaskModal({
 
                                 {/* Task Parent */}
                                 <div className="flex w-full flex-col">
-                                    <label>Task Parent</label>
+                                    <label htmlFor="task-parent">Task Parent</label>
                                     <FormControl fullWidth>
                                         <Select
                                             defaultValue={""}
                                             onChange={(e) => {
                                                 setTaskParent(e.target.value);
                                             }}
+                                            id="task-parent"
                                         >
                                             {projectTasks.map((task) => (
                                                 <MenuItem key={task.task_id} value={task.task_id}>
@@ -328,10 +329,10 @@ export default function AddTaskModal({
                             <div className="flex flex-row justify-between gap-10">
                                 {/* Location */}
                                 <div className="flex w-full flex-col">
-                                    <label>Location</label>
+                                    <label htmlFor="task-location">Location</label>
                                     <FormControl fullWidth>
                                         <TextField
-                                            id="outlined-location"
+                                            id="task-location"
                                             variant="outlined"
                                             onChange={(e) => {
                                                 setTaskLocation(e.target.value);
@@ -344,13 +345,14 @@ export default function AddTaskModal({
                             {/* Designate Meeting */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
-                                    <label>Designate Meeting</label>
+                                    <label htmlFor="task-is-meeting">Designate Meeting</label>
                                     <FormControl fullWidth>
                                         <Select
                                             value={taskMeetingBool ? "true" : "false"}
                                             onChange={(e) => {
                                                 setTaskMeetingBool(e.target.value === "true");
                                             }}
+                                            id="task-is-meeting"
                                         >
                                             <MenuItem value="true">True</MenuItem>
                                             <MenuItem value="false">False</MenuItem>
@@ -358,7 +360,7 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                                 <div className="flex w-full flex-col">
-                                    <label>Meeting Duration</label>
+                                    <label htmlFor="task-meeting-duration">Meeting Duration</label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <TimePicker
                                             disabled={!taskMeetingBool}
@@ -374,10 +376,11 @@ export default function AddTaskModal({
                             </div>
 
                             {/* Reminders */}
-                            <label>Reminders</label>
+                            <label htmlFor="task-reminders">Reminders</label>
                             <FormControl fullWidth>
                                 <Select
                                     multiple
+                                    id="task-reminders"
                                     value={taskReminders}
                                     onChange={handleReminderChange}
                                     input={<OutlinedInput label="Chip" />}
@@ -408,10 +411,11 @@ export default function AddTaskModal({
 
                             {/* Task Assignees */}
                             <FormControl fullWidth>
-                                <label>Task Assignee</label>
+                                <label htmlFor="task-assignee">Task Assignee</label>
                                 <Select
                                     fullWidth
                                     multiple
+                                    id="task-assignee"
                                     value={taskAssignee}
                                     onChange={handleAssigneeChange}
                                     input={<OutlinedInput label="Chip" />}
