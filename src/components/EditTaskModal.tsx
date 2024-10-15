@@ -413,6 +413,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                                                         ? `${user.first_name} ${user.last_name}`
                                                         : value
                                                 }
+                                                onDelete={() => {
+                                                    setTaskAssignees((prev) =>
+                                                        prev.filter((id) => id !== value),
+                                                    );
+                                                }}
                                             />
                                         );
                                     })}
@@ -420,17 +425,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                             )}
                             MenuProps={MenuProps}
                         >
-                            {members
-                                .filter(
-                                    (member) =>
-                                        !taskAssignees.some((userId) => userId === member.user_id),
-                                )
-                                .map((member) => (
-                                    <MenuItem key={member.user_id} value={member.user_id}>
-                                        {member.first_name} {member.last_name}{" "}
-                                        {/* Note: the lag to fetch this is crazy*/}
-                                    </MenuItem>
-                                ))}
+                            {members.map((member) => (
+                                <MenuItem key={member.user_id} value={member.user_id}>
+                                    {member.first_name} {member.last_name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Grid>

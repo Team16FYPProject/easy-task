@@ -74,6 +74,8 @@ export async function POST(request: Request, { params: { taskId } }: TaskIdParam
     );
 
     try {
+        // Remove old reminders and insert new reminders
+        await supabase.from("task_reminder").delete().eq("task_id", taskId);
         const { data, error } = await supabase.from("task_reminder").insert(remindersToInsert);
 
         if (error) {

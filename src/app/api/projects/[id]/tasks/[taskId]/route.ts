@@ -100,19 +100,19 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
         console.log("Update successful. Updated data:", updateData);
 
         // Merge user information and reminders with tasks
-        const taskWithDetails = {
-            ...updateData,
-            assignees: updateData.assignees?.map((assignee: any) => ({
-                ...assignee,
-                user: {
-                    email: assignee.profile.email,
-                    name: assignee.profile.first_name + " " + assignee.profile.last_name,
-                },
-            })),
-            // reminders: updateData.reminders || [], // Attach reminders
-        };
+        // const taskWithDetails = {
+        //     ...updateData,
+        //     assignees: updateData.assignees?.map((assignee: any) => ({
+        //         ...assignee,
+        //         user: {
+        //             email: assignee.profile.email,
+        //             name: assignee.profile.first_name + " " + assignee.profile.last_name,
+        //         },
+        //     })),
+        //     // reminders: updateData.reminders || [], // Attach reminders
+        // };
 
-        return okResponse({ success: true, data: taskWithDetails });
+        return okResponse({ success: true, data: updateData });
     } catch (error) {
         console.error("Unexpected error:", error);
         return internalErrorResponse({ success: false, data: "An unexpected error occurred" });
