@@ -228,20 +228,20 @@ export default function AddTaskModal({
                     <form className="flex flex-row gap-2 py-10" onSubmit={handleSubmit}>
                         <div className="flex h-full w-full flex-col gap-1 px-5 text-black">
                             {/* Task Name*/}
-                            <label>
+                            <label htmlFor="task-name">
                                 Task Name <span className="text-red-600">*</span>
                             </label>
                             <TextField
-                                id="outlined-basic"
+                                id="task-name"
                                 variant="outlined"
                                 defaultValue={""}
                                 onChange={(e) => {
                                     setTaskName(e.target.value);
                                 }}
                             />
-                            <label>Task Description</label>
+                            <label htmlFor="task-description">Task Description</label>
                             <TextField
-                                id="outlined-basic"
+                                id="task-description"
                                 variant="outlined"
                                 defaultValue={""}
                                 onChange={(e) => {
@@ -288,7 +288,7 @@ export default function AddTaskModal({
                             {/* Task Status */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
-                                    <label>
+                                    <label htmlFor="task-status">
                                         Task Status<span className="text-red-600">*</span>
                                     </label>
                                     <FormControl fullWidth>
@@ -297,6 +297,7 @@ export default function AddTaskModal({
                                             onChange={(e) => {
                                                 setTaskStatus(e.target.value);
                                             }}
+                                            id="task-status"
                                         >
                                             <MenuItem value={"TODO"}>TODO</MenuItem>
                                             <MenuItem value={"DOING"}>IN PROGRESS</MenuItem>
@@ -305,7 +306,7 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                                 <div className="flex w-full flex-col">
-                                    <label>
+                                    <label htmlFor="task-priority">
                                         Task Priority<span className="text-red-600">*</span>
                                     </label>
                                     <FormControl fullWidth>
@@ -314,6 +315,7 @@ export default function AddTaskModal({
                                             onChange={(e) => {
                                                 setTaskPriority(e.target.value);
                                             }}
+                                            id="task-priority"
                                         >
                                             <MenuItem value={"LOW"}>LOW</MenuItem>
                                             <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>

@@ -1,25 +1,16 @@
 import { expect, test, vi, Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import Kanban from "@/app/kanban/page";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
-import AddTaskModal from "@/app/kanban/AddTaskModal";
+import AddTaskModal from "@/components/AddTaskModal";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 // Mock the hooks and modules
 vi.mock("@/hooks/useUser");
 vi.mock("next/navigation", () => ({
     useRouter: vi.fn(),
-}));
-vi.mock("@/components/Kanban", () => ({
-    KanbanBoard: vi.fn(({ projects }) => (
-        <div data-testid="kanban-board">
-            {projects.map((project: any) => (
-                <div key={project.project_id} data-testid="project-card">
-                    {project.project_name}
-                </div>
-            ))}
-        </div>
-    )),
 }));
 
 // Setup function to mock fetch and router
@@ -28,7 +19,13 @@ const setup = () => {
     vi.mocked(useRouter).mockReturnValue(mockRouter);
     vi.mocked(useUser).mockReturnValue({
         loadingUser: false,
-        user: { id: "1", name: "Test User" },
+        user: {
+            id: "1",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+        },
     });
 
     global.fetch = vi.fn().mockImplementation((url: string) => {
@@ -39,7 +36,7 @@ const setup = () => {
                 json: () =>
                     Promise.resolve({
                         success: true,
-                        data: { taskName: "New Task", taskDeadline: "11-11-2099 00:00 PM" },
+                        data: { taskName: "New Task", taskDeadline: "2099-11-11T00:00:00.000Z" },
                     }),
             });
         }
@@ -53,26 +50,67 @@ const setup = () => {
 };
 
 test("Add Task Works", async () => {
-    // Arrange
-    const { mockRouter } = setup();
+    setup();
 
     render(
-        <AddTaskModal
-            open={true}
-            handleClose={vi.fn()}
-            project_id="1"
-            setUpdatedTask={vi.fn()}
-            projectTasks={[{ task_id: "123", task_name: "Test Task" }]}
-        />,
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <AddTaskModal
+                open={true}
+                handleClose={vi.fn()}
+                project_id="1"
+                setUpdatedTask={vi.fn()}
+                projectTasks={[
+                    {
+                        task_id: "123",
+                        task_name: "Test Task",
+                        project_id: "1",
+                        task_creator_id: "1",
+                        task_deadline: "2099-11-11T00:00:00.000Z",
+                        task_desc: "Test Task Description",
+                        task_priority: "HIGH",
+                        task_status: "TODO",
+                        task_is_meeting: false,
+                        task_location: "",
+                        task_parent_id: "",
+                        task_time_spent: 0,
+                        assignees: [],
+                        reminders: [],
+                        project: undefined,
+                    },
+                ]}
+            />
+        </LocalizationProvider>,
     );
 
     // Fill out the form
     fireEvent.change(screen.getByLabelText(/Task Name/i), { target: { value: "New Task" } });
-    fireEvent.change(screen.getByLabelText(/Task Deadline/i), {
-        target: { value: "11-11-2099 00:00 PM" },
+
+    // For DateTimePicker, we need to use a different approach
+    const dateInput = screen.getByLabelText(/Task Deadline/i);
+    fireEvent.change(dateInput, { target: { value: "11/11/2099 12:00 AM" } });
+
+    // For select inputs, we need to use a different approach
+    fireEvent.mouseDown(screen.getByLabelText(/Task Status/i));
+    fireEvent.click(screen.getByText(/TODO/i));
+
+    fireEvent.mouseDown(screen.getByLabelText(/Task Priority/i));
+    fireEvent.click(screen.getByText(/HIGH/i));
+
+    // Fill out other fields
+    fireEvent.change(screen.getByLabelText(/Task Description/i), {
+        target: { value: "New Task Description" },
     });
-    fireEvent.change(screen.getByLabelText(/Task Priority/i), { target: { value: "HIGH" } });
-    fireEvent.change(screen.getByLabelText(/Task Status/i), { target: { value: "TODO" } });
+
+    // For Task Parent, assuming it's a select input
+    fireEvent.mouseDown(screen.getByLabelText(/Task Parent/i));
+    fireEvent.click(screen.getByText(/Test Task/i));
+
+    // For Location
+    fireEvent.change(screen.getByLabelText(/Location/i), { target: { value: "Office" } });
+
+    // For Designate Meeting
+    fireEvent.mouseDown(screen.getByLabelText(/Designate Meeting/i));
+    fireEvent.click(screen.getByText(/False/i));
 
     // Submit the form
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
@@ -86,13 +124,13 @@ test("Add Task Works", async () => {
             },
             body: JSON.stringify({
                 taskName: "New Task",
-                taskDescription: null,
-                taskDeadline: new Date("11-11-2099 00:00 PM").toISOString(),
+                taskDescription: "New Task Description",
+                taskDeadline: dayjs("2099-11-11T00:00:00.000Z").toISOString(),
                 taskPriority: "HIGH",
-                taskParent: null,
+                taskParent: "123",
                 taskStatus: "TODO",
                 taskMeetingBool: false,
-                taskLocation: null,
+                taskLocation: "Office",
                 taskDuration: null,
                 taskAssignee: null,
             }),
