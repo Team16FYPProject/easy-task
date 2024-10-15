@@ -32,12 +32,10 @@ INSERT INTO achievement (achievement_id, achievement_name, achievement_desc, max
 (gen_random_uuid(), 'Early Bird', 'Complete 5 tasks before 9 AM', 5, '🐦'),
 (gen_random_uuid(), 'Team Player', 'Collaborate on 10 different projects', 10, '🤝'),
 (gen_random_uuid(), 'Deadline Crusher', 'Complete 20 tasks before their deadlines', 20, '⏰'),
-(gen_random_uuid(), 'Project Master', 'Successfully complete 5 projects', 5, '🏆'),
 (gen_random_uuid(), 'Multitasker', 'Have 10 tasks in progress simultaneously', 10, '🔄'),
 (gen_random_uuid(), 'Task Master', 'Complete 50 tasks', 50, '✅'),
 (gen_random_uuid(), 'Time Wizard', 'Spend 100 hours on tasks', 100, '⌛'),
 (gen_random_uuid(), 'Meeting Maven', 'Attend 20 project meetings', 20, '💼'),
-(gen_random_uuid(), 'Productive Streak', 'Use the app for 30 consecutive days', 30, '🔥'),
 (gen_random_uuid(), 'Task Organizer', 'Create 25 tasks with all fields filled', 25, '📝');
 
 -- Dummy data for project table
@@ -91,9 +89,9 @@ CROSS JOIN unnest(user_ids) AS u(id)
 WHERE random() > 0.5;  -- 50% chance of each user being assigned to each task
 
 -- Dummy data for task_reminder table
-INSERT INTO task_reminder (task_id, reminder_datetime)
-SELECT task_id, task_deadline - (random() * INTERVAL '3 days')
-FROM task;
+-- INSERT INTO task_reminder (task_id, reminder_datetime)
+-- SELECT task_id, task_deadline - (random() * INTERVAL '3 days')
+-- FROM task;
 
 -- Dummy data for user_achievement table
 INSERT INTO user_achievement (user_id, achievement_id, progress, completed, completed_at)

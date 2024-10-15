@@ -14,6 +14,8 @@ import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pi
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { FormEvent, useEffect, useState } from "react";
 import { ProjectTask } from "@/utils/types";
+import dayjs, { Dayjs } from "dayjs";
+
 const style = {
     position: "absolute",
     top: "50%",
@@ -37,6 +39,9 @@ const MenuProps = {
         },
     },
 };
+
+type ReminderOption = "One Hour Before" | "One Day Before" | "One Week Before";
+
 export default function AddTaskModal({
     open,
     handleClose,
@@ -53,13 +58,12 @@ export default function AddTaskModal({
     const [taskName, setTaskName] = useState<string>("");
     const [taskDescription, setTaskDescription] = useState<string | null>(null);
     const [taskParent, setTaskParent] = useState<string>("");
-    const [taskDeadline, setTaskDeadline] = useState<Date | null>(null);
+    const [taskDeadline, setTaskDeadline] = useState<Dayjs | null>(null);
     const [taskStatus, setTaskStatus] = useState<string>("");
     const [taskPriority, setTaskPriority] = useState<string>("");
-    const [taskReminder, setTaskReminder] = useState<string>("");
     const [taskLocation, setTaskLocation] = useState<string>("");
     const [taskMeetingBool, setTaskMeetingBool] = useState<boolean>(false);
-    const [taskDuration, setTaskDuration] = useState<string>("");
+    const [taskDuration, setTaskDuration] = useState<string>(""); // Handle as string for easier submission
     const [taskAssignee, setTaskAssignees] = useState<string[]>([]);
     const [error, setError] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
@@ -68,22 +72,41 @@ export default function AddTaskModal({
     >([]);
 
     const handleModalClose = () => {
-        // reset all form values
+        // Reset all form values
         setTaskName("");
         setTaskDescription("");
         setTaskParent("");
         setTaskDeadline(null);
         setTaskStatus("");
         setTaskPriority("");
-        setTaskReminder("");
         setTaskLocation("");
         setTaskMeetingBool(false);
         setTaskDuration("");
         setTaskAssignees([]);
+        setTaskReminders([]); // Reset reminders
         handleClose();
     };
+
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
+
+        if (!taskDeadline) {
+            setError("Task deadline is required to calculate reminders");
+            setIsError(true);
+            setTimeout(() => setIsError(false), 5000);
+            return;
+        }
+
+        // Calculate the reminders based on selected options
+        const reminderTimestamps = calculateReminderTimestamps(taskDeadline, taskReminders);
+
+        const reminders = reminderTimestamps.map((timestamp) => ({
+            reminder_datetime: timestamp.reminder_datetime.toISOString(),
+            type: timestamp.type,
+        }));
+
+        // const taskAssignee = taskAssignees;
+        // Prepare to send data
         const route = `/api/projects/${project_id}/tasks`;
         const response = await fetch(route, {
             method: "POST",
@@ -91,29 +114,78 @@ export default function AddTaskModal({
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
+                project_id,
                 taskName,
-                taskDescription: taskDescription || null,
-                taskDeadline,
+                taskDesc: taskDescription || null,
+                taskDeadline: taskDeadline.toISOString(),
                 taskPriority,
-                taskParent: taskParent || null,
+                taskParentId: taskParent || null,
                 taskStatus,
-                taskMeetingBool,
+                taskIsMeeting: taskMeetingBool,
                 taskLocation: taskLocation || null,
-                taskDuration: taskDuration || null,
-                taskAssignee: taskAssignee || null,
+                taskAssignee: taskAssignee || null, // Assignees
+                taskReminder: reminders || null, // Reminders
+                taskDuration: taskMeetingBool && taskDuration ? taskDuration : null, // Only set duration if it's a meeting
             }),
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         if (!response.ok || !data.success) {
             setError(data.data);
             setIsError(true);
+            setTimeout(() => setIsError(false), 5000);
         } else {
             setIsError(false);
             setUpdatedTask(data.data);
             handleClose();
         }
     }
-    const handleChange = (event: SelectChangeEvent<typeof taskAssignee>) => {
+
+    {
+        /* Reminder Functions */
+    }
+    const [taskReminders, setTaskReminders] = useState<ReminderOption[]>([]);
+    const reminderOptions: ReminderOption[] = [
+        "One Hour Before",
+        "One Day Before",
+        "One Week Before",
+    ];
+
+    const calculateReminderTimestamps = (
+        deadline: Dayjs,
+        reminders: ReminderOption[],
+    ): { reminder_datetime: Dayjs; type: string }[] => {
+        return reminders.map((reminder) => {
+            switch (reminder) {
+                case "One Hour Before":
+                    return { reminder_datetime: deadline.subtract(1, "hour"), type: "1H" };
+                case "One Day Before":
+                    return { reminder_datetime: deadline.subtract(1, "day"), type: "1D" };
+                case "One Week Before":
+                    return { reminder_datetime: deadline.subtract(1, "week"), type: "1W" };
+                default:
+                    return { reminder_datetime: deadline, type: "UNKNOWN" }; // Fallback to deadline if unknown option
+            }
+        });
+    };
+
+    const handleReminderChange = (event: SelectChangeEvent<ReminderOption[]>) => {
+        const {
+            target: { value },
+        } = event;
+        setTaskReminders(
+            typeof value === "string" ? [value as ReminderOption] : (value as ReminderOption[]),
+        );
+    };
+
+    {
+        /* Assignee Functions */
+    }
+    const handleAssigneeChange = (event: SelectChangeEvent<typeof taskAssignee>) => {
         const {
             target: { value },
         } = event;
@@ -122,6 +194,7 @@ export default function AddTaskModal({
             typeof value === "string" ? value.split(",") : value,
         );
     };
+
     useEffect(() => {
         async function fetchTeamMembers() {
             if (project_id && open) {
@@ -140,7 +213,6 @@ export default function AddTaskModal({
         }
         fetchTeamMembers();
     }, [handleClose]);
-
     return (
         <div>
             <Modal
@@ -156,6 +228,7 @@ export default function AddTaskModal({
                     </label>
                     <form className="flex flex-row gap-2 py-10" onSubmit={handleSubmit}>
                         <div className="flex h-full w-full flex-col gap-1 px-5 text-black">
+                            {/* Task Name*/}
                             <label>
                                 Task Name <span className="text-red-600">*</span>
                             </label>
@@ -176,6 +249,8 @@ export default function AddTaskModal({
                                     setTaskDescription(e.target.value);
                                 }}
                             />
+
+                            {/* Task Deadline */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>
@@ -185,15 +260,13 @@ export default function AddTaskModal({
                                         <DateTimePicker
                                             disablePast
                                             onChange={(newValue) =>
-                                                setTaskDeadline(
-                                                    newValue
-                                                        ? new Date(newValue.toISOString())
-                                                        : null,
-                                                )
+                                                setTaskDeadline(newValue ? dayjs(newValue) : null)
                                             }
-                                        ></DateTimePicker>
+                                        />
                                     </LocalizationProvider>
                                 </div>
+
+                                {/* Task Parent */}
                                 <div className="flex w-full flex-col">
                                     <label>Task Parent</label>
                                     <FormControl fullWidth>
@@ -212,6 +285,8 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                             </div>
+
+                            {/* Task Status */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>
@@ -248,22 +323,9 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                             </div>
+
                             <div className="flex flex-row justify-between gap-10">
-                                <div className="flex w-full flex-col">
-                                    <label>Reminder</label>
-                                    <FormControl fullWidth>
-                                        <Select
-                                            defaultValue={""}
-                                            onChange={(e) => {
-                                                setTaskReminder(e.target.value);
-                                            }}
-                                        >
-                                            <MenuItem value={"HOUR"}>One Hour Before</MenuItem>
-                                            <MenuItem value={"DAY"}>One Day Before</MenuItem>
-                                            <MenuItem value={"WEEK"}>One Week Before</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </div>
+                                {/* Location */}
                                 <div className="flex w-full flex-col">
                                     <label>Location</label>
                                     <FormControl fullWidth>
@@ -277,20 +339,20 @@ export default function AddTaskModal({
                                     </FormControl>
                                 </div>
                             </div>
+
+                            {/* Designate Meeting */}
                             <div className="flex flex-row justify-between gap-10">
                                 <div className="flex w-full flex-col">
                                     <label>Designate Meeting</label>
                                     <FormControl fullWidth>
                                         <Select
-                                            defaultValue={false}
+                                            value={taskMeetingBool ? "true" : "false"}
                                             onChange={(e) => {
-                                                setTaskMeetingBool(
-                                                    e.target.value === "true" ? true : false,
-                                                );
+                                                setTaskMeetingBool(e.target.value === "true");
                                             }}
                                         >
-                                            <MenuItem value={"true"}>True</MenuItem>
-                                            <MenuItem value={"false"}>False</MenuItem>
+                                            <MenuItem value="true">True</MenuItem>
+                                            <MenuItem value="false">False</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>
@@ -298,25 +360,59 @@ export default function AddTaskModal({
                                     <label>Meeting Duration</label>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <TimePicker
-                                            onChange={() => {
+                                            disabled={!taskMeetingBool}
+                                            onChange={(newValue) => {
                                                 setTaskDuration(
-                                                    taskDuration
-                                                        ? taskDuration.toString().split("T")[0]
-                                                        : "",
+                                                    newValue ? newValue.format("HH:mm:ss") : "",
                                                 );
                                             }}
-                                            ampm={false} // 24-hour format
+                                            ampm={false}
                                         />
                                     </LocalizationProvider>
                                 </div>
                             </div>
+
+                            {/* Reminders */}
+                            <label>Reminders</label>
+                            <FormControl fullWidth>
+                                <Select
+                                    multiple
+                                    value={taskReminders}
+                                    onChange={handleReminderChange}
+                                    input={<OutlinedInput label="Chip" />}
+                                    renderValue={(selected) => (
+                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                            {selected
+                                                .sort((a, b) => {
+                                                    const order = [
+                                                        "One Hour Before",
+                                                        "One Day Before",
+                                                        "One Week Before",
+                                                    ];
+                                                    return order.indexOf(a) - order.indexOf(b); // so that the order is always 'One Hour Before' then 'One Day Before' then 'One Week Before'
+                                                })
+                                                .map((value) => (
+                                                    <Chip key={value} label={value} />
+                                                ))}
+                                        </Box>
+                                    )}
+                                >
+                                    {reminderOptions.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            {/* Task Assignees */}
                             <FormControl fullWidth>
                                 <label>Task Assignee</label>
                                 <Select
                                     fullWidth
                                     multiple
                                     value={taskAssignee}
-                                    onChange={handleChange}
+                                    onChange={handleAssigneeChange}
                                     input={<OutlinedInput label="Chip" />}
                                     renderValue={(selected) => (
                                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

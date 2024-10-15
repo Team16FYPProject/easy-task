@@ -166,7 +166,7 @@ export default function TeamMembers({ params: { id } }: TeamIdParams) {
                 {/* Project Name */}
                 <Grid item xs={12}>
                     <Typography variant="h3">
-                        Project {project?.project_name ? project.project_name : ""} Members
+                        {project?.project_name ? project.project_name : ""} Members
                     </Typography>
                 </Grid>
 

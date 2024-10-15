@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Project } from "../utils/types";
 import AddTaskModal from "./AddTaskModal";
 import { determineBgColor, determineTextColor } from "../utils/colourUtils";
-import { ProjectTask, Assignee } from "@/utils/types";
+import { ProjectTask, Assignee, Reminder } from "@/utils/types";
 import ViewTaskModal from "@/components/ViewTaskModal";
 // Types
 
@@ -22,6 +22,7 @@ type ColumnProps = {
     setCards: React.Dispatch<React.SetStateAction<ProjectTask[]>>;
     setTasksDict: React.Dispatch<React.SetStateAction<Map<string, { tasks: ProjectTask[] }>>>;
     setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    handleDeleteTask: (taskId: string) => void;
 };
 /**
  * @param project_id: The id of the project
@@ -36,6 +37,7 @@ type ColumnProps = {
  * @param task_priority: The priority of the task;
  * @param task_time_spent: How much time is spent on the task;
  * @param assignees: The assignees of the task;
+ * @param reminders: The reminders of the task;
  * @param task_status: Current status of the task;
  * @param handleDragStart: Function to start drag event
  */
@@ -52,9 +54,11 @@ type CardProp = {
     task_priority: string;
     task_time_spent: number;
     assignees: Assignee[];
+    reminders: Reminder[];
     task_status: string;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: ProjectTask) => void;
     setUpdatedTask: React.Dispatch<React.SetStateAction<ProjectTask | null>>;
+    handleDeleteTask: (taskId: string) => void;
 };
 /**
  * @param beforeId: The id of the column it is being dragged from
@@ -178,6 +182,16 @@ export const Board = ({ projects }: { projects: Project[] }) => {
         setTeamId(newTeamId);
     };
 
+    const handleDeleteTask = (taskId: string) => {
+        if (teamId && tasksDict) {
+            const updatedTasks = [...(tasksDict.get(teamId)?.tasks || [])];
+            const filteredTasks = updatedTasks.filter((task) => task.task_id !== taskId);
+            tasksDict.set(teamId, { ...tasksDict.get(teamId), tasks: filteredTasks });
+            setCards(filteredTasks);
+            setTasksDict(tasksDict);
+        }
+    };
+
     return (
         <div className="flex-col">
             <div className="flex justify-between p-5">
@@ -229,6 +243,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     setCards={setCards}
                     setTasksDict={setTasksDict}
                     setUpdatedTask={setUpdatedTask}
+                    handleDeleteTask={handleDeleteTask}
                 />
                 <Column
                     title="IN PROGRESS"
@@ -237,6 +252,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     setCards={setCards}
                     setTasksDict={setTasksDict}
                     setUpdatedTask={setUpdatedTask}
+                    handleDeleteTask={handleDeleteTask}
                 />
                 <Column
                     title="COMPLETE"
@@ -245,6 +261,7 @@ export const Board = ({ projects }: { projects: Project[] }) => {
                     setCards={setCards}
                     setTasksDict={setTasksDict}
                     setUpdatedTask={setUpdatedTask}
+                    handleDeleteTask={handleDeleteTask}
                 />
             </div>
         </div>
@@ -262,6 +279,7 @@ export const Column: React.FC<ColumnProps> = ({
     setCards,
     setTasksDict,
     setUpdatedTask,
+    handleDeleteTask,
 }) => {
     async function handleTaskStatus(cardToBeTransferred: ProjectTask) {
         if (!cardToBeTransferred) {
@@ -269,14 +287,14 @@ export const Column: React.FC<ColumnProps> = ({
             return;
         }
         try {
-            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}/task_status`;
+            const route = `/api/projects/${cardToBeTransferred.project_id}/tasks/${cardToBeTransferred.task_id}`;
             await fetch(route, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    task_status: cardToBeTransferred.task_status,
+                    taskStatus: cardToBeTransferred.task_status,
                 }),
             });
         } catch (e) {
@@ -431,6 +449,7 @@ export const Column: React.FC<ColumnProps> = ({
                             task_id={c.task_id}
                             handleDragStart={handleDragStart}
                             setUpdatedTask={setUpdatedTask}
+                            handleDeleteTask={handleDeleteTask}
                         />
                     );
                 })}
@@ -458,6 +477,8 @@ const Card: React.FC<CardProp> = ({
     task_status,
     task_time_spent,
     assignees,
+    reminders,
+    handleDeleteTask,
     handleDragStart,
     setUpdatedTask,
 }) => {
@@ -471,6 +492,10 @@ const Card: React.FC<CardProp> = ({
     const handleCloseModal = () => {
         setViewTaskOpen(false);
     };
+
+    // const handleDelete = () => {
+    //     handleDeleteTask(task_id);
+    // };
 
     return (
         <>
@@ -492,6 +517,7 @@ const Card: React.FC<CardProp> = ({
                         task_status,
                         task_time_spent,
                         assignees,
+                        reminders,
                     })
                 }
                 style={{
@@ -537,8 +563,10 @@ const Card: React.FC<CardProp> = ({
                         task_status,
                         task_time_spent,
                         assignees,
+                        reminders,
                     }}
                     updateTask={(updatedTask) => setUpdatedTask(updatedTask)}
+                    handleDeleteTask={handleDeleteTask}
                 />
             )}
         </>

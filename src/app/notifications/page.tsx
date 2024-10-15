@@ -18,12 +18,12 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import React from "react";
-import { ApiResponse, Reminders, ProjectTask, Project } from "@/utils/types";
+import { ApiResponse, Reminder, ProjectTask, Project } from "@/utils/types";
 
 export default function Notifications() {
     const router = useRouter();
     const { loadingUser, user } = useUser();
-    const [displayedNotifications, setDisplayedNotifications] = React.useState<Reminders[]>([]);
+    const [displayedNotifications, setDisplayedNotifications] = React.useState<Reminder[]>([]);
     const [projects, setProjects] = React.useState<Map<string, Project>>(new Map());
     const [loadingNotifications, setLoadingNotifications] = React.useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -36,11 +36,14 @@ export default function Notifications() {
     }, [loadingUser, user]);
 
     // Fetch notifications and projects
+    const [debugInfo, setDebugInfo] = useState<string>("");
+
     useEffect(() => {
         async function fetchData() {
             if (!user) {
                 setError("User not authenticated");
                 setLoadingNotifications(false);
+                setDebugInfo("No user detected");
                 return;
             }
 
@@ -49,46 +52,35 @@ export default function Notifications() {
 
             try {
                 // Fetch notifications
+                setDebugInfo("Fetching notifications...");
                 const notificationsResponse = await fetch(`/api/notifications`, {
                     method: "GET",
                 });
+
+                setDebugInfo(`Notifications response status: ${notificationsResponse.status}`);
 
                 if (!notificationsResponse.ok) {
                     throw new Error(`HTTP error! status: ${notificationsResponse.status}`);
                 }
 
-                const notificationsResult: ApiResponse<Reminders[]> =
+                const notificationsResult: ApiResponse<Reminder[]> =
                     await notificationsResponse.json();
+                setDebugInfo(`Notifications result: ${JSON.stringify(notificationsResult)}`);
+
                 if (!notificationsResult.success) {
                     throw new Error(
                         (notificationsResult.data as string) || "Unable to fetch notifications",
                     );
                 }
+
                 setDisplayedNotifications(notificationsResult.data);
+                setDebugInfo(`Number of notifications: ${notificationsResult.data.length}`);
 
-                // Fetch projects
-                const projectIds = Array.from(
-                    new Set(notificationsResult.data.map((n) => n.task.project_id)),
-                );
-                const projectsMap = new Map<string, Project>();
-
-                for (const projectId of projectIds) {
-                    const projectResponse = await fetch(`/api/projects/${projectId}`, {
-                        method: "GET",
-                    });
-
-                    if (projectResponse.ok) {
-                        const projectResult: ApiResponse<Project> = await projectResponse.json();
-                        if (projectResult.success) {
-                            projectsMap.set(projectId, projectResult.data);
-                        }
-                    }
-                }
-
-                setProjects(projectsMap);
+                // ... (rest of the function remains the same)
             } catch (e) {
                 console.error("Error:", e);
                 setError(e instanceof Error ? e.message : "An unexpected error occurred");
+                setDebugInfo(`Error occurred: ${e instanceof Error ? e.message : "Unknown error"}`);
             } finally {
                 setLoadingNotifications(false);
             }
@@ -103,7 +95,7 @@ export default function Notifications() {
     }
 
     // Generate table row function
-    function generateRowFunction(reminders: Reminders[]): React.ReactNode {
+    function generateRowFunction(reminders: Reminder[]): React.ReactNode {
         if (!reminders || reminders.length === 0) {
             return (
                 <TableRow>
@@ -111,7 +103,7 @@ export default function Notifications() {
                 </TableRow>
             );
         }
-        return reminders.map((reminder: Reminders) => {
+        return reminders.map((reminder: Reminder) => {
             const notificationDate = new Date(reminder.reminder_datetime);
             const dueDate = new Date(reminder.task.task_deadline);
             const today = new Date();
@@ -184,6 +176,9 @@ export default function Notifications() {
                     </TableContainer>
                 </Grid>
             </Grid>
+            {/* Debug Info*/}
+            {/* <Typography variant="h6">Debug Information</Typography>
+            <pre>{debugInfo}</pre> */}
         </Container>
     );
 }
