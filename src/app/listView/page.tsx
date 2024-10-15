@@ -21,6 +21,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
     Typography,
     useTheme,
 } from "@mui/material";
@@ -29,6 +30,7 @@ import React, { useEffect, useState } from "react";
 import SelectTeamModal from "@/components/SelectTeamModal";
 
 export default function ListView() {
+    const [displayedTasks, setDisplayedTasks] = useState<ProjectTask[]>([]);
     const [createNewTask, setCreateNewTask] = useState(false);
     const [currentProjectID, setCurrentProjectID] = useState("");
     const [projectTasks, setProjectTasks] = useState<ProjectTask[]>([]);
@@ -51,6 +53,7 @@ export default function ListView() {
     >([]);
     const theme = useTheme(); // Access the MUI theme
     const [selectedTask, setSelectedTask] = useState<ProjectTask | null>(null);
+    const [search, setSearch] = useState<string>("");
 
     const handleCreateTaskModalClose = () => {
         setCreateNewTask(false);
@@ -104,6 +107,39 @@ export default function ListView() {
         updateTasks();
     }, [updatedTask]);
 
+    const formatDate = (date: string): string => {
+        return new Intl.DateTimeFormat("en-AU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(new Date(date));
+    };
+    // Set Filtered Tasks
+    useEffect(() => {
+        const searchQuery = search.toLowerCase() || "";
+        setDisplayedTasks(
+            tasks.filter(
+                (task) =>
+                    // Filter Task Name
+                    task.task_name.toLowerCase().includes(searchQuery) ||
+                    // Filter Project Name
+                    allProjects
+                        .filter((project) =>
+                            project.project_name.toLowerCase().includes(searchQuery),
+                        )
+                        .find((e) => e.project_id === task.project_id) ||
+                    // Filter Status
+                    task.task_status.toLowerCase() === searchQuery ||
+                    // Filter Priority
+                    task.task_priority.toLowerCase() === searchQuery ||
+                    // // Filter Deadline
+                    formatDate(task.task_deadline).startsWith(searchQuery),
+            ),
+        );
+    }, [search, tasks]);
+
     // Fetch tasks
     useEffect(() => {
         async function fetchTasks() {
@@ -144,7 +180,6 @@ export default function ListView() {
                             }));
                         }),
                 );
-
                 const results = await Promise.all(fetchPromises);
                 // Flatten the results and include project names with tasks
                 const allTasks = results.flatMap(({ tasks, project_name }) =>
@@ -361,6 +396,16 @@ export default function ListView() {
                         </Grid>
                     </Grid>
                 </Grid>
+                <Grid item>
+                    <TextField
+                        className="w-2/5"
+                        id="search-tasks"
+                        label="Search"
+                        placeholder="Enter Task Name or Team Name..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </Grid>
                 {/* Upcoming Tasks Table */}
                 <Grid item xs={12}>
                     <TableContainer component={Paper}>
@@ -395,7 +440,7 @@ export default function ListView() {
                                               </TableCell>
                                           </TableRow>
                                       ))
-                                    : generateRowFunction(tasks)}
+                                    : generateRowFunction(displayedTasks)}
                             </TableBody>
                         </Table>
                     </TableContainer>
