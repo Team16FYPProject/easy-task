@@ -165,30 +165,37 @@ export default function Achievements() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {achievements.map((achievement) => (
-                                    <TableRow key={achievement.achievement_id}>
-                                        <TableCell>
-                                            <Box display="flex" alignItems="center">
-                                                <span style={{ marginRight: "8px" }}>
-                                                    {achievement.icon}
-                                                </span>
-                                                {achievement.achievement_name}
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>{achievement.achievement_desc}</TableCell>
-                                        <TableCell>
-                                            <ProgressIcons
-                                                progress={achievement.progress}
-                                                maxProgress={achievement.max_progress}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            {achievement.completed
-                                                ? "100%"
-                                                : `${Math.round((achievement.progress / achievement.max_progress) * 100)}%`}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {achievements?.length > 0 ? (
+                                    achievements.map((achievement) => (
+                                        <TableRow key={achievement.id}>
+                                            <TableCell>
+                                                <Box display="flex" alignItems="center">
+                                                    <span style={{ marginRight: "8px" }}>
+                                                        {achievement.icon}
+                                                    </span>
+                                                    {achievement.name}
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell>{achievement.desc}</TableCell>
+                                            <TableCell>
+                                                <ProgressIcons
+                                                    progress={achievement.progress}
+                                                    maxProgress={achievement.max_progress}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                {achievement.completed
+                                                    ? "100%"
+                                                    : `${Math.round((achievement.progress / achievement.max_progress) * 100)}%`}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <Typography variant="body1" className="p-2 text-gray-500">
+                                        You have no achievements yet. Complete some tasks to earn
+                                        some!
+                                    </Typography>
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>
