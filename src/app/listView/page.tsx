@@ -23,11 +23,11 @@ import {
     TableRow,
     TextField,
     Typography,
-    useTheme,
 } from "@mui/material";
 import { PieChart } from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
 import SelectTeamModal from "@/components/SelectTeamModal";
+import getTheme from "@/styles/theme";
 
 export default function ListView() {
     const [displayedTasks, setDisplayedTasks] = useState<ProjectTask[]>([]);
@@ -51,7 +51,7 @@ export default function ListView() {
     const [pieChartAssignmentData, setPieChartAssignmentData] = useState<
         { id: number; value: number; color: string; label: string }[]
     >([]);
-    const theme = useTheme(); // Access the MUI theme
+    const theme = getTheme(); // Access the MUI theme
     const [selectedTask, setSelectedTask] = useState<ProjectTask | null>(null);
     const [search, setSearch] = useState<string>("");
 
@@ -236,7 +236,7 @@ export default function ListView() {
             {
                 id: 1,
                 value: statusCounts.inProgress,
-                color: theme.palette.tertiary?.main,
+                color: "#0055CC",
                 label: "In Progress",
             },
             {
@@ -261,12 +261,7 @@ export default function ListView() {
                 label: "Not Assigned",
             },
         ]);
-    }, [
-        tasks,
-        theme.palette.primary.main,
-        theme.palette.secondary.main,
-        theme.palette.tertiary?.main,
-    ]);
+    }, [tasks, theme.palette.primary.main, theme.palette.secondary.main]);
 
     const [viewTaskOpen, setViewTaskOpen] = React.useState(false); // state for modal task view
     const handleRowClick = (task: ProjectTask) => {

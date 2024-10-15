@@ -2,7 +2,15 @@
 import Link from "next/link";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import { Divider, Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import {
+    Divider,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Switch,
+} from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -32,7 +40,13 @@ const NAVIGATION_LINKS: NavigationLink[][] = [
     [{ name: "Logout", link: "/logout" }],
 ];
 
-export default function SiteAppBar() {
+export default function SiteAppBar({
+    toggleTheme,
+    currentMode,
+}: {
+    toggleTheme: () => void;
+    currentMode: "light" | "dark";
+}) {
     const [open, setOpen] = React.useState(false);
     const [shouldShowIconButton, setShouldShowIconButton] = React.useState(true);
 
@@ -68,8 +82,6 @@ export default function SiteAppBar() {
         </Box>
     );
 
-    // const shouldShowIconButton = !["/login", "/register"].includes(location.pathname);
-
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -89,6 +101,11 @@ export default function SiteAppBar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Easy Task
                     </Typography>
+                    <Switch
+                        checked={currentMode === "dark"}
+                        onChange={toggleTheme}
+                        inputProps={{ "aria-label": "toggle theme" }}
+                    />
                 </Toolbar>
             </AppBar>
             <Drawer open={open} onClose={toggleDrawer(false)}>

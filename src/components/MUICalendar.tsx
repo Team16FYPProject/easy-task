@@ -1,4 +1,5 @@
-import { Paper, Theme, useTheme } from "@mui/material";
+import getTheme from "@/styles/theme";
+import { Paper, Theme } from "@mui/material";
 import { ThemeProvider, styled } from "@mui/material/styles";
 import { MUIStyledCommonProps } from "@mui/system";
 import React from "react";
@@ -29,7 +30,7 @@ const MUICalendar = (
         CalendarProps<object, object> &
         MUIStyledCommonProps<Theme> & { ref?: React.Ref<Calendar<object, object>> | undefined },
 ) => {
-    const theme = useTheme();
+    const theme = getTheme("light");
 
     return (
         <ThemeProvider theme={theme}>

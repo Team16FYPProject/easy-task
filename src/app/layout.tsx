@@ -1,9 +1,7 @@
-import SiteAppBar from "@/components/AppBar";
-import "@/styles/globals.css";
-import theme from "@/styles/theme"; // Adjust the import path as necessary
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
+// layout.tsx (Server Component)
 import type { Metadata } from "next";
+import ThemeProviderWrapper from "@/components/ThemeProviderWrapper"; // Child Client Component
+import "@/styles/globals.css";
 import React from "react";
 
 export const metadata: Metadata = {
@@ -11,21 +9,11 @@ export const metadata: Metadata = {
     description: "The ultimate student project manager",
 };
 
-export default function RootLayout({
-    // Layouts must accept a children prop.
-    // This will be populated with nested layouts or pages
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
             <body>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <SiteAppBar /> {/* This is the AppBar component */}
-                    <div>{children}</div>
-                </ThemeProvider>
+                <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
             </body>
         </html>
     );
