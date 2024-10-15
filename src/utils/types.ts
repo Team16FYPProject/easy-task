@@ -96,7 +96,7 @@ export interface User {
 export interface Reminder {
     type: string;
     reminder_id: string;
-    task: ProjectTask | null;
+    task: ProjectTask;
     task_id: string;
     profile: Profile | null;
     reminder_datetime: string;

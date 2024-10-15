@@ -7,7 +7,6 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "./types";
-import { Reminder } from "@/utils/types";
 
 export async function GET(request: Request, { params }: TaskIdParams) {
     const { user } = await getSession();
@@ -98,12 +97,6 @@ export async function POST(request: Request, { params: { taskId } }: TaskIdParam
                 data: "Unable to complete updating reminders. Please refresh and try again",
             });
         }
-        // console.log("remindersData", remindersData);
-        // const reminders: Reminder[] =
-        //     remindersData?.map((reminder) => ({
-        //         ...reminder,
-
-        //     })) ?? [];
 
         return okResponse({ success: true, data: remindersData });
     } catch (error) {
