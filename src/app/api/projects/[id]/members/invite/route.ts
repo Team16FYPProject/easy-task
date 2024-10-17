@@ -13,6 +13,12 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY ?? "re_123");
 
+/**
+ * Sends an project invitation email to a specified email
+ *
+ * @param request The HTTP request
+ * @param id The project id
+ */
 export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
     const { user } = await getSession();
     if (!user) {
@@ -25,6 +31,7 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
 
     const supabase = getServiceSupabase();
 
+    // Get basic information about the project the user is being invited into
     const { data: projectData, error: projectError } = await supabase
         .from("project")
         .select("project_name, project_id")
@@ -36,6 +43,7 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
         return notFoundResponse({ success: false, data: "No project with that id exists" });
     }
 
+    // Create the invite link and attach required information to it
     const { data: inviteData, error: inviteError } = await supabase
         .from("project_invite_link")
         .insert({
@@ -55,6 +63,7 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
 
     const inviteLink = `${process.env.NEXT_PUBLIC_URL}/invite/${inviteData.invite_id}`;
 
+    // Send out the invitation email
     const { error } = await resend.emails.send({
         from: "Easy-Task <no-reply@easy-task.com>",
         to: [email],

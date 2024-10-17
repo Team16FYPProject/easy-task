@@ -6,6 +6,9 @@ import {
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { getSession } from "@/utils/server/auth.server.utils";
 
+/**
+ * Get all the user's achievements and their progress so far
+ */
 export async function GET() {
     const { user } = await getSession();
     if (!user) {

@@ -4,6 +4,9 @@ import { okResponse, unauthorizedResponse } from "@/utils/server/server.response
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { increaseAchievementProgress } from "@/utils/server/achievements.utils";
 
+/**
+ * Get all the user's projects
+ */
 export async function GET() {
     const { user } = await getSession();
     if (!user) {
@@ -28,16 +31,19 @@ export async function GET() {
             "project_id",
             memberData!.map((data) => data.project_id),
         );
-    // When a user creates a new project, increase their progress on the Team Player achievement.
-    void increaseAchievementProgress(user.id, "Team Player", 1);
     return okResponse({ success: true, projects: projectData });
 }
 
+/**
+ * Create a new project
+ */
 export async function POST(request: Request) {
     const session = await getSession();
     if (!session.user) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
     const data = await request.formData();
+    // When a user creates a new project, increase their progress on the Team Player achievement.
+    void increaseAchievementProgress(session.user.id, "Team Player", 1);
     return setProjectSettings(null, data, session, true);
 }

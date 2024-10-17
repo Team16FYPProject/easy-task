@@ -13,6 +13,12 @@ import {
     increaseAchievementProgress,
 } from "@/utils/server/achievements.utils";
 
+/**
+ * Get all members in a project
+ *
+ * @param _ The HTTP request
+ * @param id The project id
+ */
 export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session) {
@@ -44,6 +50,12 @@ export async function GET(_: Request, { params: { id } }: ProjectIdParams) {
     return okResponse({ success: true, users: userData });
 }
 
+/**
+ * Add a user to a project by using the user's email
+ *
+ * @param request The HTTP request
+ * @param id The project id
+ */
 export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session) {
@@ -57,6 +69,7 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
 
     const serviceSupabase = getServiceSupabase();
 
+    // Search for the user by their email
     const { data: userData, error: userError } = await serviceSupabase
         .from("profile")
         .select("*")
@@ -101,6 +114,12 @@ export async function POST(request: Request, { params: { id } }: ProjectIdParams
     return okResponse({ success: true, data: userData });
 }
 
+/**
+ * Cause the logged in user to leave a project
+ *
+ * @param request The HTTP request
+ * @param id The id of the project
+ */
 export async function DELETE(request: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session) {

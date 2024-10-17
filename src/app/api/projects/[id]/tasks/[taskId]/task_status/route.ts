@@ -7,6 +7,9 @@ import {
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "../types";
 
+/**
+ * Modify a task' status\
+ */
 export async function PATCH(request: Request, { params: { id, taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {

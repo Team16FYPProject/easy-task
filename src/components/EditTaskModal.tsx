@@ -229,7 +229,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 reminders: reminderData.data,
                 assignees: assigneesData.data,
             };
-            console.log("updateTaskData", updateTaskData);
             updateTask(updateTaskData as ProjectTask);
 
             handleCloseModal();

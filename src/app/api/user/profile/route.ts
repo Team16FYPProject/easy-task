@@ -9,6 +9,9 @@ import {
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { ProfileResponse } from "@/utils/types";
 
+/**
+ * Get info about the user such as their project, account settings, tasks, etc, for the profile page
+ */
 export async function GET() {
     const { user } = await getSession();
 
@@ -67,6 +70,9 @@ export async function GET() {
     });
 }
 
+/**
+ * Update a user's profile data such as name, email, profile avatar, etc
+ */
 export async function PATCH(request: Request) {
     const { user } = await getSession();
     if (!user) {
@@ -77,6 +83,7 @@ export async function PATCH(request: Request) {
     const serviceSupabase = getServiceSupabase();
 
     if (data.has("avatar_image")) {
+        // Attempt to upload the avatar image if one is provided
         const avatarImage = data.get("avatar_image");
         if (avatarImage instanceof File) {
             const { data, error } = await serviceSupabase.storage
@@ -93,6 +100,7 @@ export async function PATCH(request: Request) {
         }
     }
 
+    // Update the user's data provided
     if (data.get("first_name")) {
         updateData.first_name = data.get("first_name") as string;
     }
@@ -106,6 +114,7 @@ export async function PATCH(request: Request) {
         updateData.profile_bio = data.get("bio") as string;
     }
 
+    // Update the user's email and name in supabase first
     const { error: authError } = await serviceSupabase.auth.admin.updateUserById(user.id, {
         email: data.has("email") ? (data.get("email") as string) : undefined,
         user_metadata: {
@@ -121,6 +130,7 @@ export async function PATCH(request: Request) {
         });
     }
 
+    // Update the user's name in the database as well.
     const { error } = await serviceSupabase
         .from("profile")
         .update(updateData)

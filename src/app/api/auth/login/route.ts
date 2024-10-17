@@ -1,8 +1,12 @@
 import { getServerSupabase } from "@/utils/supabase/server";
 
+/**
+ * This endpoint is used to log a user in
+ * @param request The HTTP request
+ */
 export async function POST(request: Request) {
     const { email, password } = await request.json();
-
+    // Basic validation
     if (!email) {
         return Response.json(
             { success: false, data: "Please provide an email address" },

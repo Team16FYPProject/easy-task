@@ -7,6 +7,13 @@ import {
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { TaskIdParams } from "../types";
 
+/**
+ * Modify the logged hours for a task
+ *
+ * @param request The HTTP request
+ * @param id The project id
+ * @param taskId The task id
+ */
 export async function PATCH(request: Request, { params: { id, taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {

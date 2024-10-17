@@ -33,6 +33,7 @@ jobs:
                   cache: "npm"
             - run: npm ci
             - run: npm run test:unit
+# Disabled E2E action because it took up lots of GitHub Action minutes as each run took approx 10 minute.
 #    e2e-tests:
 #        runs-on: ubuntu-latest
 #        steps:

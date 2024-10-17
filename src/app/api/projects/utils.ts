@@ -7,15 +7,25 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
+/**
+ * Set (or create if doesn't exist) a project's data
+ *
+ * @param id The project id
+ * @param data The new data for the project
+ * @param session The user's auth session
+ * @param create A boolean indicating whether the project should be created if it doesn't already exist
+ */
 export async function setProjectSettings(
     id: string | null,
     data: FormData,
     session: Session,
     create: boolean,
 ): Promise<Response> {
+    // Form data was used instead of a json body to allow for file/image uploads
     const name = data.get("name");
     const description = data.get("description");
 
+    // Basic validation
     if (!name) {
         return badRequestResponse({ success: false, data: "Project name is a required field" });
     }
@@ -41,6 +51,7 @@ export async function setProjectSettings(
     const supabase = getServiceSupabase();
     let imageUrl: string | undefined = undefined;
     if (data.has("image")) {
+        // Attempt to upload the profile image to Supabase Storage if one is provided
         const profileImage = data.get("image");
         if (!(profileImage instanceof File)) {
             return badRequestResponse({
@@ -62,9 +73,11 @@ export async function setProjectSettings(
                 data: "Unable to create your project. Please try again later.",
             });
         }
+        // Set the project's image url to be the path of the newly uploaded image
         imageUrl = imageData.fullPath;
     }
 
+    // Create or update the project information
     const { data: projectData, error: projectError } = await supabase
         .from("project")
         .upsert({
@@ -85,6 +98,7 @@ export async function setProjectSettings(
         });
     }
 
+    // If it's a new project, add the current user as an owner/member to the project
     if (create) {
         const { error: memberError } = await supabase.from("project_member").insert({
             project_id: projectData.project_id,

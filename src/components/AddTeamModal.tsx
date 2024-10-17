@@ -62,7 +62,6 @@ export default function AddTeamModal({
         // If you do image
         if (image) {
             formData.append("image", image);
-            console.log("Image added");
         }
 
         try {
@@ -75,7 +74,6 @@ export default function AddTeamModal({
             if (response.ok && data.success) {
                 const projectId = data.data.id;
                 // Handle successful response
-                console.log("Project created successfully");
                 handleClose(); // Close the modal
                 router.push(`/team/${projectId}`);
             } else {
