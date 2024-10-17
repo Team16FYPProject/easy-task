@@ -9,6 +9,9 @@ import {
 
 import { getServiceSupabase } from "@/utils/supabase/server";
 
+/**
+ * Get the project's information including member information
+ */
 export async function GET(request: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session.user) {
@@ -40,6 +43,9 @@ export async function GET(request: Request, { params: { id } }: ProjectIdParams)
     });
 }
 
+/**
+ * Update a project's information
+ */
 export async function PATCH(request: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session.user) {
@@ -63,6 +69,9 @@ export async function PATCH(request: Request, { params: { id } }: ProjectIdParam
     return okResponse({ success: true, data: "Project settings updated." });
 }
 
+/**
+ * Set the project's data
+ */
 export async function POST(request: Request, { params: { id } }: ProjectIdParams) {
     const session = await getSession();
     if (!session.user) {

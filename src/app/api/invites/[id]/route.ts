@@ -7,12 +7,21 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
+/**
+ * This endpoint (GET /api/invites/id]) is used to get information about an invite sent to a user
+ * Information including the person who created the invite and the project to which the user was invited to
+ *
+ * @param _ The HTTP request
+ * @param id The invite DI
+ * @returns An error response if the invite is invalid, otherwise returns an OK response with data about the invite
+ */
 export async function GET(_: Request, { params: { id } }: InviteIdParams) {
     const session = await getSession();
     if (!session) {
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
     const supabase = getServiceSupabase();
+    // Get information about the invitation
     const { data: inviteData, error: inviteError } = await supabase
         .from("project_invite_link")
         .select("*, profile!inner(first_name, last_name)")
@@ -24,11 +33,13 @@ export async function GET(_: Request, { params: { id } }: InviteIdParams) {
         return badRequestResponse({ success: false, data: "Invalid invite link provided" });
     }
 
+    // Get info about the project the user was invited into
     const projectQuery = supabase
         .from("project")
         .select("*")
         .eq("project_id", inviteData.project_id)
         .single();
+    // Get info about the user who created the invite
     const inviterQuery = supabase
         .from("profile")
         .select("*")

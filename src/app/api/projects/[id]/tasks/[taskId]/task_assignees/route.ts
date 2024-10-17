@@ -8,6 +8,9 @@ import { getServiceSupabase } from "@/utils/supabase/server";
 import { Assignee } from "@/utils/types";
 import { TaskIdParams } from "./types";
 
+/**
+ * Set the assignees of a task
+ */
 export async function POST(request: Request, { params: { id, taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {

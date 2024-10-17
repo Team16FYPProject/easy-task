@@ -1,7 +1,12 @@
 import { getServerSupabase } from "@/utils/supabase/server";
 
+/**
+ * Creates an account for a user
+ * @param request The HTTP request
+ */
 export async function POST(request: Request) {
     const { firstName, lastName, email, password } = await request.json();
+    // Basic validation
     if (!firstName) {
         return Response.json(
             { success: false, data: "Please enter your first name" },

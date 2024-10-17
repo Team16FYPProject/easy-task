@@ -6,6 +6,9 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
+/**
+ * Get all the user's notifications
+ */
 export async function GET() {
     const { user } = await getSession();
     if (!user) {

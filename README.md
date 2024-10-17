@@ -2,16 +2,16 @@
 
 The project, “Easy Task” uses the following technologies:
 
-- Typescript
-- NextJS
-- ReactJS
-- Material UI (MUI)
-- Suapbase
-- Postgresql DB
-- GitHub
-- Vercel
-  This guide will walk you through all the necessary steps required to set up the project and deploy it to a working
-  environment.
+-   Typescript
+-   NextJS
+-   ReactJS
+-   Material UI (MUI)
+-   Suapbase
+-   Postgresql DB
+-   GitHub
+-   Vercel
+    This guide will walk you through all the necessary steps required to set up the project and deploy it to a working
+    environment.
 
 # Database
 

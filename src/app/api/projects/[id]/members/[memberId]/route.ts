@@ -7,6 +7,13 @@ import {
 } from "@/utils/server/server.responses.utils";
 import { getServiceSupabase } from "@/utils/supabase/server";
 
+/**
+ * Remove a member from a project
+ *
+ * @param request The HTTP request
+ * @param id The project id
+ * @param memberId The member id
+ */
 export async function DELETE(request: Request, { params: { id, memberId } }: MemberIdParams) {
     const session = await getSession();
     if (!session) {
@@ -15,6 +22,7 @@ export async function DELETE(request: Request, { params: { id, memberId } }: Mem
 
     const serviceSupabase = getServiceSupabase();
 
+    // Unassign the member from all their tasks
     const { data: assigneeData, error: assigneeError } = await serviceSupabase
         .from("task_assignee")
         .select("task!inner(project_id, task_id)")
@@ -42,6 +50,7 @@ export async function DELETE(request: Request, { params: { id, memberId } }: Mem
         });
     }
 
+    // Delete the member from the project
     const { error } = await serviceSupabase
         .from("project_member")
         .delete()

@@ -3,6 +3,9 @@ import { badRequestResponse, okResponse } from "@/utils/server/server.responses.
 import { getServiceSupabase } from "@/utils/supabase/server";
 import { DashboardResponse, Project, ProjectTask } from "@/utils/types";
 
+/**
+ * Get the user's projects and tasks for the dashboard page
+ */
 export async function GET() {
     const { user } = await getSession();
 

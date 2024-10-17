@@ -11,6 +11,9 @@ import {
     increaseAchievementProgress,
 } from "@/utils/server/achievements.utils";
 
+/**
+ * Get all information about a task
+ */
 export async function GET(_: Request, { params: { taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {
@@ -29,17 +32,16 @@ export async function GET(_: Request, { params: { taskId } }: TaskIdParams) {
     return okResponse({ success: true, data: data });
 }
 
+/**
+ * Modify a task's details/data
+ */
 export async function PATCH(request: Request, { params: { taskId } }: TaskIdParams) {
-    console.log("PATCH function called with taskId:", taskId);
-
     const { user } = await getSession();
     if (!user) {
-        console.log("Unauthorized access attempt");
         return unauthorizedResponse({ success: false, data: "Unauthorized" });
     }
 
     const data = await request.json();
-    console.log("Received data:", data);
 
     const supabase = getServiceSupabase();
 
@@ -94,22 +96,6 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
                 }
             }
         }
-
-        console.log("Update successful. Updated data:", updateData);
-
-        // Merge user information and reminders with tasks
-        // const taskWithDetails = {
-        //     ...updateData,
-        //     assignees: updateData.assignees?.map((assignee: any) => ({
-        //         ...assignee,
-        //         user: {
-        //             email: assignee.profile.email,
-        //             name: assignee.profile.first_name + " " + assignee.profile.last_name,
-        //         },
-        //     })),
-        //     // reminders: updateData.reminders || [], // Attach reminders
-        // };
-
         return okResponse({ success: true, data: updateData });
     } catch (error) {
         console.error("Unexpected error:", error);
@@ -117,6 +103,9 @@ export async function PATCH(request: Request, { params: { taskId } }: TaskIdPara
     }
 }
 
+/**
+ * Delete a task
+ */
 export async function DELETE(_: Request, { params: { taskId } }: TaskIdParams) {
     const { user } = await getSession();
     if (!user) {
